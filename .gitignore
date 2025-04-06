@@ -33,3 +33,5 @@ yarn-error.log*
 # Vite cache
 .temp/
 .cache/
+
+*storybook.log
