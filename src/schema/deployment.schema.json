@@ -1,0 +1,195 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/deployment.schema.json",
+  "title": "DeploymentConfig",
+  "description": "Schema for validating API deployment configurations",
+  "definitions": {
+    "DeploymentConfig": {
+      "type": "object",
+      "required": ["name", "environment", "target"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the deployment configuration"
+        },
+        "environment": {
+          "type": "string",
+          "enum": ["development", "staging", "production"],
+          "description": "Deployment environment"
+        },
+        "target": {
+          "type": "string",
+          "enum": ["aws", "azure", "gcp", "on-premise", "docker"],
+          "description": "Deployment target platform"
+        },
+        "deploymentId": {
+          "type": "string",
+          "description": "Unique identifier for the deployment"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the deployment configuration"
+        },
+        "region": {
+          "type": "string",
+          "description": "Target region for cloud deployments"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Base URL for the deployed API"
+        },
+        "aws": {
+          "type": "object",
+          "description": "AWS-specific configuration",
+          "properties": {
+            "lambda": {
+              "type": "object",
+              "description": "AWS Lambda configuration",
+              "properties": {
+                "memorySize": {
+                  "type": "number",
+                  "description": "Memory size in MB"
+                },
+                "timeout": {
+                  "type": "number",
+                  "description": "Timeout in seconds"
+                }
+              }
+            },
+            "apiGateway": {
+              "type": "object",
+              "description": "API Gateway configuration",
+              "properties": {
+                "stageName": {
+                  "type": "string",
+                  "description": "Deployment stage name"
+                }
+              }
+            }
+          }
+        },
+        "azure": {
+          "type": "object",
+          "description": "Azure-specific configuration",
+          "properties": {
+            "functionApp": {
+              "type": "object",
+              "description": "Azure Function App configuration",
+              "properties": {
+                "plan": {
+                  "type": "string",
+                  "description": "App service plan"
+                }
+              }
+            }
+          }
+        },
+        "gcp": {
+          "type": "object",
+          "description": "Google Cloud-specific configuration",
+          "properties": {
+            "cloudFunction": {
+              "type": "object",
+              "description": "Cloud Function configuration",
+              "properties": {
+                "memory": {
+                  "type": "string",
+                  "description": "Memory allocation"
+                }
+              }
+            }
+          }
+        },
+        "docker": {
+          "type": "object",
+          "description": "Docker-specific configuration",
+          "properties": {
+            "image": {
+              "type": "string",
+              "description": "Docker image name"
+            },
+            "port": {
+              "type": "number",
+              "description": "Exposed port"
+            }
+          }
+        },
+        "scaling": {
+          "type": "object",
+          "description": "Scaling configuration",
+          "properties": {
+            "minInstances": {
+              "type": "number",
+              "description": "Minimum number of instances"
+            },
+            "maxInstances": {
+              "type": "number",
+              "description": "Maximum number of instances"
+            }
+          }
+        },
+        "monitoring": {
+          "type": "object",
+          "description": "Monitoring configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether monitoring is enabled"
+            },
+            "alerts": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MonitoringAlert"
+              },
+              "description": "List of monitoring alerts"
+            }
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        }
+      }
+    },
+    "MonitoringAlert": {
+      "type": "object",
+      "required": ["name", "metric", "threshold"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Alert name"
+        },
+        "metric": {
+          "type": "string",
+          "description": "Metric to monitor"
+        },
+        "threshold": {
+          "type": "number",
+          "description": "Threshold value"
+        },
+        "operator": {
+          "type": "string",
+          "enum": ["gt", "lt", "eq"],
+          "default": "gt",
+          "description": "Comparison operator"
+        },
+        "period": {
+          "type": "string",
+          "description": "Evaluation period"
+        },
+        "action": {
+          "type": "string",
+          "description": "Action to take when triggered"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/api-config.schema.json",
+  "title": "APIConfig",
+  "description": "Schema for validating API configurations",
+  "type": "object",
+  "required": ["name", "version", "entities"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the API"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "API version (semver)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the API"
+    },
+    "basePath": {
+      "type": "string",
+      "description": "Base path for API endpoints"
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "$ref": "https://example.com/entity.schema.json#/definitions/ApiEntity"
+      },
+      "description": "List of API entities"
+    },
+    "security": {
+      "$ref": "https://example.com/security.schema.json#/definitions/ApiSecurity",
+      "description": "Security configuration"
+    },
+    "deployment": {
+      "type": "array",
+      "items": {
+        "$ref": "https://example.com/deployment.schema.json#/definitions/DeploymentConfig"
+      },
+      "description": "Deployment configurations"
+    },
+    "datasource": {
+      "type": "object",
+      "description": "Data source configuration",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["postgres", "mysql", "mongodb", "rest", "graphql"],
+          "description": "Data source type"
+        },
+        "connection": {
+          "type": "object",
+          "description": "Connection details",
+          "properties": {
+            "url": {
+              "type": "string",
+              "description": "Connection URL"
+            },
+            "host": {
+              "type": "string",
+              "description": "Database host"
+            },
+            "port": {
+              "type": "number",
+              "description": "Database port"
+            },
+            "database": {
+              "type": "string",
+              "description": "Database name"
+            },
+            "username": {
+              "type": "string",
+              "description": "Database username"
+            },
+            "password": {
+              "type": "string",
+              "description": "Database password"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "type": "object",
+      "description": "Shared components",
+      "properties": {
+        "schemas": {
+          "type": "object",
+          "description": "Shared schemas",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "responses": {
+          "type": "object",
+          "description": "Shared responses",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Shared parameters",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "cicd": {
+      "type": "object",
+      "description": "CI/CD configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether CI/CD is enabled"
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["build", "test", "deploy", "release"]
+          },
+          "description": "CI/CD pipeline stages"
+        }
+      }
+    },
+    "documentation": {
+      "type": "object",
+      "description": "Documentation configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether documentation is enabled"
+        },
+        "format": {
+          "type": "string",
+          "enum": ["openapi", "asyncapi", "markdown"],
+          "description": "Documentation format"
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    }
+  }
+}

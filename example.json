@@ -1,0 +1,150 @@
+{
+  "Api": {
+    "entities": [
+      {
+        "name": "User",
+        "description": "System user with authentication details",
+        "attributes": [
+          {
+            "name": "id",
+            "type": "string",
+            "format": "date-time",
+            "required": true,
+            "description": "Unique identifier"
+          },
+          {
+            "name": "username",
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 30,
+            "required": true,
+            "description": "Unique username"
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "format": "email",
+            "required": true,
+            "description": "User's email address"
+          },
+          {
+            "name": "roles",
+            "type": "array",
+            "items": "string",
+            "description": "User roles"
+          }
+        ],
+        "relationships": [
+          {
+            "type": "oneToMany",
+            "target": "Post",
+            "name": "posts",
+            "description": "Posts created by this user"
+          }
+        ],
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/users",
+            "description": "List all users",
+            "responses": {
+              "200": {
+                "description": "Successful operation",
+                "contentType": "application/json",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/users",
+            "description": "Create new user",
+            "request": {
+              "contentType": "application/json",
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            },
+            "responses": {
+              "201": {
+                "description": "User created successfully"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Post",
+        "description": "Blog post content",
+        "attributes": [
+          {
+            "name": "id",
+            "type": "string",
+            "format": "uuid",
+            "required": true,
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          {
+            "name": "title",
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 100,
+            "required": true
+          },
+          {
+            "name": "content",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "published",
+            "type": "boolean",
+            "default": false
+          }
+        ],
+        "relationships": [
+          {
+            "type": "manyToOne",
+            "target": "User",
+            "name": "author",
+            "description": "Post author"
+          }
+        ]
+      }
+    ],
+    "security": {
+      "jwt": {
+        "secret": "super-secret-key",
+        "expiresIn": "1h"
+      },
+      "roles": {
+        "hierarchy": ["admin", "editor", "user"]
+      }
+    },
+    "components": {
+      "schemas": {
+        "User": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "username": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        }
+      }
+    }
+  }
+}

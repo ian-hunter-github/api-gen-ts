@@ -1,0 +1,192 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/security.schema.json",
+  "title": "APISecurity",
+  "description": "Schema for validating API security configuration",
+  "definitions": {
+    "ApiSecurity": {
+      "type": "object",
+      "required": ["authentication"],
+      "properties": {
+        "authentication": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["none", "basic", "jwt", "oauth2", "api-key"],
+              "description": "Authentication type"
+            },
+            "jwt": {
+              "type": "object",
+              "description": "JWT configuration",
+              "properties": {
+                "issuer": {
+                  "type": "string",
+                  "description": "JWT issuer"
+                },
+                "audience": {
+                  "type": "string",
+                  "description": "JWT audience"
+                },
+                "secret": {
+                  "type": "string",
+                  "description": "JWT secret key"
+                },
+                "expiresIn": {
+                  "type": "string",
+                  "description": "Token expiration time"
+                }
+              }
+            },
+            "oauth2": {
+              "type": "object",
+              "description": "OAuth2 configuration",
+              "properties": {
+                "authorizationUrl": {
+                  "type": "string",
+                  "description": "OAuth2 authorization URL"
+                },
+                "tokenUrl": {
+                  "type": "string",
+                  "description": "OAuth2 token URL"
+                },
+                "scopes": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Available OAuth2 scopes"
+                }
+              }
+            },
+            "apiKey": {
+              "type": "object",
+              "description": "API key configuration",
+              "properties": {
+                "header": {
+                  "type": "string",
+                  "description": "Header name for API key"
+                },
+                "queryParam": {
+                  "type": "string",
+                  "description": "Query parameter name for API key"
+                }
+              }
+            }
+          }
+        },
+        "authorization": {
+          "type": "object",
+          "description": "Authorization configuration",
+          "properties": {
+            "roles": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SecurityRole"
+              },
+              "description": "List of security roles"
+            },
+            "policies": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SecurityPolicy"
+              },
+              "description": "List of security policies"
+            }
+          }
+        },
+        "cors": {
+          "type": "object",
+          "description": "CORS configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether CORS is enabled"
+            },
+            "origins": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Allowed origins"
+            },
+            "methods": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Allowed HTTP methods"
+            },
+            "headers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Allowed headers"
+            }
+          }
+        }
+      }
+    },
+    "SecurityRole": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Role name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Role description"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of permissions"
+        }
+      }
+    },
+    "SecurityPolicy": {
+      "type": "object",
+      "required": ["name", "effect", "actions"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Policy name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Policy description"
+        },
+        "effect": {
+          "type": "string",
+          "enum": ["allow", "deny"],
+          "description": "Policy effect"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of actions"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of resources"
+        },
+        "conditions": {
+          "type": "object",
+          "description": "Policy conditions"
+        }
+      }
+    }
+  }
+}

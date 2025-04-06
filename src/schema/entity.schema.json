@@ -1,0 +1,204 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/entity.schema.json",
+  "title": "APIEntity",
+  "description": "Schema for validating API entities",
+  "definitions": {
+    "ApiEntity": {
+      "type": "object",
+      "required": ["name", "attributes"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the entity"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the entity"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EntityAttribute"
+          },
+          "description": "List of entity attributes"
+        },
+        "relationships": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EntityRelationship"
+          },
+          "description": "List of entity relationships"
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EntityEndpoint"
+          },
+          "description": "List of entity endpoints"
+        }
+      }
+    },
+    "EntityAttribute": {
+      "type": "object",
+      "required": ["name", "type"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the attribute"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "date", "datetime", "object", "array"],
+          "description": "Type of the attribute"
+        },
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the attribute is required"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the attribute"
+        },
+        "default": {
+          "description": "Default value for the attribute"
+        },
+        "validation": {
+          "type": "object",
+          "description": "Validation rules for the attribute",
+          "properties": {
+            "minLength": {
+              "type": "number",
+              "description": "Minimum length for string values"
+            },
+            "maxLength": {
+              "type": "number",
+              "description": "Maximum length for string values"
+            },
+            "pattern": {
+              "type": "string",
+              "description": "Regex pattern for string values"
+            },
+            "minimum": {
+              "type": "number",
+              "description": "Minimum value for number values"
+            },
+            "maximum": {
+              "type": "number",
+              "description": "Maximum value for number values"
+            }
+          }
+        }
+      }
+    },
+    "EntityRelationship": {
+      "type": "object",
+      "required": ["name", "type", "target"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the relationship"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["one-to-one", "one-to-many", "many-to-one", "many-to-many"],
+          "description": "Type of relationship"
+        },
+        "target": {
+          "type": "string",
+          "description": "Name of the target entity"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the relationship"
+        },
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the relationship is required"
+        }
+      }
+    },
+    "EntityEndpoint": {
+      "type": "object",
+      "required": ["path", "method"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Endpoint path"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+          "description": "HTTP method"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the endpoint"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EndpointParameter"
+          },
+          "description": "List of endpoint parameters"
+        },
+        "responses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EndpointResponse"
+          },
+          "description": "List of endpoint responses"
+        }
+      }
+    },
+    "EndpointParameter": {
+      "type": "object",
+      "required": ["name", "in", "type"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the parameter"
+        },
+        "in": {
+          "type": "string",
+          "enum": ["query", "path", "header", "body"],
+          "description": "Location of the parameter"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "array", "object"],
+          "description": "Type of the parameter"
+        },
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the parameter is required"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the parameter"
+        }
+      }
+    },
+    "EndpointResponse": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "number",
+          "description": "HTTP status code"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the response"
+        },
+        "schema": {
+          "type": "object",
+          "description": "Response schema"
+        }
+      }
+    }
+  }
+}
