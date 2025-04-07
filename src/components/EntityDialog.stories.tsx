@@ -54,7 +54,20 @@ export const WithManyAttributes: Story = {
         { name: 'age', type: 'number', required: false },
         { name: 'createdAt', type: 'date', required: false },
         { name: 'updatedAt', type: 'date', required: false },
-        { name: 'isActive', type: 'boolean', required: false }
+        { name: 'isActive', type: 'boolean', required: false },
+        { name: 'address', type: 'string', required: false },
+        { name: 'phone', type: 'string', required: false },
+        { name: 'birthDate', type: 'date', required: false },
+        { name: 'gender', type: 'string', required: false },
+        { name: 'salary', type: 'number', required: false },
+        { name: 'department', type: 'string', required: true },
+        { name: 'position', type: 'string', required: true },
+        { name: 'startDate', type: 'date', required: true },
+        { name: 'endDate', type: 'date', required: false },
+        { name: 'manager', type: 'string', required: false },
+        { name: 'status', type: 'string', required: true },
+        { name: 'notes', type: 'text', required: false },
+        { name: 'avatar', type: 'string', required: false }
       ]
     }
   }

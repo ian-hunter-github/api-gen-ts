@@ -1,4 +1,5 @@
-import { EntityAttribute } from './attributes';
+import type { EntityAttribute } from './attributes';
+export type { EntityAttribute };
 import { EntityRelationship } from './relationships';
 import { EntityEndpoint } from './endpoints';
 
