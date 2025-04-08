@@ -34,8 +34,24 @@
 }
 
 .tab.active {
-  border-color: #ddd;
-  border-bottom-color: white;
+  background-color: #4a6bff;
+  color: #fff;
+  font-weight: 800;
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  border: none;
+  box-shadow: 0 2px 8px rgba(74, 107, 255, 0.3);
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+  border-bottom: 3px solid #1a3eff;
+}
+
+.tab.active:hover {
+  background-color: #3a5bef;
+}
+
+.tab.active::after {
+  content: none;
 }
 
 .tab.add-tab {

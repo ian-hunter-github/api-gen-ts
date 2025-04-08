@@ -13,6 +13,7 @@ export type ApiConfig = {
   id: string;
   name: string;
   description?: string;
+  isDemo?: boolean;
   version: string;
   entities: ApiEntity[];
   security: ApiSecurity;

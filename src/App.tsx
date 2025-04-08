@@ -1,25 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ApiConfigEditor } from './components/ApiConfigEditor';
 import { ApiConfig } from './types/api.types';
+import { demoStore } from './stores/demoStore';
 import './App.css';
 
 function App() {
-  const [tabs, setTabs] = useState([{
-    id: 1,
-    title: 'Configuration 1',
-    config: {
-      id: 'config-1',
-      name: 'API Configuration',
-      description: '',
-      version: '1.0.0',
-      entities: [],
-      security: {
-        authentication: {
-          type: 'none'
+  const [tabs, setTabs] = useState<Array<{
+    id: number;
+    title: string;
+    config: ApiConfig;
+  }>>([]);
+
+  useEffect(() => {
+    // Initialize with demo data in development
+    if (import.meta.env.DEV) {
+      setTabs(demoStore.map((config, index) => ({
+        id: index + 1,
+        title: config.name,
+        config
+      })));
+    } else {
+      // Initialize with empty config in production
+      setTabs([{
+        id: 1,
+        title: 'New Configuration',
+        config: {
+          id: 'config-1',
+          name: 'API Configuration',
+          description: '',
+          version: '1.0.0',
+          entities: [],
+          security: {
+            authentication: {
+              type: 'none'
+            }
+          }
         }
-      }
-    } as ApiConfig
-  }]);
+      }]);
+    }
+  }, []);
   const [activeTab, setActiveTab] = useState(1);
 
   const addNewTab = () => {

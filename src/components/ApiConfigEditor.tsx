@@ -22,7 +22,14 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
   const [changes, setChanges] = useState<Set<string>>(new Set());
   const [errors, setErrors] = useState<Set<string>>(new Set());
   const [editMode, setEditMode] = useState<boolean>(false);
-  const [theme, setTheme] = useState<'summerfruit:inverted' | 'monokai' | 'solarized' | 'bright'>('summerfruit:inverted');
+  const [theme, setTheme] = useState<
+    'summerfruit:inverted' | 'monokai' | 'solarized' | 'bright' | 
+    'apathy:inverted' | 'ashes' | 'bespin' | 'brewer' | 'chalk' | 'codeschool' |
+    'colors' | 'eighties' | 'embers' | 'flat' | 'google' | 'grayscale' | 
+    'greenscreen' | 'harmonic' | 'hopscotch' | 'isotope' | 'marrakesh' | 
+    'mocha' | 'ocean' | 'paraiso' | 'pop' | 'railscasts' | 
+    'rjv-default' | 'shapeshifter' | 'tomorrow' | 'tube' | 'twilight'
+  >('summerfruit:inverted');
   const [editingEntity, setEditingEntity] = useState<ApiEntity | null>(null);
   const [isEntityDialogOpen, setIsEntityDialogOpen] = useState(false);
 
@@ -69,6 +76,11 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
     setConfig(updatedConfig);
     setChanges(prev => new Set(prev).add(name));
     validateConfig(updatedConfig);
+    
+    // Update tab title immediately when name changes
+    if (name === 'name') {
+      onSave(updatedConfig);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -168,20 +180,47 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
           <div className="json-panel">
             <div className="json-controls">
               <button 
-                className={`mode-toggle ${editMode ? 'active' : ''}`}
+                className={`mode-toggle ${editMode ? 'edit-active' : 'view-active'}`}
                 onClick={() => setEditMode(!editMode)}
               >
-                {editMode ? 'View' : 'Edit'}
+                {editMode ? '✏️ Editing JSON' : '👁️ Viewing JSON'}
               </button>
               <select
                 value={theme}
                 onChange={(e) => setTheme(e.target.value as typeof theme)}
                 className="theme-selector"
               >
-                <option value="summerfruit:inverted">Summerfruit</option>
+                <option value="summerfruit:inverted">Summerfruit (Default)</option>
                 <option value="monokai">Monokai</option>
                 <option value="solarized">Solarized</option>
                 <option value="bright">Bright</option>
+                <option value="apathy:inverted">Apathy</option>
+                <option value="ashes">Ashes</option>
+                <option value="bespin">Bespin</option>
+                <option value="brewer">Brewer</option>
+                <option value="chalk">Chalk</option>
+                <option value="codeschool">Codeschool</option>
+                <option value="colors">Colors</option>
+                <option value="eighties">Eighties</option>
+                <option value="embers">Embers</option>
+                <option value="flat">Flat</option>
+                <option value="google">Google</option>
+                <option value="grayscale">Grayscale</option>
+                <option value="greenscreen">Greenscreen</option>
+                <option value="harmonic">Harmonic</option>
+                <option value="hopscotch">Hopscotch</option>
+                <option value="isotope">Isotope</option>
+                <option value="marrakesh">Marrakesh</option>
+                <option value="mocha">Mocha</option>
+                <option value="ocean">Ocean</option>
+                <option value="paraiso">Paraiso</option>
+                <option value="pop">Pop</option>
+                <option value="railscasts">Railscasts</option>
+                <option value="rjv-default">Default</option>
+                <option value="shapeshifter">Shapeshifter</option>
+                <option value="tomorrow">Tomorrow</option>
+                <option value="tube">Tube</option>
+                <option value="twilight">Twilight</option>
               </select>
             </div>
             <ReactJson
@@ -191,9 +230,14 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
               displayDataTypes={false}
               enableClipboard={false}
               onEdit={editMode ? (edit) => {
-                setConfig(edit.updated_src as ApiConfig);
+                const updatedConfig = edit.updated_src as ApiConfig;
+                setConfig(updatedConfig);
                 setChanges(prev => new Set(prev).add('json'));
-                validateConfig(edit.updated_src as ApiConfig);
+                validateConfig(updatedConfig);
+                // Update tab title if name changed in JSON editor
+                if (edit.name === 'name' || (edit.name === 'root' && 'name' in updatedConfig)) {
+                  onSave(updatedConfig);
+                }
               } : false}
               style={{
                 backgroundColor: 'transparent',
