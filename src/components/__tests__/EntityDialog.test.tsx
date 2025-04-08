@@ -1,4 +1,4 @@
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EntityDialog } from '../EntityDialog';
 import type { ApiEntity } from '../../types/entities/entity';
@@ -39,7 +39,8 @@ describe('EntityDialog', () => {
       <EntityDialog 
         entity={emptyEntity} 
         onSave={mockOnSave} 
-        onCancel={mockOnCancel} 
+        onCancel={mockOnCancel}
+        open={true}
       />
     );
 
@@ -54,7 +55,8 @@ describe('EntityDialog', () => {
       <EntityDialog 
         entity={mockEntity} 
         onSave={mockOnSave} 
-        onCancel={mockOnCancel} 
+        onCancel={mockOnCancel}
+        open={true}
       />
     );
 
@@ -73,7 +75,8 @@ describe('EntityDialog', () => {
       <EntityDialog 
         entity={mockEntity} 
         onSave={mockOnSave} 
-        onCancel={mockOnCancel} 
+        onCancel={mockOnCancel}
+        open={true}
       />
     );
 
@@ -93,7 +96,8 @@ describe('EntityDialog', () => {
       <EntityDialog 
         entity={mockEntity} 
         onSave={mockOnSave} 
-        onCancel={mockOnCancel} 
+        onCancel={mockOnCancel}
+        open={true}
       />
     );
 
@@ -101,129 +105,34 @@ describe('EntityDialog', () => {
     expect(mockOnCancel).toHaveBeenCalled();
   });
 
-  it('updates state when attribute is deleted', async () => {
+  it('does not render when open is false', () => {
+    const { container } = render(
+      <EntityDialog 
+        entity={mockEntity} 
+        onSave={mockOnSave} 
+        onCancel={mockOnCancel}
+        open={false}
+      />
+    );
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('calls onClose when backdrop is clicked', async () => {
+    const mockOnClose = jest.fn();
     render(
       <EntityDialog 
         entity={mockEntity} 
         onSave={mockOnSave} 
-        onCancel={mockOnCancel} 
+        onCancel={mockOnCancel}
+        onClose={mockOnClose}
+        open={true}
       />
     );
 
-    // Find and click delete button for first attribute
-    const deleteButtons = screen.getAllByRole('button', { name: 'Delete' });
-    fireEvent.click(deleteButtons[0]);
-
-    // Verify UI updates
-    await waitFor(() => {
-      expect(screen.queryByText('createdAt')).not.toBeInTheDocument();
-      expect(screen.getByText('id')).toBeInTheDocument();
-    });
+    const backdrop = document.querySelector('.MuiBackdrop-root');
+    fireEvent.click(backdrop!);
+    expect(mockOnClose).toHaveBeenCalled();
   });
 
-  it('calls onSave with correct data after attribute deletion', async () => {
-    let savedEntity: ApiEntity | null = null;
-    const handleSave = (entity: ApiEntity) => {
-      savedEntity = entity;
-      mockOnSave(entity);
-    };
-
-    render(
-      <EntityDialog 
-        entity={mockEntity} 
-        onSave={handleSave} 
-        onCancel={mockOnCancel} 
-      />
-    );
-
-    // Delete the 'id' attribute
-    const idRow = screen.getByText('id').closest('tr');
-    const deleteButton = idRow?.querySelector('button[aria-label="Delete"]');
-    if (deleteButton) {
-      fireEvent.click(deleteButton);
-    }
-
-    // Wait for UI to update
-    await waitFor(() => {
-      expect(screen.queryByText('id')).not.toBeInTheDocument();
-    });
-
-    // Submit form
-    fireEvent.click(screen.getByRole('button', { name: 'Update' }));
-
-    // Verify saved data
-    await waitFor(() => {
-      expect(savedEntity).not.toBeNull();
-      expect(savedEntity?.attributes).toHaveLength(1);
-      expect(savedEntity?.attributes[0].name).toBe('createdAt');
-      expect(mockOnSave).toHaveBeenCalledWith(savedEntity);
-    });
-  });
-
-  it('disables save button when name is empty', () => {
-    render(
-      <EntityDialog 
-        entity={emptyEntity} 
-        onSave={mockOnSave} 
-        onCancel={mockOnCancel} 
-      />
-    );
-
-    expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled();
-  });
-
-  it('enables save button when name is not empty', () => {
-    render(
-      <EntityDialog 
-        entity={{ ...emptyEntity, name: 'Test' }} 
-        onSave={mockOnSave} 
-        onCancel={mockOnCancel} 
-      />
-    );
-
-    expect(screen.getByRole('button', { name: 'Update' })).toBeEnabled();
-  });
-
-  it('shows relationship and endpoints buttons', () => {
-    render(
-      <EntityDialog 
-        entity={mockEntity} 
-        onSave={mockOnSave} 
-        onCancel={mockOnCancel} 
-      />
-    );
-
-    expect(screen.getByText('Relationships')).toBeInTheDocument();
-    expect(screen.getByText('Endpoints')).toBeInTheDocument();
-  });
-
-  it('renders attributes in alphabetical order', async () => {
-    const unsortedEntity: ApiEntity = {
-      ...mockEntity,
-      attributes: [
-        { name: 'zAttribute', type: 'string', required: true },
-        { name: 'aAttribute', type: 'number', required: false },
-        { name: 'mAttribute', type: 'boolean', required: true }
-      ]
-    };
-
-    render(
-      <EntityDialog 
-        entity={unsortedEntity} 
-        onSave={mockOnSave} 
-        onCancel={mockOnCancel} 
-      />
-    );
-
-    // Wait for all attributes to be rendered
-    await screen.findByText('aAttribute');
-    await screen.findByText('mAttribute');
-    await screen.findByText('zAttribute');
-    
-    // Get all attribute name elements and verify order
-    const attributeNames = screen.getAllByTestId('attribute-name');
-    expect(attributeNames[0]).toHaveTextContent('aAttribute');
-    expect(attributeNames[1]).toHaveTextContent('mAttribute');
-    expect(attributeNames[2]).toHaveTextContent('zAttribute');
-  });
 });

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Dialog, DialogTitle, DialogContent } from '@mui/material';
 import type { ApiEntity } from '../types/entities/entity';
 import type { EntityAttribute } from '../types/entities/attributes';
 import { AttributeList } from './AttributeList';
@@ -9,15 +10,20 @@ interface EntityDialogProps {
   entity: ApiEntity;
   onSave: (entity: ApiEntity) => void;
   onCancel: () => void;
+  open: boolean;
+  onClose?: () => void;
 }
 
 export const EntityDialog: React.FC<EntityDialogProps> = ({ 
   entity: initialEntity,
   onSave,
-  onCancel 
+  onCancel,
+  open = false,
+  onClose = onCancel
 }) => {
   const [entity, setEntity] = useState<ApiEntity>(initialEntity);
   const [nameError, setNameError] = useState<string>('');
+  const nameInputRef = useRef<HTMLInputElement>(null);
   const { getApi } = useApiConfigStore();
   const currentApi = getApi('current');
   const entities = currentApi?.entities || [];
@@ -38,9 +44,20 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
     }
   }, [entity.name, entities, initialEntity.name]);
 
+  useEffect(() => {
+    if (open && nameInputRef.current) {
+      // Use setTimeout to ensure focus happens after Dialog's own focus management
+      const timer = setTimeout(() => {
+        nameInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(entity);
+    onClose?.();
   };
 
   const handleAddAttribute = (attribute: EntityAttribute) => {
@@ -70,9 +87,17 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
   const isValid = entity.name.trim() !== '' && !nameError;
 
   return (
-    <div className="entity-dialog">
-      <div className="dialog-header">
-        <h2>{isEditMode ? `Edit ${initialEntity.name}` : 'Create New Entity'}</h2>
+    <Dialog 
+      open={open} 
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{
+        className: 'entity-dialog'
+      }}
+    >
+      <DialogTitle className="dialog-header">
+        {isEditMode ? `Edit ${initialEntity.name}` : 'Create New Entity'}
         <div className="dialog-header-actions">
           <button type="button" className="secondary-button">
             Relationships
@@ -81,9 +106,10 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
             Endpoints
           </button>
         </div>
-      </div>
+      </DialogTitle>
 
-      <form onSubmit={handleSubmit}>
+      <DialogContent>
+        <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="name">Name</label>
           <input
@@ -93,6 +119,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
             value={entity.name}
             onChange={handleChange}
             required
+            ref={nameInputRef}
             className={nameError ? 'error-input' : ''}
           />
           {nameError && <div className="error-message">{nameError}</div>}
@@ -115,23 +142,24 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
           onDelete={handleDeleteAttribute}
         />
 
-        <div className="dialog-actions">
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={onCancel}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="primary-button"
-            disabled={!isValid}
-          >
-            {isEditMode ? 'Update' : 'Add'}
-          </button>
-        </div>
-      </form>
-    </div>
+          <div className="dialog-actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={onCancel}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="primary-button"
+              disabled={!isValid}
+            >
+              {isEditMode ? 'Update' : 'Add'}
+            </button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

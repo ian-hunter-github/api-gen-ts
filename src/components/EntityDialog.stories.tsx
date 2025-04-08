@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Button } from '@mui/material';
 import { EntityDialog } from './EntityDialog';
 import type { Meta, StoryObj } from '@storybook/react';
 import type { ApiEntity } from '../types/entities/entity';
@@ -7,8 +9,13 @@ const meta: Meta<typeof EntityDialog> = {
   component: EntityDialog,
   tags: ['autodocs'],
   argTypes: {
+    open: { control: 'boolean' },
     onSave: { action: 'saved' },
-    onCancel: { action: 'cancelled' }
+    onCancel: { action: 'cancelled' },
+    onClose: { action: 'closed' }
+  },
+  args: {
+    open: true
   }
 };
 
@@ -33,13 +40,15 @@ const emptyEntity: ApiEntity = {
 
 export const CreateMode: Story = {
   args: {
-    entity: emptyEntity
+    entity: emptyEntity,
+    open: true
   }
 };
 
 export const EditMode: Story = {
   args: {
-    entity: mockEntity
+    entity: mockEntity,
+    open: true
   }
 };
 
@@ -69,6 +78,31 @@ export const WithManyAttributes: Story = {
         { name: 'notes', type: 'text', required: false },
         { name: 'avatar', type: 'string', required: false }
       ]
-    }
+    },
+    open: true
+  }
+};
+
+const Template: Story['render'] = (args) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <Button variant="contained" onClick={() => setIsOpen(true)}>
+        Open Entity Dialog
+      </Button>
+      <EntityDialog
+        {...args}
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        onCancel={() => setIsOpen(false)}
+      />
+    </>
+  );
+};
+
+export const WithModalControls: Story = {
+  render: Template,
+  args: {
+    entity: mockEntity
   }
 };
