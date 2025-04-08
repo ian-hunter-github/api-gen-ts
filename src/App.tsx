@@ -1,35 +1,109 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { ApiConfigEditor } from './components/ApiConfigEditor';
+import { ApiConfig } from './types/api.types';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [tabs, setTabs] = useState([{
+    id: 1,
+    title: 'Configuration 1',
+    config: {
+      id: 'config-1',
+      name: 'API Configuration',
+      description: '',
+      version: '1.0.0',
+      entities: [],
+      security: {
+        authentication: {
+          type: 'none'
+        }
+      }
+    } as ApiConfig
+  }]);
+  const [activeTab, setActiveTab] = useState(1);
+
+  const addNewTab = () => {
+    const newTabId = Math.max(...tabs.map(tab => tab.id), 0) + 1;
+    setTabs([...tabs, {
+      id: newTabId,
+      title: `Configuration ${newTabId}`,
+      config: {
+        id: `config-${newTabId}`,
+        name: `API Configuration ${newTabId}`,
+        description: '',
+        version: '1.0.0',
+        entities: [],
+        security: {
+          authentication: {
+            type: 'none'
+          }
+        }
+      } as ApiConfig
+    }]);
+    setActiveTab(newTabId);
+  };
+
+  const removeTab = (id: number) => {
+    if (tabs.length <= 1) return;
+    const newTabs = tabs.filter(tab => tab.id !== id);
+    setTabs(newTabs);
+    if (activeTab === id) {
+      setActiveTab(newTabs[newTabs.length - 1].id);
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app-container">
+      <header className="app-header">
+        <h1>API Configuration Editor</h1>
+      </header>
+
+      <div className="tab-container">
+        <div className="tab-header">
+          {tabs.map(tab => (
+            <div
+              key={tab.id}
+              className={`tab ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+              onDoubleClick={() => removeTab(tab.id)}
+            >
+              {tab.title}
+            </div>
+          ))}
+          <div className="tab add-tab" onClick={addNewTab}>
+            +
+          </div>
+        </div>
+
+        <div className="panel-content">
+          {tabs.map(tab => (
+            <div
+              key={tab.id}
+              style={{ display: activeTab === tab.id ? 'block' : 'none' }}
+            >
+              <ApiConfigEditor 
+                config={tab.config}
+                onSave={(updatedConfig) => {
+                  setTabs(tabs.map(t => 
+                    t.id === tab.id 
+                      ? { ...t, config: updatedConfig, title: updatedConfig.name } 
+                      : t
+                  ));
+                }}
+                allConfigs={tabs.map(t => t.config)}
+              />
+            </div>
+          ))}
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      <footer className="app-footer">
+        <div className="copyright">
+          © {new Date().getFullYear()} API Generator
+        </div>
+      </footer>
+    </div>
+  );
 }
 
-export default App
+export default App;

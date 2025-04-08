@@ -1,4 +1,4 @@
-./gitlogshsh#!/bin/bash
+#!/bin/bash
 
 # Get number of commits to show (default 10)
 count=${1:-10}
