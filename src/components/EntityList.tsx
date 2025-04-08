@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import type { ApiEntity } from '../types/entities/entity';
 import './EntityList.css';
 
@@ -9,15 +9,17 @@ interface EntityListProps {
   onEdit: (entity: ApiEntity) => void;
   onDelete: (entityName: string) => void;
   selectedEntity?: ApiEntity;
+  changedEntities: Set<string>;
 }
 
-export const EntityList: React.FC<EntityListProps> = ({ 
+const EntityListComponent: React.FC<EntityListProps> = ({
   entities,
   onSelect,
   onAdd,
   onEdit,
   onDelete,
-  selectedEntity
+  selectedEntity,
+  changedEntities
 }) => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
@@ -30,6 +32,7 @@ export const EntityList: React.FC<EntityListProps> = ({
   const toggleSort = () => {
     setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
   };
+
   return (
     <div className="entity-list">
       <div className="entity-list-header">
@@ -64,9 +67,11 @@ export const EntityList: React.FC<EntityListProps> = ({
           <tbody>
             {sortedEntities.map((entity) => (
               <tr 
-                key={entity.name}
-                className={selectedEntity?.name === entity.name ? 'selected' : ''}
+                key={entity.name} 
                 onClick={() => onSelect(entity)}
+                className={`${selectedEntity?.name === entity.name ? 'selected' : ''} ${
+                  changedEntities.has(entity.name) ? 'changed' : ''
+                }`}
               >
                 <td data-testid="entity-name">{entity.name}</td>
                 <td>{entity.description || '-'}</td>
@@ -95,3 +100,15 @@ export const EntityList: React.FC<EntityListProps> = ({
     </div>
   );
 };
+
+const areEqual = (prevProps: EntityListProps, nextProps: EntityListProps) => {
+  return (
+    prevProps.entities.length === nextProps.entities.length &&
+    prevProps.entities.every((entity, i) => 
+      entity.name === nextProps.entities[i].name
+    )
+  );
+};
+
+export const EntityList = memo(EntityListComponent, areEqual);
+export const MemoizedEntityList = EntityList;

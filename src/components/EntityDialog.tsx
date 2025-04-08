@@ -21,8 +21,11 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
   open = false,
   onClose = onCancel
 }) => {
+  console.log('EntityDialog rendering - open:', open);
   const [entity, setEntity] = useState<ApiEntity>(initialEntity);
   const [nameError, setNameError] = useState<string>('');
+  const [changedAttributes, setChangedAttributes] = useState<Set<string>>(new Set());
+  const [changedFields, setChangedFields] = useState<Set<string>>(new Set());
   const nameInputRef = useRef<HTMLInputElement>(null);
   const { getApi } = useApiConfigStore();
   const currentApi = getApi('current');
@@ -30,6 +33,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setEntity(prev => ({ ...prev, [name]: value }));
+    setChangedFields(prev => new Set(prev).add(name));
   };
 
   useEffect(() => {
@@ -45,6 +49,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
   }, [entity.name, entities, initialEntity.name]);
 
   useEffect(() => {
+    console.log('EntityDialog useEffect - open changed to:', open);
     if (open && nameInputRef.current) {
       // Use setTimeout to ensure focus happens after Dialog's own focus management
       const timer = setTimeout(() => {
@@ -56,15 +61,23 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('EntityDialog handleSubmit - saving entity');
     onSave(entity);
     onClose?.();
   };
 
   const handleAddAttribute = (attribute: EntityAttribute) => {
+    console.log('EntityDialog handleAddAttribute - adding new attribute');
+    const newAttribute = {
+      ...attribute,
+      name: `new_attribute_${Date.now()}`
+    };
     setEntity(prev => ({
       ...prev,
-      attributes: [...prev.attributes, attribute]
+      attributes: [...prev.attributes, newAttribute]
     }));
+    setChangedAttributes(prev => new Set(prev).add(newAttribute.name));
+    console.log('EntityDialog handleAddAttribute - added:', newAttribute);
   };
 
   const handleEditAttribute = (attribute: EntityAttribute) => {
@@ -74,6 +87,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
         a.name === attribute.name ? attribute : a
       )
     }));
+    setChangedAttributes(prev => new Set(prev).add(attribute.name));
   };
 
   const handleDeleteAttribute = (attributeName: string) => {
@@ -81,6 +95,11 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
       ...prev,
       attributes: prev.attributes.filter(a => a.name !== attributeName)
     }));
+    setChangedAttributes(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(attributeName);
+      return newSet;
+    });
   };
 
   const isEditMode = !!initialEntity.name;
@@ -89,7 +108,6 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
   return (
     <Dialog 
       open={open} 
-      onClose={onClose}
       maxWidth="md"
       fullWidth
       PaperProps={{
@@ -120,7 +138,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
             onChange={handleChange}
             required
             ref={nameInputRef}
-            className={nameError ? 'error-input' : ''}
+            className={`${nameError ? 'error-input' : ''} ${changedFields.has('name') ? 'changed' : ''}`}
           />
           {nameError && <div className="error-message">{nameError}</div>}
         </div>
@@ -132,6 +150,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
             name="description"
             value={entity.description || ''}
             onChange={handleChange}
+            className={changedFields.has('description') ? 'changed' : ''}
           />
         </div>
 
@@ -140,6 +159,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
           onAdd={handleAddAttribute}
           onEdit={handleEditAttribute}
           onDelete={handleDeleteAttribute}
+          changedAttributes={changedAttributes}
         />
 
           <div className="dialog-actions">

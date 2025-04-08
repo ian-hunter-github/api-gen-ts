@@ -61,3 +61,8 @@
 .attribute-table button:hover {
   background-color: #e9ecef;
 }
+
+.attribute-table tr.changed td {
+  border-left: 3px solid #ffc107;
+  background-color: #fff8e1;
+}

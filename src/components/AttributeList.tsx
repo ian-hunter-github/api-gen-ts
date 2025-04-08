@@ -7,13 +7,15 @@ interface AttributeListProps {
   onAdd: (attribute: EntityAttribute) => void;
   onEdit: (attribute: EntityAttribute) => void;
   onDelete: (attributeName: string) => void;
+  changedAttributes: Set<string>;
 }
 
 export const AttributeList = ({ 
   attributes, 
   onAdd, 
   onEdit, 
-  onDelete 
+  onDelete,
+  changedAttributes
 }: AttributeListProps) => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
@@ -32,6 +34,7 @@ export const AttributeList = ({
       <div className="attribute-list-header">
         <h3>Attributes</h3>
         <button 
+          type="button"
           className="add-button" 
           onClick={() => onAdd({
             name: '',
@@ -65,7 +68,7 @@ export const AttributeList = ({
           </thead>
           <tbody>
             {sortedAttributes.map((attr) => (
-              <tr key={attr.name}>
+              <tr key={attr.name} className={changedAttributes.has(attr.name) ? 'changed' : ''}>
                 <td data-testid="attribute-name">{attr.name}</td>
                 <td>{attr.type}</td>
                 <td>{attr.required ? 'Yes' : 'No'}</td>

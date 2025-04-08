@@ -1,9 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
+
+const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(func: F, wait: number) => {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Parameters<F>) => {
+    if (timeout !== null) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
+const InputField = memo(({
+  name,
+  value,
+  onChange,
+  label,
+  type = 'text',
+  required = false,
+  changed = false,
+  error = false,
+  errorMessage = ''
+}: {
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  label: string;
+  type?: string;
+  required?: boolean;
+  changed?: boolean;
+  error?: boolean;
+  errorMessage?: string;
+}) => (
+  <div className={`form-group ${changed ? 'changed' : ''} ${error ? 'error' : ''}`}>
+    <label htmlFor={name}>{label}</label>
+    <input
+      type={type}
+      id={name}
+      name={name}
+      value={value}
+      onChange={onChange}
+      required={required}
+    />
+    {error && <div className="error-message">{errorMessage}</div>}
+  </div>
+));
+
+const TextAreaField = memo(({
+  name,
+  value,
+  onChange,
+  label,
+  changed = false
+}: {
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  label: string;
+  changed?: boolean;
+}) => (
+  <div className={`form-group ${changed ? 'changed' : ''}`}>
+    <label htmlFor={name}>{label}</label>
+    <textarea
+      id={name}
+      name={name}
+      value={value}
+      onChange={onChange}
+    />
+  </div>
+));
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { EntityList } from './EntityList';
+import { MemoizedEntityList } from './EntityList';
 import { EntityDialog } from './EntityDialog';
 import type { ApiEntity } from '../types/entities/entity';
-import ReactJson from 'react-json-view';
+import ReactJson, { InteractionProps } from 'react-json-view';
 import type { ApiConfig } from '../types/api.types';
 import './ApiConfigEditor.css';
 
@@ -33,49 +102,35 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
   const [editingEntity, setEditingEntity] = useState<ApiEntity | null>(null);
   const [isEntityDialogOpen, setIsEntityDialogOpen] = useState(false);
 
-  const validateConfig = (currentConfig: ApiConfig) => {
+  const validateConfig = useCallback((currentConfig: ApiConfig) => {
     const newErrors = new Set<string>();
-    // Check for duplicate name+version
-    console.log('Validating config uniqueness:', {
-      currentName: currentConfig.name,
-      currentVersion: currentConfig.version,
-      currentId: currentConfig.id,
-      allConfigs: allConfigs.map(c => ({
-        id: c.id,
-        name: c.name,
-        version: c.version
-      }))
-    });
-
-    const isDuplicate = allConfigs.some(c => {
-      const isMatch = c.id !== currentConfig.id && 
-        c.name === currentConfig.name && 
-        c.version === currentConfig.version;
-      if (isMatch) {
-        console.log('Found duplicate config:', {
-          duplicateId: c.id,
-          duplicateName: c.name,
-          duplicateVersion: c.version
-        });
-      }
-      return isMatch;
-    });
+    const isDuplicate = allConfigs.some(c => 
+      c.id !== currentConfig.id && 
+      c.name === currentConfig.name && 
+      c.version === currentConfig.version
+    );
     
     if (isDuplicate) {
-      console.log('Duplicate detected - marking fields with error');
       newErrors.add('name');
       newErrors.add('version');
     }
     setErrors(newErrors);
     return newErrors.size === 0;
-  };
+  }, [allConfigs]);
+
+  const debouncedValidate = useMemo(
+    () => debounce(validateConfig, 300),
+    [validateConfig]
+  );
+
+  const memoizedConfig = useMemo(() => config, [JSON.stringify(config)]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     const updatedConfig = {...config, [name]: value};
     setConfig(updatedConfig);
     setChanges(prev => new Set(prev).add(name));
-    validateConfig(updatedConfig);
+    debouncedValidate(updatedConfig);
     
     // Update tab title immediately when name changes
     if (name === 'name') {
@@ -98,46 +153,41 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
           <div className="form-panel">
             <form onSubmit={handleSubmit}>
               <div className="form-row">
-                <div className={`form-group ${changes.has('name') ? 'changed' : ''} ${errors.has('name') ? 'error' : ''}`}>
-                  <label htmlFor="name">API Name</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={config.name}
-                    onChange={handleChange}
-                    required
-                  />
-                  {errors.has('name') && <div className="error-message">Name+Version must be unique</div>}
-                </div>
-
-                <div className={`form-group ${changes.has('version') ? 'changed' : ''} ${errors.has('version') ? 'error' : ''}`}>
-                  <label htmlFor="version">Version</label>
-                  <input
-                    type="text"
-                    id="version"
-                    name="version"
-                    value={config.version}
-                    onChange={handleChange}
-                    required
-                  />
-                  {errors.has('version') && <div className="error-message">Name+Version must be unique</div>}
-                </div>
-              </div>
-
-              <div className={`form-group ${changes.has('description') ? 'changed' : ''}`}>
-                <label htmlFor="description">Description</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={config.description || ''}
+                <InputField
+                  name="name"
+                  value={config.name}
                   onChange={handleChange}
+                  label="API Name"
+                  required
+                  changed={changes.has('name')}
+                  error={errors.has('name')}
+                  errorMessage="Name+Version must be unique"
+                />
+
+                <InputField
+                  name="version"
+                  value={config.version}
+                  onChange={handleChange}
+                  label="Version"
+                  required
+                  changed={changes.has('version')}
+                  error={errors.has('version')}
+                  errorMessage="Name+Version must be unique"
                 />
               </div>
 
-              <EntityList 
+              <TextAreaField
+                name="description"
+                value={config.description || ''}
+                onChange={handleChange}
+                label="Description"
+                changed={changes.has('description')}
+              />
+
+              <MemoizedEntityList
+                key={`${config.id}-${config.entities?.length || 0}`}
                 entities={config.entities || []}
-                onSelect={(entity) => console.log('Selected entity:', entity)}
+                onSelect={(entity: ApiEntity) => console.log('Selected entity:', entity)}
                 onAdd={() => {
                   const newEntity = {
                     name: `NewEntity${(config.entities?.length || 0) + 1}`,
@@ -150,17 +200,22 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
                   });
                   setChanges(prev => new Set(prev).add('entities'));
                 }}
-                onEdit={(entity) => {
+                onEdit={(entity: ApiEntity) => {
                   setEditingEntity(entity);
                   setIsEntityDialogOpen(true);
                 }}
-                onDelete={(entityName) => {
+                onDelete={(entityName: string) => {
                   setConfig({
                     ...config,
                     entities: (config.entities || []).filter(e => e.name !== entityName)
                   });
                   setChanges(prev => new Set(prev).add('entities'));
                 }}
+                changedEntities={new Set(
+                  changes.has('entities') 
+                    ? config.entities?.map(e => e.name) || []
+                    : []
+                )}
               />
 
               <div className="editor-actions">
@@ -224,12 +279,14 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
               </select>
             </div>
             <ReactJson
-              src={config}
+              src={memoizedConfig}
               name={false}
               theme={theme}
               displayDataTypes={false}
               enableClipboard={false}
-              onEdit={editMode ? (edit) => {
+              collapsed={1}
+              collapseStringsAfterLength={50}
+              onEdit={editMode ? debounce((edit: InteractionProps) => {
                 const updatedConfig = edit.updated_src as ApiConfig;
                 setConfig(updatedConfig);
                 setChanges(prev => new Set(prev).add('json'));
@@ -238,7 +295,7 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
                 if (edit.name === 'name' || (edit.name === 'root' && 'name' in updatedConfig)) {
                   onSave(updatedConfig);
                 }
-              } : false}
+              }, 1000) : false}
               style={{
                 backgroundColor: 'transparent',
                 fontSize: '14px',
@@ -254,6 +311,7 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
           entity={editingEntity}
           open={isEntityDialogOpen}
           onSave={(updatedEntity) => {
+            console.log('ApiConfigEditor - EntityDialog onSave - updating entity:', updatedEntity.name);
             setConfig({
               ...config,
               entities: (config.entities || []).map(e => 
@@ -261,8 +319,7 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
               )
             });
             setChanges(prev => new Set(prev).add('entities'));
-            setIsEntityDialogOpen(false);
-            setEditingEntity(null);
+            console.log('ApiConfigEditor - EntityDialog onSave - updated config, keeping dialog open');
           }}
           onCancel={() => {
             setIsEntityDialogOpen(false);

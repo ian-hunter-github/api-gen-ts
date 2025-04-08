@@ -50,6 +50,11 @@
   border-bottom: 1px solid #dee2e6;
 }
 
+.entity-table tr.changed td {
+  border-left: 3px solid #ffc107;
+  background-color: #fff8e1;
+}
+
 .entity-table button {
   padding: 0.25rem 0.5rem;
   background-color: #f8f9fa;

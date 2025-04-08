@@ -63,7 +63,18 @@
 }
 
 .error-input {
-  border-color: var(--danger-color) !important;
+  border-color: #dc3545 !important;
+}
+
+.changed {
+  border-left: 3px solid #ffc107;
+  background-color: #fff8e1;
+}
+
+input.changed,
+textarea.changed {
+  border-left: 3px solid #ffc107 !important;
+  background-color: #fff8e1 !important;
 }
 
 .error-message {
