@@ -95,15 +95,19 @@ describe('AttributeRowView', () => {
     expect(screen.getByLabelText('Restore test')).toBeInTheDocument();
   });
 
-  it('handles null state safely', () => {
+  it('handles null state safely by rendering default attribute', () => {
     const model = new AttributeModel(mockAttribute);
     // Force history into null state (simulating updateDeleted)
     model['history']['history'] = [null];
     model['history']['currentIndex'] = 0;
     
-    expect(() => {
-      render(<AttributeRowView model={model} {...mockHandlers} />);
-    }).not.toThrow();
+    render(<AttributeRowView model={model} {...mockHandlers} />);
+    
+    // Verify default empty attribute is rendered
+    const nameCell = screen.getByTestId('attribute-name');
+    expect(nameCell).toBeEmptyDOMElement(); // Empty name cell
+    expect(screen.getByText('string')).toBeInTheDocument(); // Default type
+    expect(screen.getByText('No')).toBeInTheDocument(); // Default required=false
   });
 
   it('tracks history length correctly', () => {

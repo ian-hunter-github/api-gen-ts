@@ -3,6 +3,19 @@ import '@testing-library/jest-dom';
 import { AttributeList } from '../AttributeList';
 import { EntityAttribute } from '../../types/entities/attributes';
 
+jest.mock('../AttributeDialog', () => ({
+  AttributeDialog: jest.fn(({ attribute, onSave, open }) => {
+    if (!open) return null;
+    return (
+      <div role="dialog">
+        <button onClick={() => onSave({...attribute, type: 'number'})}>
+          Save
+        </button>
+      </div>
+    );
+  })
+}));
+
 describe('AttributeList', () => {
   const mockAttributes: EntityAttribute[] = [
     { name: 'username', type: 'string', required: true },
@@ -56,7 +69,7 @@ describe('AttributeList', () => {
     expect(mockOnAdd).toHaveBeenCalled();
   });
 
-  it('calls onEdit with correct attribute when edit icon button is clicked', () => {
+  it('opens dialog with correct attribute when edit icon button is clicked', () => {
     render(
       <AttributeList
         attributes={mockAttributes}
@@ -70,7 +83,26 @@ describe('AttributeList', () => {
     );
 
     fireEvent.click(screen.getByLabelText('Edit username'));
-    expect(mockOnEdit).toHaveBeenCalledWith(mockAttributes[0]);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('calls onEdit with saved attribute when dialog is saved', () => {
+    render(
+      <AttributeList
+        attributes={mockAttributes}
+        onAdd={mockOnAdd}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set()}
+        deletedAttributes={new Set()}
+      />
+    );
+
+    fireEvent.click(screen.getByLabelText('Edit username'));
+    const updatedAttribute = {...mockAttributes[0], type: 'number'};
+    fireEvent.click(screen.getByRole('button', {name: /save/i}));
+    expect(mockOnEdit).toHaveBeenCalledWith(updatedAttribute);
   });
 
   it('calls onDelete with correct attribute name when delete icon button is clicked', () => {

@@ -46,7 +46,11 @@ export class AttributeModel {
   get current(): EntityAttribute {
     const current = this.history.current;
     if (current === null) {
-      throw new Error('Attribute cannot be null');
+      return {
+        name: '',
+        type: 'string',
+        required: false
+      };
     }
     return current;
   }

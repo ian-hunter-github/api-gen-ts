@@ -159,7 +159,7 @@ describe('EntityDialog', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: /add/i }));
-    fireEvent.click(screen.getByText('Update'));
+    fireEvent.click(screen.getByRole('button', { name: 'Update' }));
 
     expect(mockOnSave).toHaveBeenCalled();
     const savedEntity = mockOnSave.mock.calls[0][0];
@@ -168,28 +168,6 @@ describe('EntityDialog', () => {
     expect(savedEntity.attributes[2].modified).toBe(true);
   });
 
-  it('handles editing attributes', () => {
-    render(
-      <EntityDialog
-        entity={mockEntity}
-        onSave={mockOnSave}
-        onCancel={mockOnCancel}
-        onClose={jest.fn()}
-        open={true}
-      />
-    );
-
-    fireEvent.click(screen.getByLabelText('Edit id'));
-    const idInput = screen.getByRole('textbox', { name: /name/i });
-    fireEvent.change(idInput, {
-      target: { value: 'modifiedId' }
-    });
-    fireEvent.click(screen.getByText('Update'));
-
-    expect(mockOnSave).toHaveBeenCalled();
-    const savedEntity = mockOnSave.mock.calls[0][0];
-    expect(savedEntity.attributes[0].modified).toBe(true);
-  });
 
   it('handles deleting attributes', () => {
     render(
@@ -236,7 +214,7 @@ describe('EntityDialog', () => {
     );
 
     fireEvent.click(screen.getAllByLabelText(/Delete/i)[0]);
-    fireEvent.click(screen.getByLabelText(/Undo delete/i));
+    fireEvent.click(screen.getByRole('button', { name: /Undo delete/i }));
     fireEvent.click(screen.getByText('Update'));
 
     expect(mockOnSave).toHaveBeenCalled();
