@@ -21,15 +21,31 @@
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.entity-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
 .entity-dialog {
   max-width: 800px;
-  margin: 0 auto;
+  width: 90%;
   padding: var(--dialog-padding);
   background: var(--dialog-bg);
   border-radius: var(--dialog-radius);
   box-shadow: var(--dialog-shadow);
   border: var(--dialog-border);
   transition: var(--transition);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .entity-dialog h2 {
@@ -96,6 +112,20 @@ textarea.changed {
   resize: vertical;
 }
 
+
+.dialog-content {
+  padding: 20px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.entity-form {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: var(--input-radius);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
 
 .dialog-header {
   display: flex;

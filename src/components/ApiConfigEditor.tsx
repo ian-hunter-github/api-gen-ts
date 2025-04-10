@@ -1,4 +1,11 @@
 import React, { useState, useCallback, useMemo, memo } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { MemoizedEntityList } from './EntityList';
+import { EntityDialog } from './EntityDialog';
+import type { ApiEntity } from '../types/entities/entity';
+import ReactJson, { InteractionProps } from 'react-json-view';
+import type { ApiConfig } from '../types/api.types';
+import './ApiConfigEditor.css';
 
 const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(func: F, wait: number) => {
   let timeout: ReturnType<typeof setTimeout> | null = null;
@@ -68,13 +75,6 @@ const TextAreaField = memo(({
     />
   </div>
 ));
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { MemoizedEntityList } from './EntityList';
-import { EntityDialog } from './EntityDialog';
-import type { ApiEntity } from '../types/entities/entity';
-import ReactJson, { InteractionProps } from 'react-json-view';
-import type { ApiConfig } from '../types/api.types';
-import './ApiConfigEditor.css';
 
 interface ApiConfigEditorProps {
   config: ApiConfig;
@@ -185,7 +185,7 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
               />
 
               <MemoizedEntityList
-                key={`${config.id}-${config.entities?.length || 0}`}
+                key={`${config.id}-${config.entities?.length || 0}-${Date.now()}`}
                 entities={config.entities || []}
                 onSelect={(entity: ApiEntity) => console.log('Selected entity:', entity)}
                 onAdd={() => {
@@ -319,9 +319,15 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
               )
             });
             setChanges(prev => new Set(prev).add('entities'));
-            console.log('ApiConfigEditor - EntityDialog onSave - updated config, keeping dialog open');
+            setIsEntityDialogOpen(false);
+            setEditingEntity(null);
+            console.log('ApiConfigEditor - EntityDialog onSave - updated config and closed dialog');
           }}
           onCancel={() => {
+            setIsEntityDialogOpen(false);
+            setEditingEntity(null);
+          }}
+          onClose={() => {
             setIsEntityDialogOpen(false);
             setEditingEntity(null);
           }}

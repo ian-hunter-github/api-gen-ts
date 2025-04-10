@@ -1,0 +1,57 @@
+.attribute-row {
+  transition: background-color 0.2s ease;
+}
+
+.attribute-row.pristine {
+  background-color: inherit;
+}
+
+.attribute-row.modified {
+  background-color: #fff3e0;
+}
+
+.attribute-row.new {
+  background-color: #e8f5e9;
+}
+
+.attribute-row.deleted {
+  background-color: #ffebee;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.attribute-row {
+  display: flex;
+  align-items: center;
+}
+
+.attribute-cell {
+  padding: 8px 12px;
+  flex: 1;
+}
+
+.attribute-cell.actions {
+  flex: 0 0 180px;
+  justify-content: flex-end;
+}
+
+.attribute-row .actions {
+  display: flex;
+  gap: 8px;
+}
+
+.attribute-row button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.attribute-row button:hover {
+  opacity: 0.8;
+}
+
+.attribute-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

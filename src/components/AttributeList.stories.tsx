@@ -9,7 +9,14 @@ const meta: Meta<typeof AttributeList> = {
   argTypes: {
     onAdd: { action: 'add clicked' },
     onEdit: { action: 'edit clicked' },
-    onDelete: { action: 'delete clicked' }
+    onDelete: { action: 'delete clicked' },
+    onUndoDelete: { action: 'undo delete clicked' },
+    changedAttributes: { control: false },
+    deletedAttributes: { control: false }
+  },
+  args: {
+    changedAttributes: new Set(),
+    deletedAttributes: new Set()
   }
 };
 export default meta;
@@ -50,5 +57,29 @@ export const WithAttributes: Story = {
 export const ManyAttributes: Story = {
   args: {
     attributes: [...mockAttributes, ...mockAttributes, ...mockAttributes]
+  }
+};
+
+export const WithChangedAttributes: Story = {
+  args: {
+    attributes: mockAttributes,
+    changedAttributes: new Set(['username', 'email']),
+    deletedAttributes: new Set()
+  }
+};
+
+export const WithDeletedAttributes: Story = {
+  args: {
+    attributes: mockAttributes,
+    changedAttributes: new Set(),
+    deletedAttributes: new Set(['age'])
+  }
+};
+
+export const WithChangedAndDeletedAttributes: Story = {
+  args: {
+    attributes: mockAttributes,
+    changedAttributes: new Set(['username']),
+    deletedAttributes: new Set(['age'])
   }
 };

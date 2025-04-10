@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AttributeList } from '../AttributeList';
@@ -6,68 +5,233 @@ import { EntityAttribute } from '../../types/entities/attributes';
 
 describe('AttributeList', () => {
   const mockAttributes: EntityAttribute[] = [
-    {
-      name: 'username',
-      type: 'string',
-      required: true,
-      description: 'User login name'
-    },
-    {
-      name: 'age',
-      type: 'number',
-      required: false
-    }
+    { name: 'username', type: 'string', required: true },
+    { name: 'age', type: 'number', required: false }
   ];
 
   const mockOnAdd = jest.fn();
   const mockOnEdit = jest.fn();
   const mockOnDelete = jest.fn();
+  const mockOnUndoDelete = jest.fn();
 
   beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders all attributes', () => {
     render(
       <AttributeList
         attributes={mockAttributes}
         onAdd={mockOnAdd}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set()}
+        deletedAttributes={new Set()}
       />
     );
-  });
 
-  it('renders the title and add button', () => {
-    expect(screen.getByText('Attributes')).toBeInTheDocument();
-    expect(screen.getByText('+')).toBeInTheDocument();
-  });
-
-  it('renders all attributes in the table', () => {
-    expect(screen.getByText('username')).toBeInTheDocument();
-    expect(screen.getByText('string')).toBeInTheDocument();
-    expect(screen.getByText('Yes')).toBeInTheDocument();
-    expect(screen.getByText('age')).toBeInTheDocument();
-    expect(screen.getByText('number')).toBeInTheDocument();
-    expect(screen.getByText('No')).toBeInTheDocument();
+    expect(screen.getByText('username')).toBeVisible();
+    expect(screen.getByText('string')).toBeVisible();
+    expect(screen.getByText('Yes')).toBeVisible();
+    expect(screen.getByText('age')).toBeVisible();
+    expect(screen.getByText('number')).toBeVisible();
+    expect(screen.getByText('No')).toBeVisible();
   });
 
   it('calls onAdd when add button is clicked', () => {
-    fireEvent.click(screen.getByText('+'));
+    render(
+      <AttributeList
+        attributes={mockAttributes}
+        onAdd={mockOnAdd}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set()}
+        deletedAttributes={new Set()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /add/i }));
     expect(mockOnAdd).toHaveBeenCalled();
   });
 
-  it('calls onEdit with correct attribute when edit button is clicked', () => {
-    const usernameRow = screen.getByText('username').closest('tr');
-    const editButton = usernameRow?.querySelector('button');
-    fireEvent.click(editButton!);
+  it('calls onEdit with correct attribute when edit icon button is clicked', () => {
+    render(
+      <AttributeList
+        attributes={mockAttributes}
+        onAdd={mockOnAdd}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set()}
+        deletedAttributes={new Set()}
+      />
+    );
+
+    fireEvent.click(screen.getByLabelText('Edit username'));
     expect(mockOnEdit).toHaveBeenCalledWith(mockAttributes[0]);
   });
 
-  it('calls onDelete with correct attribute name when delete button is clicked', () => {
-    // Find and click delete button for 'age' attribute
-    const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
-    expect(deleteButtons).toHaveLength(2);
-    fireEvent.click(deleteButtons[0]);
+  it('calls onDelete with correct attribute name when delete icon button is clicked', () => {
+    render(
+      <AttributeList
+        attributes={mockAttributes}
+        onAdd={mockOnAdd}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set()}
+        deletedAttributes={new Set()}
+      />
+    );
+
+    fireEvent.click(screen.getByLabelText('Delete username'));
+    expect(mockOnDelete).toHaveBeenCalledWith('username');
+  });
+
+  it('calls onUndoDelete with correct attribute name when undo icon button is clicked', () => {
+    render(
+      <AttributeList
+        attributes={mockAttributes}
+        onAdd={mockOnAdd}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set()}
+        deletedAttributes={new Set(['username'])}
+      />
+    );
+
+    fireEvent.click(screen.getByLabelText('Undo delete username'));
+    expect(mockOnUndoDelete).toHaveBeenCalledWith('username');
+  });
+
+  it('when attributes are marked for deletion > shows deleted attributes with strikeout text and reduced opacity', () => {
+    render(
+      <AttributeList
+        attributes={mockAttributes}
+        onAdd={mockOnAdd}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set()}
+        deletedAttributes={new Set(['username'])}
+      />
+    );
+
+    const usernameRow = screen.getByText('username').closest('.attribute-list-row');
+    expect(usernameRow).toBeInTheDocument();
+    expect(usernameRow).toHaveClass('deleted');
     
-    // Verify correct callback
-    expect(mockOnDelete).toHaveBeenCalledTimes(1);
-    expect(mockOnDelete).toHaveBeenCalledWith('age');
+    // Verify deleted class is applied
+    expect(usernameRow).toHaveClass('deleted');
+  });
+
+  it('renders visible icons for all action buttons', () => {
+    render(
+      <AttributeList
+        attributes={mockAttributes}
+        onAdd={mockOnAdd}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set()}
+        deletedAttributes={new Set()}
+      />
+    );
+
+    const editButton = screen.getByLabelText('Edit username');
+    const deleteButton = screen.getByLabelText('Delete username');
+    const addButton = screen.getByRole('button', { name: /add/i });
+
+  
+    expect(editButton).toBeInTheDocument();
+    expect(editButton).toBeVisible();
+    expect(deleteButton).toBeInTheDocument();
+    expect(deleteButton).toBeVisible();
+
+    expect(addButton).toBeInTheDocument();
+    expect(addButton).toBeVisible();
+
+  });
+
+  it('when attributes are marked for deletion > shows visible undo icon for deleted attributes', () => {
+    render(
+      <AttributeList
+        attributes={mockAttributes}
+        onAdd={mockOnAdd}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set()}
+        deletedAttributes={new Set(['username'])}
+      />
+    );
+
+    const undoButton = screen.getByLabelText('Undo delete username');
+    expect(undoButton).toHaveClass('undo-button');
+
+  });
+
+  it('when attributes are marked for deletion > disables edit icon button for deleted attributes', () => {
+    render(
+      <AttributeList
+        attributes={mockAttributes}
+        onAdd={mockOnAdd}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set()}
+        deletedAttributes={new Set(['username'])}
+      />
+    );
+
+    const editButton = screen.queryByRole('button', { name: /edit username/i });
+    expect(editButton).toBeNull();
+  });
+
+  it('sorts attributes alphabetically', () => {
+    render(
+      <AttributeList
+        attributes={mockAttributes}
+        onAdd={mockOnAdd}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set()}
+        deletedAttributes={new Set()}
+      />
+    );
+
+    // Initial sort is ascending
+    const rows = screen.getAllByTestId('attribute-name');
+    expect(rows[0]).toHaveTextContent('age');
+    expect(rows[1]).toHaveTextContent('username');
+
+    // Click sort button to toggle to descending
+    fireEvent.click(screen.getByLabelText('Sort descending'));
+
+    const updatedRows = screen.getAllByTestId('attribute-name');
+    expect(updatedRows[0]).toHaveTextContent('username');
+    expect(updatedRows[1]).toHaveTextContent('age');
+  });
+
+  it('puts modified attributes first in the list', () => {
+    render(
+      <AttributeList
+        attributes={mockAttributes}
+        onAdd={mockOnAdd}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndoDelete={mockOnUndoDelete}
+        changedAttributes={new Set(['age'])}
+        deletedAttributes={new Set()}
+      />
+    );
+
+    const rows = screen.getAllByTestId('attribute-name');
+    expect(rows[0]).toHaveTextContent('age');
+    expect(rows[1]).toHaveTextContent('username');
   });
 });

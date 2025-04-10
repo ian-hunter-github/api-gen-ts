@@ -7,6 +7,7 @@ import { EntityEndpoint } from './endpoints';
  * Base entity type that all entities extend
  */
 export type ApiEntity = {
+  id?: string;
   name: string;
   description?: string;
   attributes: EntityAttribute[];

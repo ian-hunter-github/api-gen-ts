@@ -1,30 +1,37 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { ApiConfigEditor } from '../ApiConfigEditor';
 import type { ApiConfig } from '../../types/api.types';
 
 describe('ApiConfigEditor', () => {
   const mockConfig: ApiConfig = {
+    id: 'test-api',
     name: 'Test API',
-    description: 'Test description',
-    version: '1.0.0'
+    description: 'Test Description',
+    version: '1.0.0',
+    entities: [],
+    security: {
+      authentication: {
+        type: 'none'
+      }
+    }
   };
 
-  const mockEntities = ['User', 'Product'];
+  const mockAllConfigs = [mockConfig];
 
   it('renders correctly', () => {
     render(
       <ApiConfigEditor 
         config={mockConfig}
         onSave={jest.fn()}
-        entities={mockEntities}
+        allConfigs={mockAllConfigs}
       />
     );
 
     expect(screen.getByLabelText('API Name')).toBeInTheDocument();
     expect(screen.getByLabelText('Description')).toBeInTheDocument();
-    expect(screen.getByText('User')).toBeInTheDocument();
-    expect(screen.getByText('Product')).toBeInTheDocument();
+    expect(screen.getByText('Save Changes')).toBeInTheDocument();
   });
 
   it('handles form changes', () => {
@@ -32,7 +39,7 @@ describe('ApiConfigEditor', () => {
       <ApiConfigEditor 
         config={mockConfig}
         onSave={jest.fn()}
-        entities={mockEntities}
+        allConfigs={mockAllConfigs}
       />
     );
 
@@ -46,7 +53,7 @@ describe('ApiConfigEditor', () => {
       <ApiConfigEditor 
         config={mockConfig}
         onSave={jest.fn()}
-        entities={mockEntities}
+        allConfigs={mockAllConfigs}
       />
     );
 
@@ -61,13 +68,13 @@ describe('ApiConfigEditor', () => {
       <ApiConfigEditor 
         config={mockConfig}
         onSave={mockSave}
-        entities={mockEntities}
+        allConfigs={mockAllConfigs}
       />
     );
 
     const nameInput = screen.getByLabelText('API Name');
     fireEvent.change(nameInput, { target: { value: 'New Name' } });
-    fireEvent.click(screen.getByText('Save'));
+    fireEvent.click(screen.getByText('Save Changes'));
 
     expect(mockSave).toHaveBeenCalledWith({
       ...mockConfig,

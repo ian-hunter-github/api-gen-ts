@@ -1,92 +1,131 @@
-import { useState } from 'react';
-import { EntityAttribute } from '../types/entities/attributes';
+import React, { useState } from 'react';
 import './AttributeList.css';
+import { EntityAttribute } from '../types/entities/attributes';
 
 interface AttributeListProps {
   attributes: EntityAttribute[];
-  onAdd: (attribute: EntityAttribute) => void;
+  onAdd: () => void;
   onEdit: (attribute: EntityAttribute) => void;
   onDelete: (attributeName: string) => void;
+  onUndoDelete: (attributeName: string) => void;
   changedAttributes: Set<string>;
+  deletedAttributes: Set<string>;
 }
 
-export const AttributeList = ({ 
-  attributes, 
-  onAdd, 
-  onEdit, 
+export const AttributeList: React.FC<AttributeListProps> = ({
+  attributes,
+  onAdd,
+  onEdit,
   onDelete,
-  changedAttributes
-}: AttributeListProps) => {
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  onUndoDelete,
+  changedAttributes,
+  deletedAttributes,
+}) => {
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
 
-  const sortedAttributes = [...attributes].sort((a, b) => {
-    if (a.name < b.name) return sortDirection === 'asc' ? -1 : 1;
-    if (a.name > b.name) return sortDirection === 'asc' ? 1 : -1;
+  const handleSort = () => {
+    if (sortDirection === null) {
+      setSortDirection('desc');
+    } else if (sortDirection === 'desc') {
+      setSortDirection('asc');
+    } else {
+      setSortDirection(null);
+    }
+  };
+
+  const processedAttributes = [...attributes].sort((a, b) => {
+    const comparison = a.name.localeCompare(b.name);
+    return sortDirection === 'desc' ? -comparison : comparison;
+  });
+
+  // Put changed attributes first
+  const prioritizedAttributes = [...processedAttributes].sort((a, b) => {
+    const aChanged = changedAttributes.has(a.name);
+    const bChanged = changedAttributes.has(b.name);
+    if (aChanged && !bChanged) return -1;
+    if (!aChanged && bChanged) return 1;
     return 0;
   });
 
-  const toggleSort = () => {
-    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  const renderText = (text: string | boolean | undefined) => {
+    return typeof text === 'boolean' ? (text ? 'Yes' : 'No') : text || '';
   };
 
   return (
     <div className="attribute-list">
       <div className="attribute-list-header">
         <h3>Attributes</h3>
-        <button 
-          type="button"
-          className="add-button" 
-          onClick={() => onAdd({
-            name: '',
-            type: 'string',
-            required: false
-          })}
-        >
-          +
+        <button className="add-button" onClick={onAdd}>
+          <span className="material-icons">add</span>
         </button>
       </div>
-      
-      <div className="attribute-table-container">
-        <table className="attribute-table">
-          <thead>
-            <tr>
-              <th>
-                Name
-                <button 
-                  className="sort-button"
-                  onClick={toggleSort}
-                  aria-label={`Sort ${sortDirection === 'asc' ? 'descending' : 'ascending'}`}
-                >
-                  {sortDirection === 'asc' ? '↑' : '↓'}
-                </button>
-              </th>
-              <th>Type</th>
-              <th>Required</th>
-              <th>Edit</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedAttributes.map((attr) => (
-              <tr key={attr.name} className={changedAttributes.has(attr.name) ? 'changed' : ''}>
-                <td data-testid="attribute-name">{attr.name}</td>
-                <td>{attr.type}</td>
-                <td>{attr.required ? 'Yes' : 'No'}</td>
-                <td>
-                  <button onClick={() => onEdit(attr)}>Edit</button>
-                </td>
-                <td>
-                  <button 
-                    onClick={() => onDelete(attr.name)}
-                    aria-label="Delete"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+      <div className="attribute-list-container">
+        <div className="attribute-list-header-row">
+          <div className="attribute-list-header-cell">
+            Name
+            <button
+              className="sort-button"
+              onClick={handleSort}
+              aria-label={`Sort ${sortDirection === null || sortDirection === 'asc' ? 'descending' : 'ascending'}`}
+            >
+              <span className="material-icons">
+                {sortDirection === 'asc' ? 'arrow_downward' : 
+                 sortDirection === 'desc' ? 'arrow_upward' : 'sort'}
+              </span>
+            </button>
+          </div>
+          <div className="attribute-list-header-cell">Type</div>
+          <div className="attribute-list-header-cell">Required</div>
+          <div className="attribute-list-header-cell">Actions</div>
+        </div>
+        <div className="attribute-list-body">
+          {prioritizedAttributes.map((attribute) => {
+              const isDeleted = deletedAttributes.has(attribute.name);
+              const rowClass = isDeleted
+                ? 'deleted'
+                : changedAttributes.has(attribute.name)
+                ? 'changed'
+                : '';
+
+              return (
+                <div key={attribute.name} className={`attribute-list-row ${rowClass}`}>
+                  <div className="attribute-list-cell" data-testid="attribute-name">
+                    {renderText(attribute.name)}
+                  </div>
+                  <div className="attribute-list-cell">{renderText(attribute.type)}</div>
+                  <div className="attribute-list-cell">{renderText(attribute.required)}</div>
+                  <div className="attribute-list-cell actions">
+                    {isDeleted ? (
+                      <button
+                        className="undo-button"
+                        onClick={() => onUndoDelete(attribute.name)}
+                        aria-label={`Undo delete ${attribute.name}`}
+                      >
+                        <span className="material-icons">undo</span>
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => onEdit(attribute)}
+                          disabled={isDeleted}
+                          aria-label={`Edit ${attribute.name}`}
+                        >
+                          <span className="material-icons">edit</span>
+                        </button>
+                        <button
+                          onClick={() => onDelete(attribute.name)}
+                          aria-label={`Delete ${attribute.name}`}
+                        >
+                          <span className="material-icons">delete</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+        </div>
       </div>
     </div>
   );
