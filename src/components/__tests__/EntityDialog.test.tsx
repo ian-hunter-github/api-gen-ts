@@ -48,7 +48,7 @@ describe('EntityDialog', () => {
     expect(screen.getByText(/Create New Entity|Edit/)).toBeInTheDocument();
     expect(screen.getByLabelText('Name')).toHaveValue('');
     expect(screen.getByLabelText('Description')).toHaveValue('');
-    expect(screen.queryAllByTestId('attribute-name')).toHaveLength(0);
+    expect(screen.queryAllByTestId(/^attribute-name-/)).toHaveLength(0);
   });
 
   it('renders in edit mode with populated entity', () => {
@@ -66,7 +66,7 @@ describe('EntityDialog', () => {
     expect(screen.getByLabelText('Name')).toHaveValue('TestEntity');
     expect(screen.getByLabelText('Description')).toHaveValue('Test description');
     
-    const attributeNames = screen.getAllByTestId('attribute-name');
+    const attributeNames = screen.getAllByTestId(/^attribute-name-/);
     const attributeTexts = attributeNames.map(el => el.textContent);
     expect(attributeTexts).toContain('id');
     expect(attributeTexts).toContain('createdAt');
@@ -181,7 +181,7 @@ describe('EntityDialog', () => {
     );
 
     // Get initial attribute names
-    const initialAttributes = screen.getAllByTestId('attribute-name').map(el => el.textContent);
+    const initialAttributes = screen.getAllByTestId(/^attribute-name-/).map(el => el.textContent);
     
     // Delete first attribute
     fireEvent.click(screen.getAllByLabelText(/Delete/i)[0]);
@@ -246,6 +246,6 @@ describe('EntityDialog', () => {
       />
     );
 
-    expect(screen.getAllByTestId('attribute-name')).toHaveLength(2);
+    expect(screen.getAllByTestId(/^attribute-name-/)).toHaveLength(2);
   });
 });

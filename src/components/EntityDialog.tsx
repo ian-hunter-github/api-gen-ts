@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ApiEntity } from '../types/entities/entity';
-import { EntityAttribute } from '../types/entities/attributes';
-import { AttributeList } from './AttributeList';
+import { EntityAttribute, AttributeModel } from '../types/entities/attributes';
+import { AttributesTable } from './AttributesTable';
 import './EntityDialog.css';
 
 interface EntityDialogProps {
@@ -20,6 +20,10 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
   onClose
 }) => {
   const [currentEntity, setCurrentEntity] = useState<ApiEntity>({ ...entity });
+  const attributeModels = useMemo(() => 
+    currentEntity.attributes.map(attr => new AttributeModel(attr)),
+    [currentEntity.attributes]
+  );
   const [changedAttributes, setChangedAttributes] = useState<Set<string>>(new Set());
   const [deletedAttributes, setDeletedAttributes] = useState<Set<string>>(new Set());
 
@@ -115,10 +119,10 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
             </div>
           </div>
 
-          <AttributeList
-            attributes={currentEntity.attributes}
+          <AttributesTable
+            attributes={attributeModels}
             onAdd={handleAddAttribute}
-            onEdit={handleEditAttribute}
+            onEdit={(attr) => handleEditAttribute(attr.current)}
             onDelete={handleDeleteAttribute}
             onUndoDelete={handleUndoDelete}
             changedAttributes={changedAttributes}

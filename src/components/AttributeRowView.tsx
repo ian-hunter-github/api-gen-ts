@@ -9,6 +9,8 @@ interface AttributeRowViewProps {
   onUndo: (model: AttributeModel) => void;
   onRedo: (model: AttributeModel) => void;
   onRestore: (model: AttributeModel) => void;
+  deleted: boolean;
+  changed: boolean;
 }
 
 export const AttributeRowView: React.FC<AttributeRowViewProps> = ({
@@ -18,6 +20,8 @@ export const AttributeRowView: React.FC<AttributeRowViewProps> = ({
   onUndo,
   onRedo,
   onRestore,
+  deleted,
+  changed,
 }) => {
   const renderText = (text: string | boolean | undefined) => {
     if (text === undefined || text === null) return '';
@@ -25,69 +29,67 @@ export const AttributeRowView: React.FC<AttributeRowViewProps> = ({
   };
 
   const getRowClass = () => {
-    switch (model.status) {
-      case 'deleted': return 'deleted';
-      case 'modified': return 'modified';
-      case 'new': return 'new';
-      case 'pristine': return 'pristine';
-    }
+    const classes = [];
+    if (deleted) classes.push('deleted');
+    if (changed) classes.push('changed');
+    return classes.join(' ');
   };
 
-  const canUndo = model.canUndo; // model.history.length > 0;
-  const canRedo = model.canRedo; // model.history.length > 0 && model.historyIndex < model.history.length - 1;
+  const canUndo = model.canUndo;
+  const canRedo = model.canRedo;
 
   return (
     <table>
       <tbody>
         <tr className={`attribute-row ${getRowClass()}`}>
-      <td className="attribute-cell" data-testid="attribute-name">
-        {renderText(model.current?.name)}
-      </td>
-      <td className="attribute-cell">{renderText(model.current?.type)}</td>
-      <td className="attribute-cell">{renderText(model.current?.required)}</td>
-      <td className="attribute-cell actions">
-        {model.status === 'deleted' ? (
-          <button
-            className="undo-button"
-            onClick={() => onRestore(model)}
-            aria-label={`Restore ${model.current.name}`}
-          >
-            <span className="material-icons">undo</span>
-          </button>
-        ) : (
-          <div className="action-buttons">
-            <button
-              onClick={() => onEdit(model)}
-              disabled={['deleted', 'modified'].includes(model.status)}
-              aria-label={`Edit ${model.current.name}`}
-            >
-              <span className="material-icons">edit</span>
-            </button>
-            <button
-              onClick={() => onDelete(model)}
-              aria-label={`Delete ${model.current.name}`}
-            >
-              <span className="material-icons">delete</span>
-            </button>
-            {canUndo && (
+          <td className="attribute-cell" data-testid="attribute-name">
+            {renderText(model.current?.name)}
+          </td>
+          <td className="attribute-cell">{renderText(model.current?.type)}</td>
+          <td className="attribute-cell">{renderText(model.current?.required)}</td>
+          <td className="attribute-cell actions">
+            {deleted ? (
               <button
-                onClick={() => onUndo(model)}
-                aria-label={`Undo changes to ${model.current.name}`}
+                className="undo-button"
+                onClick={() => onRestore(model)}
+                aria-label={`Restore ${model.current.name}`}
               >
                 <span className="material-icons">undo</span>
               </button>
+            ) : (
+              <div className="action-buttons">
+                <button
+                  onClick={() => onEdit(model)}
+                  disabled={deleted}
+                  aria-label={`Edit ${model.current.name}`}
+                >
+                  <span className="material-icons">edit</span>
+                </button>
+                <button
+                  onClick={() => onDelete(model)}
+                  aria-label={`Delete ${model.current.name}`}
+                >
+                  <span className="material-icons">delete</span>
+                </button>
+                {canUndo && (
+                  <button
+                    onClick={() => onUndo(model)}
+                    aria-label={`Undo changes to ${model.current.name}`}
+                  >
+                    <span className="material-icons">undo</span>
+                  </button>
+                )}
+                {canRedo && (
+                  <button
+                    onClick={() => onRedo(model)}
+                    aria-label={`Redo changes to ${model.current.name}`}
+                  >
+                    <span className="material-icons">redo</span>
+                  </button>
+                )}
+              </div>
             )}
-            {canRedo && (
-              <button
-                onClick={() => onRedo(model)}
-                aria-label={`Redo changes to ${model.current.name}`}
-              >
-                <span className="material-icons">redo</span>
-              </button>
-            )}
-          </div>
-        )}
-      </td>
+          </td>
         </tr>
       </tbody>
     </table>

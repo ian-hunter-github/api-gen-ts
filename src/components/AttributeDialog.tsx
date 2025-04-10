@@ -1,24 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogTitle, DialogContent } from '@mui/material';
-import type { EntityAttribute } from '../types/entities/attributes';
+import type { AttributeModel, EntityAttribute } from '../types/entities/attributes';
 import './AttributeDialog.css';
 
 interface AttributeDialogProps {
-  attribute: EntityAttribute;
+  attribute: AttributeModel;
   existingNames: string[];
-  onSave: (attribute: EntityAttribute) => void;
+  onSave: (attribute: AttributeModel) => void;
   onCancel: () => void;
   open: boolean;
 }
 
 export const AttributeDialog: React.FC<AttributeDialogProps> = ({ 
-  attribute: initialAttribute,
+  attribute: initialModel,
   existingNames,
   onSave,
   onCancel,
   open = false
 }) => {
-  const [attribute, setAttribute] = useState<EntityAttribute>(initialAttribute);
+  const [attribute, setAttribute] = useState<EntityAttribute>(initialModel.current);
   const [nameError, setNameError] = useState<string>('');
   const [changedFields, setChangedFields] = useState<Set<string>>(new Set());
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -26,12 +26,12 @@ export const AttributeDialog: React.FC<AttributeDialogProps> = ({
   useEffect(() => {
     if (attribute.name) {
       const isUnique = !existingNames.includes(attribute.name) || 
-                      attribute.name === initialAttribute.name;
+                      attribute.name === initialModel.current.name;
       setNameError(isUnique ? '' : 'Attribute name must be unique within entity');
     } else {
       setNameError('');
     }
-  }, [attribute.name, existingNames, initialAttribute.name]);
+  }, [attribute.name, existingNames, initialModel.current.name]);
 
   useEffect(() => {
     if (open && nameInputRef.current) {
@@ -55,7 +55,7 @@ export const AttributeDialog: React.FC<AttributeDialogProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
+    initialModel.update({
       name: attribute.name,
       type: attribute.type,
       required: attribute.required || false,
@@ -63,9 +63,10 @@ export const AttributeDialog: React.FC<AttributeDialogProps> = ({
       ...(attribute.enumValues ? { enumValues: attribute.enumValues } : {}),
       ...(attribute.items ? { items: attribute.items } : {})
     });
+    onSave(initialModel);
   };
 
-  const isEditMode = !!initialAttribute.name;
+  const isEditMode = !!initialModel.current.name;
   const isValid = attribute.name.trim() !== '' && !nameError;
 
   return (
