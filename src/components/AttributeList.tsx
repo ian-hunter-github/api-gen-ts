@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import './AttributeList.css';
 import { EntityAttribute } from '../types/entities/attributes';
+import { AttributeDialog } from './AttributeDialog';
 
 interface AttributeListProps {
   attributes: EntityAttribute[];
@@ -22,6 +23,27 @@ export const AttributeList: React.FC<AttributeListProps> = ({
   deletedAttributes,
 }) => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentAttribute, setCurrentAttribute] = useState<EntityAttribute | null>(null);
+
+  const existingNames = useMemo(() => 
+    attributes.map(attr => attr.name), 
+    [attributes]
+  );
+
+  const handleEdit = (attribute: EntityAttribute) => {
+    setCurrentAttribute(attribute);
+    setIsDialogOpen(true);
+  };
+
+  const handleSave = (attribute: EntityAttribute) => {
+    onEdit(attribute);
+    setIsDialogOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsDialogOpen(false);
+  };
 
   const handleSort = () => {
     if (sortDirection === null) {
@@ -53,6 +75,15 @@ export const AttributeList: React.FC<AttributeListProps> = ({
 
   return (
     <div className="attribute-list">
+      {currentAttribute && (
+        <AttributeDialog
+          attribute={currentAttribute}
+          existingNames={existingNames}
+          onSave={handleSave}
+          onCancel={handleCancel}
+          open={isDialogOpen}
+        />
+      )}
       <div className="attribute-list-header">
         <h3>Attributes</h3>
         <button className="add-button" onClick={onAdd}>
@@ -107,7 +138,7 @@ export const AttributeList: React.FC<AttributeListProps> = ({
                     ) : (
                       <>
                         <button
-                          onClick={() => onEdit(attribute)}
+                          onClick={() => handleEdit(attribute)}
                           disabled={isDeleted}
                           aria-label={`Edit ${attribute.name}`}
                         >
