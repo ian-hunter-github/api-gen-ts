@@ -39,25 +39,23 @@ export const AttributeRowView: React.FC<AttributeRowViewProps> = ({
   const canRedo = model.canRedo;
 
   return (
-    <table>
-      <tbody>
-        <tr className={`attribute-row ${getRowClass()}`}>
-          <td className="attribute-cell" data-testid="attribute-name">
-            {renderText(model.current?.name)}
-          </td>
-          <td className="attribute-cell">{renderText(model.current?.type)}</td>
-          <td className="attribute-cell">{renderText(model.current?.required)}</td>
-          <td className="attribute-cell actions">
-            {deleted ? (
-              <button
-                className="undo-button"
-                onClick={() => onRestore(model)}
-                aria-label={`Restore ${model.current.name}`}
-              >
-                <span className="material-icons">undo</span>
-              </button>
-            ) : (
-              <div className="action-buttons">
+    <div className={`attribute-row ${getRowClass()}`}>
+      <div className="attribute-cell" data-testid="attribute-name">
+        {renderText(model.current?.name)}
+      </div>
+      <div className="attribute-cell">{renderText(model.current?.type)}</div>
+      <div className="attribute-cell">{renderText(model.current?.required)}</div>
+      <div className="attribute-cell actions">
+        {deleted ? (
+          <button
+            className="undo-button"
+            onClick={() => onRestore(model)}
+            aria-label={`Restore ${model.current.name}`}
+          >
+            <span className="material-icons">undo</span>
+          </button>
+        ) : (
+          <div className="action-buttons">
                 <button
                   onClick={() => onEdit(model)}
                   disabled={deleted}
@@ -71,27 +69,23 @@ export const AttributeRowView: React.FC<AttributeRowViewProps> = ({
                 >
                   <span className="material-icons">delete</span>
                 </button>
-                {canUndo && (
-                  <button
-                    onClick={() => onUndo(model)}
-                    aria-label={`Undo changes to ${model.current.name}`}
-                  >
-                    <span className="material-icons">undo</span>
-                  </button>
-                )}
-                {canRedo && (
-                  <button
-                    onClick={() => onRedo(model)}
-                    aria-label={`Redo changes to ${model.current.name}`}
-                  >
-                    <span className="material-icons">redo</span>
-                  </button>
-                )}
-              </div>
-            )}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+                <button
+                  onClick={() => onUndo(model)}
+                  disabled={!canUndo}
+                  aria-label={`Undo changes to ${model.current.name}`}
+                >
+                  <span className="material-icons">undo</span>
+                </button>
+                <button
+                  onClick={() => onRedo(model)}
+                  disabled={!canRedo}
+                  aria-label={`Redo changes to ${model.current.name}`}
+                >
+                  <span className="material-icons">redo</span>
+                </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };

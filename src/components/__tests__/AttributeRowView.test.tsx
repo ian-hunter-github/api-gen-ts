@@ -107,7 +107,7 @@ describe('AttributeRowView', () => {
       />
     );
 
-    const row = screen.getByText('username').closest('tr');
+    const row = screen.getByText('username').closest('.attribute-row');
     expect(row).toHaveClass('changed');
   });
 
@@ -125,7 +125,7 @@ describe('AttributeRowView', () => {
       />
     );
 
-    const row = screen.getByText('username').closest('tr');
+    const row = screen.getByText('username').closest('.attribute-row');
     expect(row).toHaveClass('deleted');
   });
 
