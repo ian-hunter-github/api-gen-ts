@@ -14,6 +14,10 @@ export class History<T> {
     return this.history[this.currentIndex];
   }
 
+  get previous(): T | null {
+    return this.currentIndex > 0 ? this.history[this.currentIndex - 1] : null;
+  }
+
   get canUndo(): boolean {
     return this.currentIndex > 0;
   }

@@ -43,16 +43,12 @@ export class AttributeModel {
     }
   }
 
-  get current(): EntityAttribute {
-    const current = this.history.current;
-    if (current === null) {
-      return {
-        name: '',
-        type: 'string',
-        required: false
-      };
-    }
-    return current;
+  get current(): EntityAttribute | null {
+    return this.history.current;
+  }
+
+  get previous(): EntityAttribute | null {
+    return this.history.previous;
   }
 
   update(newValues: Partial<EntityAttribute>): void {
@@ -61,11 +57,16 @@ export class AttributeModel {
   }
 
   delete(): void {
+    this.history.updateDeleted();
     this.status = 'deleted';
   }
 
   restore(): void {
     this.status = this.original ? 'pristine' : 'new';
+    // When restoring, we need to ensure the history reflects the restored state
+    if (this.history.current === null) {
+      this.history.undo(); // Go back to pre-delete state
+    }
   }
 
   get canUndo(): boolean {
@@ -78,7 +79,10 @@ export class AttributeModel {
 
   undo(): boolean {
     const result = this.history.undo();
-    if (result) {
+    if (result !== null) {
+      this.status = result === null ? 'deleted' : 
+                   this.original && JSON.stringify(result) === JSON.stringify(this.original) ? 
+                   'pristine' : 'modified';
       return true;
     }
     return false;
@@ -86,7 +90,8 @@ export class AttributeModel {
 
   redo(): boolean {
     const result = this.history.redo();
-    if (result) {
+    if (result !== null || this.history.current === null) {
+      this.status = this.history.current === null ? 'deleted' : 'modified';
       return true;
     }
     return false;

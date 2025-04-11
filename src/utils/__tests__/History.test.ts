@@ -190,4 +190,30 @@ describe('History', () => {
     expect(history.historyLength).toBe(initialLength);
     expect(history.current).toEqual(initialState);
   });
+
+  it('should return null for previous() at start of history', () => {
+    expect(history.previous).toBeNull();
+  });
+
+  it('should return previous state after update', () => {
+    history.update({ value: 2 });
+    expect(history.previous).toEqual(initialState);
+  });
+
+  it('should return pre-delete state after deletion', () => {
+    history.update({ value: 2 });
+    history.updateDeleted();
+    expect(history.previous).toEqual({ value: 2, text: 'initial' });
+  });
+
+  it('should maintain previous state through undo/redo', () => {
+    history.update({ value: 2 });
+    history.update({ text: 'updated' });
+    
+    history.undo();
+    expect(history.previous).toEqual(initialState);
+    
+    history.redo();
+    expect(history.previous).toEqual({ value: 2, text: 'initial' });
+  });
 });

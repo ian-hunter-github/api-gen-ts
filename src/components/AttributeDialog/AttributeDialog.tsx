@@ -18,7 +18,12 @@ export const AttributeDialog: React.FC<AttributeDialogProps> = ({
   onCancel,
   open = false
 }) => {
-  const [attribute, setAttribute] = useState<EntityAttribute>(initialModel.current);
+  const [attribute, setAttribute] = useState<EntityAttribute>(initialModel.current || {
+    name: '',
+    type: 'string',
+    required: false,
+    description: ''
+  });
   const [nameError, setNameError] = useState<string>('');
   const [changedFields, setChangedFields] = useState<Set<string>>(new Set());
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -26,12 +31,12 @@ export const AttributeDialog: React.FC<AttributeDialogProps> = ({
   useEffect(() => {
     if (attribute.name) {
       const isUnique = !existingNames.includes(attribute.name) || 
-                      attribute.name === initialModel.current.name;
+                      (initialModel.current && attribute.name === initialModel.current.name);
       setNameError(isUnique ? '' : 'Attribute name must be unique within entity');
     } else {
       setNameError('');
     }
-  }, [attribute.name, existingNames, initialModel.current.name]);
+  }, [attribute.name, existingNames, initialModel.current]);
 
   useEffect(() => {
     if (open && nameInputRef.current) {
@@ -66,8 +71,17 @@ export const AttributeDialog: React.FC<AttributeDialogProps> = ({
     onSave(initialModel);
   };
 
-  const isEditMode = !!initialModel.current.name;
+  const isEditMode = !!(initialModel.current && initialModel.current.name);
   const isValid = attribute.name.trim() !== '' && !nameError;
+
+  const handleClose = (event: object, reason: 'backdropClick' | 'escapeKeyDown') => {
+    if (reason === 'backdropClick' && changedFields.size > 0) {
+      if (!window.confirm('You have unsaved changes. Are you sure you want to discard them?')) {
+        return;
+      }
+    }
+    onCancel();
+  };
 
   return (
     <Dialog 
@@ -77,6 +91,7 @@ export const AttributeDialog: React.FC<AttributeDialogProps> = ({
       PaperProps={{
         className: 'attribute-dialog'
       }}
+      onClose={handleClose}
     >
       <DialogTitle className="dialog-header">
         {isEditMode ? 'Edit Attribute' : 'Create New Attribute'}

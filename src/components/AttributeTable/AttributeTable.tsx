@@ -8,10 +8,7 @@ interface AttributeTableProps {
   initialAttributes: AttributeModel[];
   onAdd: () => void;
   onEdit: (attribute: AttributeModel) => void;
-  onDelete: (attributeName: string) => void;
-  onUndoDelete: (attributeName: string) => void;
-  changedAttributes?: Set<string>;
-  deletedAttributes?: Set<string>;
+  onChange?: () => void;
 }
 
 export const AttributeTable = React.forwardRef<{
@@ -20,82 +17,69 @@ export const AttributeTable = React.forwardRef<{
   initialAttributes,
   onAdd,
   onEdit,
-  onDelete,
-  onUndoDelete,
-  changedAttributes = new Set(),
-  deletedAttributes = new Set(),
+  onChange,
 }, ref) => {
   const [attributes, setAttributes] = useState<AttributeModel[]>(initialAttributes);
   const [currentAttribute, setCurrentAttribute] = useState<AttributeModel | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
-  const [localChangedAttributes, setLocalChangedAttributes] = useState<Set<string>>(new Set());
+  const [isAttributeDialogOpen, setIsAttributeDialogOpen] = useState(false);
 
   const handleEdit = (attribute: AttributeModel) => {
+    // Skip edit if attribute is deleted or has no current state
+    if (attribute.status === 'deleted' || !attribute.current) {
+      return;
+    }
     setCurrentAttribute(attribute);
-    setIsDialogOpen(true);
+    setIsAttributeDialogOpen(true);
   };
 
   const handleDelete = (attributeName: string) => {
-    onDelete(attributeName);
+    const attribute = attributes.find(a => 
+      a.current !== null && a.current.name === attributeName
+    );
+    if (attribute) {
+      attribute.delete();
+      setAttributes(prev => [...prev]); // Force re-render
+      onChange?.();
+    }
   };
 
   React.useImperativeHandle(ref, () => ({
     getAttributes: () => {
-      return attributes
-        .filter(attr => !deletedAttributes.has(attr.current.name))
-        .map(attr => {
-          const modified = changedAttributes.has(attr.current.name);
-          if (modified && attr.status !== 'modified') {
-            attr.update({}); // Empty update to trigger modified status
-          }
-          return attr;
-        });
+      return attributes.filter(attr => attr.status !== 'deleted');
     }
-  }), [attributes, changedAttributes, deletedAttributes]);
+  }), [attributes]);
 
   const existingNames = useMemo(() => 
-    attributes.map(attr => attr.current.name), 
+    attributes
+      .filter(attr => attr.current !== null)
+      .map(attr => attr.current!.name), 
     [attributes]
   );
 
   const handleSave = (attribute: AttributeModel) => {
+    if (!attribute.current) return;
+    
     setAttributes(prev => 
-      prev.map(a => 
-        a.current.name === attribute.current.name ? attribute : a
-      )
+      prev.map(a => {
+        if (!a.current || !attribute.current) return a;
+        return a.current.name === attribute.current.name ? attribute : a;
+      })
     );
-    setLocalChangedAttributes(prev => new Set(prev).add(attribute.current.name));
-    setIsDialogOpen(false);
+    setIsAttributeDialogOpen(false);
     onEdit(attribute);
+    onChange?.();
   };
 
   const handleCancel = () => {
-    setIsDialogOpen(false);
+    setIsAttributeDialogOpen(false);
   };
 
-  const handleSort = () => {
-    if (sortDirection === null) {
-      setSortDirection('desc');
-    } else if (sortDirection === 'desc') {
-      setSortDirection('asc');
-    } else {
-      setSortDirection(null);
-    }
-  };
-
-  const processedAttributes = [...attributes].sort((a, b) => {
-    const comparison = a.current.name.localeCompare(b.current.name);
-    return sortDirection === 'desc' ? -comparison : comparison;
-  });
-
-  const prioritizedAttributes = [...processedAttributes].sort((a, b) => {
-    const aChanged = localChangedAttributes.has(a.current.name) || changedAttributes.has(a.current.name);
-    const bChanged = localChangedAttributes.has(b.current.name) || changedAttributes.has(b.current.name);
-    if (aChanged && !bChanged) return -1;
-    if (!aChanged && bChanged) return 1;
-    return 0;
-  });
+  const processedAttributes = [...attributes]
+    .sort((a, b) => {
+      const aName = a.current ? a.current.name : a.previous?.name || '';
+      const bName = b.current ? b.current.name : b.previous?.name || '';
+      return aName.localeCompare(bName);
+    });
 
   return (
     <div className="attribute-table">
@@ -105,7 +89,7 @@ export const AttributeTable = React.forwardRef<{
           existingNames={existingNames}
           onSave={handleSave}
           onCancel={handleCancel}
-          open={isDialogOpen}
+          open={isAttributeDialogOpen}
         />
       )}
       <div className="attribute-table-header">
@@ -117,37 +101,60 @@ export const AttributeTable = React.forwardRef<{
 
       <div className="table-container">
         <div className="table-header">
-          <div className="table-header-cell">
-            Name
-            <button
-              className="sort-button"
-              onClick={handleSort}
-              aria-label={`Sort ${sortDirection === null || sortDirection === 'asc' ? 'descending' : 'ascending'}`}
-            >
-              <span className="material-icons">
-                {sortDirection === 'asc' ? 'arrow_downward' : 
-                 sortDirection === 'desc' ? 'arrow_upward' : 'sort'}
-              </span>
-            </button>
-          </div>
+          <div className="table-header-cell">Name</div>
           <div className="table-header-cell">Type</div>
           <div className="table-header-cell">Required</div>
           <div className="table-header-cell">Actions</div>
         </div>
         <div className="table-body">
-          {prioritizedAttributes.map((attribute) => (
+          {processedAttributes.map((attribute: AttributeModel) => (
             <AttributeRowView
-              key={attribute.current.name}
+              key={attribute.id}
               model={attribute}
-              onEdit={() => handleEdit(attribute)}
-              onDelete={() => handleDelete(attribute.current.name)}
+              onEdit={() => attribute.status !== 'deleted' && handleEdit(attribute)}
+              onDelete={() => attribute.current ? handleDelete(attribute.current.name) : undefined}
               onUndo={() => {
-                deletedAttributes.delete(attribute.current.name);
-                onUndoDelete(attribute.current.name);
+                console.log('=== DEBUG: Before Undo ===');
+                console.log('Model:', {
+                  name: attribute.current?.name || attribute.previous?.name,
+                  status: attribute.status,
+                  canUndo: attribute.canUndo,
+                  canRedo: attribute.canRedo
+                });
+                const result = attribute.undo();
+                console.log('=== DEBUG: After Undo ===');
+                console.log('Undo result:', result);
+                console.log('Model:', {
+                  name: attribute.current?.name || attribute.previous?.name,
+                  status: attribute.status,
+                  canUndo: attribute.canUndo,
+                  canRedo: attribute.canRedo
+                });
+                setAttributes(prev => [...prev]);
+                onChange?.();
               }}
-              onRedo={() => {}}
-              deleted={deletedAttributes.has(attribute.current.name)}
-              changed={changedAttributes.has(attribute.current.name)}
+              onRedo={() => {
+                console.log('=== DEBUG: Before Redo ===');
+                console.log('Model:', {
+                  name: attribute.current?.name || attribute.previous?.name,
+                  status: attribute.status,
+                  canUndo: attribute.canUndo,
+                  canRedo: attribute.canRedo
+                });
+                const result = attribute.redo();
+                console.log('=== DEBUG: After Redo ===');
+                console.log('Redo result:', result);
+                console.log('Model:', {
+                  name: attribute.current?.name || attribute.previous?.name,
+                  status: attribute.status,
+                  canUndo: attribute.canUndo,
+                  canRedo: attribute.canRedo
+                });
+                setAttributes(prev => [...prev]);
+                onChange?.();
+              }}
+              deleted={attribute.status === 'deleted'}
+              changed={attribute.status === 'modified'}
             />
           ))}
         </div>
