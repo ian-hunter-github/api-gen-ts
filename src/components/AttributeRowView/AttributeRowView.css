@@ -16,8 +16,13 @@
 
 .attribute-row.deleted {
   background-color: #ffebee;
-  text-decoration: line-through;
   opacity: 0.7;
+}
+
+.attribute-row.deleted .attribute-cell:not(.actions) {
+  text-decoration: line-through;
+  pointer-events: none;
+  user-select: none;
 }
 
 .attribute-row {

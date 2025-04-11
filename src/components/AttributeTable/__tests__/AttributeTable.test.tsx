@@ -74,15 +74,13 @@ describe('AttributeTable', () => {
     onDelete: jest.fn(),
     onUndoDelete: jest.fn(),
     canAdd: true,
-    canEdit: true,
-    changedAttributes: new Set<string>(),
-    deletedAttributes: new Set<string>()
+    canEdit: true
   };
 
   it('renders attribute rows', () => {
     render(
       <AttributeTable 
-        attributes={mockAttributes}
+        initialAttributes={mockAttributes}
         {...mockCallbacks}
       />
     );
@@ -93,7 +91,7 @@ describe('AttributeTable', () => {
   it('calls onEdit when attribute is edited', () => {
     render(
       <AttributeTable 
-        attributes={mockAttributes}
+        initialAttributes={mockAttributes}
         {...mockCallbacks}
       />
     );
@@ -105,7 +103,7 @@ describe('AttributeTable', () => {
   it('calls onDelete when delete button is clicked', () => {
     render(
       <AttributeTable 
-        attributes={mockAttributes}
+        initialAttributes={mockAttributes}
         {...mockCallbacks}
       />
     );

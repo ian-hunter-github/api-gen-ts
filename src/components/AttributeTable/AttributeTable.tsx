@@ -2,43 +2,72 @@ import React, { useState, useMemo } from 'react';
 import './AttributeTable.css';
 import type { AttributeModel } from '../../types/entities/attributes';
 import { AttributeDialog } from '../AttributeDialog/AttributeDialog';
+import { AttributeRowView } from '../AttributeRowView/AttributeRowView';
 
 interface AttributeTableProps {
-  attributes: AttributeModel[];
+  initialAttributes: AttributeModel[];
   onAdd: () => void;
   onEdit: (attribute: AttributeModel) => void;
   onDelete: (attributeName: string) => void;
   onUndoDelete: (attributeName: string) => void;
-  changedAttributes: Set<string>;
-  deletedAttributes: Set<string>;
+  changedAttributes?: Set<string>;
+  deletedAttributes?: Set<string>;
 }
 
-export const AttributeTable: React.FC<AttributeTableProps> = ({
-  attributes,
+export const AttributeTable = React.forwardRef<{
+  getAttributes: () => AttributeModel[];
+}, AttributeTableProps>(({
+  initialAttributes,
   onAdd,
   onEdit,
   onDelete,
   onUndoDelete,
-  changedAttributes,
-  deletedAttributes,
-}) => {
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  changedAttributes = new Set(),
+  deletedAttributes = new Set(),
+}, ref) => {
+  const [attributes, setAttributes] = useState<AttributeModel[]>(initialAttributes);
   const [currentAttribute, setCurrentAttribute] = useState<AttributeModel | null>(null);
-
-  const existingNames = useMemo(() => 
-    attributes.map(attr => attr.current.name), 
-    [attributes]
-  );
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
+  const [localChangedAttributes, setLocalChangedAttributes] = useState<Set<string>>(new Set());
 
   const handleEdit = (attribute: AttributeModel) => {
     setCurrentAttribute(attribute);
     setIsDialogOpen(true);
   };
 
+  const handleDelete = (attributeName: string) => {
+    onDelete(attributeName);
+  };
+
+  React.useImperativeHandle(ref, () => ({
+    getAttributes: () => {
+      return attributes
+        .filter(attr => !deletedAttributes.has(attr.current.name))
+        .map(attr => {
+          const modified = changedAttributes.has(attr.current.name);
+          if (modified && attr.status !== 'modified') {
+            attr.update({}); // Empty update to trigger modified status
+          }
+          return attr;
+        });
+    }
+  }), [attributes, changedAttributes, deletedAttributes]);
+
+  const existingNames = useMemo(() => 
+    attributes.map(attr => attr.current.name), 
+    [attributes]
+  );
+
   const handleSave = (attribute: AttributeModel) => {
-    onEdit(attribute);
+    setAttributes(prev => 
+      prev.map(a => 
+        a.current.name === attribute.current.name ? attribute : a
+      )
+    );
+    setLocalChangedAttributes(prev => new Set(prev).add(attribute.current.name));
     setIsDialogOpen(false);
+    onEdit(attribute);
   };
 
   const handleCancel = () => {
@@ -60,18 +89,13 @@ export const AttributeTable: React.FC<AttributeTableProps> = ({
     return sortDirection === 'desc' ? -comparison : comparison;
   });
 
-  // Put changed attributes first
   const prioritizedAttributes = [...processedAttributes].sort((a, b) => {
-    const aChanged = changedAttributes.has(a.current.name);
-    const bChanged = changedAttributes.has(b.current.name);
+    const aChanged = localChangedAttributes.has(a.current.name) || changedAttributes.has(a.current.name);
+    const bChanged = localChangedAttributes.has(b.current.name) || changedAttributes.has(b.current.name);
     if (aChanged && !bChanged) return -1;
     if (!aChanged && bChanged) return 1;
     return 0;
   });
-
-  const renderText = (text: string | boolean | undefined) => {
-    return typeof text === 'boolean' ? (text ? 'Yes' : 'No') : text || '';
-  };
 
   return (
     <div className="attribute-table">
@@ -111,53 +135,23 @@ export const AttributeTable: React.FC<AttributeTableProps> = ({
           <div className="table-header-cell">Actions</div>
         </div>
         <div className="table-body">
-          {prioritizedAttributes.map((attribute) => {
-              const isDeleted = deletedAttributes.has(attribute.current.name);
-              const rowClass = isDeleted
-                ? 'deleted'
-                : changedAttributes.has(attribute.current.name)
-                ? 'changed'
-                : '';
-
-              return (
-                <div key={attribute.current.name} className={`table-row ${rowClass}`}>
-                  <div className="table-cell" data-testid={`attribute-name-${attribute.current.name}`}>
-                    {renderText(attribute.current.name)}
-                  </div>
-                  <div className="table-cell">{renderText(attribute.current.type)}</div>
-                  <div className="table-cell">{renderText(attribute.current.required)}</div>
-                  <div className="table-cell actions">
-                    {isDeleted ? (
-                      <button
-                        className="undo-button"
-                        onClick={() => onUndoDelete(attribute.current.name)}
-                        aria-label={`Undo delete ${attribute.current.name}`}
-                      >
-                        <span className="material-icons">undo</span>
-                      </button>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => handleEdit(attribute)}
-                          disabled={isDeleted}
-                          aria-label={`Edit ${attribute.current.name}`}
-                        >
-                          <span className="material-icons">edit</span>
-                        </button>
-                        <button
-                          onClick={() => onDelete(attribute.current.name)}
-                          aria-label={`Delete ${attribute.current.name}`}
-                        >
-                          <span className="material-icons">delete</span>
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+          {prioritizedAttributes.map((attribute) => (
+            <AttributeRowView
+              key={attribute.current.name}
+              model={attribute}
+              onEdit={() => handleEdit(attribute)}
+              onDelete={() => handleDelete(attribute.current.name)}
+              onUndo={() => {
+                deletedAttributes.delete(attribute.current.name);
+                onUndoDelete(attribute.current.name);
+              }}
+              onRedo={() => {}}
+              deleted={deletedAttributes.has(attribute.current.name)}
+              changed={changedAttributes.has(attribute.current.name)}
+            />
+          ))}
         </div>
       </div>
     </div>
   );
-};
+});

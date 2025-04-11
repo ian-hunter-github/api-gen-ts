@@ -25,51 +25,19 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
     currentEntity.attributes.map((attr: EntityAttribute) => new AttributeModel(attr)),
     [currentEntity.attributes]
   );
-  const [changedAttributes, setChangedAttributes] = useState<Set<string>>(new Set());
-  const [deletedAttributes, setDeletedAttributes] = useState<Set<string>>(new Set());
 
-  const handleAddAttribute = (): void => {
-    const newAttribute: EntityAttribute = {
-      name: `new_attribute_${Date.now()}`,
-      type: 'string',
-      required: false
-    };
-    setCurrentEntity((prev: ApiEntity) => ({
-      ...prev,
-      attributes: [...prev.attributes, newAttribute]
-    }));
-    setChangedAttributes((prev: Set<string>) => new Set(prev).add(newAttribute.name));
-  };
+  const attributeTableRef = React.useRef<{ getAttributes: () => AttributeModel[] }>(null);
 
-  const handleEditAttribute = (attribute: EntityAttribute): void => {
-    setCurrentEntity((prev: ApiEntity) => ({
-      ...prev,
-      attributes: prev.attributes.map((a: EntityAttribute) => 
-        a.name === attribute.name ? attribute : a
-      )
-    }));
-    setChangedAttributes((prev: Set<string>) => new Set(prev).add(attribute.name));
-  };
-
-  const handleDeleteAttribute = (attributeName: string): void => {
-    setDeletedAttributes((prev: Set<string>) => new Set(prev).add(attributeName));
-  };
-
-  const handleUndoDelete = (attributeName: string): void => {
-    setDeletedAttributes((prev: Set<string>) => {
-      const newSet = new Set(prev);
-      newSet.delete(attributeName);
-      return newSet;
-    });
-  };
+  const handleAddAttribute = (): void => {};
+  const handleEditAttribute = (): void => {};
+  const handleDeleteAttribute = (): void => {};
+  const handleUndoDelete = (): void => {};
 
   const handleSave = (): void => {
-    const finalAttributes = currentEntity.attributes
-      .filter((attr: EntityAttribute) => !deletedAttributes.has(attr.name))
-      .map((attr: EntityAttribute) => {
-        const modified = changedAttributes.has(attr.name);
-        return modified ? { ...attr, modified: true } : attr;
-      });
+    if (!attributeTableRef.current) return;
+    
+    const attributeModels = attributeTableRef.current.getAttributes();
+    const finalAttributes = attributeModels.map(model => model.current);
     
     onSave({
       ...currentEntity,
@@ -79,8 +47,6 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
 
   const handleCancel = (): void => {
     setCurrentEntity({ ...entity });
-    setChangedAttributes(new Set());
-    setDeletedAttributes(new Set());
     onCancel();
   };
 
@@ -121,13 +87,12 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
           </div>
 
           <AttributeTable
-            attributes={attributeModels}
+            ref={attributeTableRef}
+            initialAttributes={attributeModels}
             onAdd={handleAddAttribute}
-            onEdit={(attr) => handleEditAttribute(attr.current)}
+            onEdit={handleEditAttribute}
             onDelete={handleDeleteAttribute}
             onUndoDelete={handleUndoDelete}
-            changedAttributes={changedAttributes}
-            deletedAttributes={deletedAttributes}
           />
         </div>
 

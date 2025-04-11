@@ -2,14 +2,51 @@ import { render, fireEvent, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EntityDialog } from '../EntityDialog';
 import type { ApiEntity } from '../../../types/entities/entity';
+import { AttributeModel } from '../../../types/entities/attributes';
+import type { EntityAttribute } from '../../../types/entities/attributes';
+
+class MockAttributeModel extends AttributeModel {
+  constructor(attribute: EntityAttribute, status: 'pristine' | 'modified' | 'deleted' | 'new' = 'pristine') {
+    super(attribute, status);
+    // Mock methods
+    this.update = jest.fn();
+    this.delete = jest.fn();
+    this.restore = jest.fn();
+    this.undo = jest.fn();
+    this.redo = jest.fn();
+  }
+
+  // Override getters to make them mockable
+  get canUndo(): boolean {
+    return false;
+  }
+
+  get canRedo(): boolean {
+    return false;
+  }
+}
+
+const createMockAttribute = (
+  id: string,
+  name: string,
+  type: EntityAttribute['type'],
+  required: boolean
+): MockAttributeModel & EntityAttribute => {
+  const attr: EntityAttribute = { name, type, required };
+  const mock = new MockAttributeModel(attr);
+  // Set mock ID
+  Object.defineProperty(mock, 'id', { value: id });
+  // Mix in EntityAttribute properties
+  return Object.assign(mock, attr);
+};
 
 describe('EntityDialog', () => {
   const mockEntity: ApiEntity = {
     name: 'TestEntity',
     description: 'Test description',
     attributes: [
-      { name: 'id', type: 'string', required: true },
-      { name: 'createdAt', type: 'date', required: false }
+    createMockAttribute('1', 'id', 'string', true),
+    createMockAttribute('2', 'createdAt', 'date', false)
     ]
   };
 
@@ -147,7 +184,7 @@ describe('EntityDialog', () => {
     });
   });
 
-  it('handles adding new attributes', () => {
+  it('passes initial attributes to AttributeTable', () => {
     render(
       <EntityDialog
         entity={mockEntity}
@@ -158,51 +195,13 @@ describe('EntityDialog', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /add/i }));
-    fireEvent.click(screen.getByRole('button', { name: 'Update' }));
-
-    expect(mockOnSave).toHaveBeenCalled();
-    const savedEntity = mockOnSave.mock.calls[0][0];
-    expect(savedEntity.attributes.length).toBe(3);
-    expect(savedEntity.attributes[2].name).toMatch(/new_attribute_\d+/);
-    expect(savedEntity.attributes[2].modified).toBe(true);
+    const attributeNames = screen.getAllByTestId(/^attribute-name-/).map(el => el.textContent);
+    expect(attributeNames).toHaveLength(2);
+    expect(attributeNames).toContain('id');
+    expect(attributeNames).toContain('createdAt');
   });
 
-
-  it('handles deleting attributes', () => {
-    render(
-      <EntityDialog
-        entity={mockEntity}
-        onSave={mockOnSave}
-        onCancel={mockOnCancel}
-        onClose={jest.fn()}
-        open={true}
-      />
-    );
-
-    // Get initial attribute names
-    const initialAttributes = screen.getAllByTestId(/^attribute-name-/).map(el => el.textContent);
-    
-    // Delete first attribute
-    fireEvent.click(screen.getAllByLabelText(/Delete/i)[0]);
-    fireEvent.click(screen.getByText('Update'));
-
-    expect(mockOnSave).toHaveBeenCalled();
-    const savedEntity = mockOnSave.mock.calls[0][0];
-    
-    // Should have one less attribute
-    expect(savedEntity.attributes.length).toBe(mockEntity.attributes.length - 1);
-    
-    // The remaining attribute should be one of the original ones
-    const remainingNames = savedEntity.attributes.map((attr: ApiEntity['attributes'][0]) => attr.name);
-    expect(initialAttributes).toEqual(expect.arrayContaining(remainingNames));
-    
-    // Verify exactly one attribute was removed
-    const removedNames = initialAttributes.filter(name => !remainingNames.includes(name!));
-    expect(removedNames).toHaveLength(1);
-  });
-
-  it('handles undoing attribute deletes', () => {
+  it('gets final attributes from AttributeTable on save', () => {
     render(
       <EntityDialog
         entity={mockEntity}
@@ -214,12 +213,44 @@ describe('EntityDialog', () => {
     );
 
     fireEvent.click(screen.getAllByLabelText(/Delete/i)[0]);
-    fireEvent.click(screen.getByRole('button', { name: /Undo delete/i }));
+    fireEvent.click(screen.getByLabelText('Undo delete createdAt'));
     fireEvent.click(screen.getByText('Update'));
 
     expect(mockOnSave).toHaveBeenCalled();
     const savedEntity = mockOnSave.mock.calls[0][0];
     expect(savedEntity.attributes.length).toBe(2);
+    expect(savedEntity.attributes[1].status).toBe('pristine');
+  });
+
+  it('preserves entity-level changes while handling attributes', () => {
+    render(
+      <EntityDialog
+        entity={mockEntity}
+        onSave={mockOnSave}
+        onCancel={mockOnCancel}
+        onClose={jest.fn()}
+        open={true}
+      />
+    );
+
+    // Make multiple changes
+    fireEvent.click(screen.getByRole('button', { name: /add/i }));
+    fireEvent.click(screen.getAllByLabelText(/Delete/i)[0]);
+    fireEvent.change(screen.getByLabelText('Name'), {
+      target: { value: 'UpdatedEntity' }
+    });
+
+    // Verify no changes sent yet
+    expect(mockOnSave).not.toHaveBeenCalled();
+
+    // Click update
+    fireEvent.click(screen.getByText('Update'));
+
+    // Verify all changes sent together
+    expect(mockOnSave).toHaveBeenCalledTimes(1);
+    const savedEntity = mockOnSave.mock.calls[0][0];
+    expect(savedEntity.name).toBe('UpdatedEntity');
+    expect(savedEntity.attributes.length).toBe(2); // 1 deleted, 1 added
   });
 
   it('discards changes when cancel is clicked', () => {

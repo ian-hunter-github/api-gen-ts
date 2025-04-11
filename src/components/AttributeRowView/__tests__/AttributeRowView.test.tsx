@@ -10,9 +10,19 @@ describe('AttributeRowView', () => {
     required: true
   });
 
+  // Mock methods using jest.spyOn
+  jest.spyOn(mockAttribute, 'update').mockImplementation(jest.fn());
+  jest.spyOn(mockAttribute, 'delete').mockImplementation(jest.fn());
+  jest.spyOn(mockAttribute, 'restore').mockImplementation(jest.fn());
+  jest.spyOn(mockAttribute, 'undo').mockImplementation(jest.fn());
+  jest.spyOn(mockAttribute, 'redo').mockImplementation(jest.fn());
+
+  // Mock history state
+  jest.spyOn(mockAttribute, 'canUndo', 'get').mockReturnValue(false);
+  jest.spyOn(mockAttribute, 'canRedo', 'get').mockReturnValue(false);
+
   const mockOnEdit = jest.fn();
   const mockOnDelete = jest.fn();
-  const mockOnRestore = jest.fn();
   const mockOnUndo = jest.fn();
   const mockOnRedo = jest.fn();
 
@@ -26,7 +36,6 @@ describe('AttributeRowView', () => {
         model={mockAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-        onRestore={mockOnRestore}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
         deleted={false}
@@ -45,7 +54,6 @@ describe('AttributeRowView', () => {
         model={mockAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-        onRestore={mockOnRestore}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
         deleted={false}
@@ -63,7 +71,6 @@ describe('AttributeRowView', () => {
         model={mockAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-        onRestore={mockOnRestore}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
         deleted={false}
@@ -75,22 +82,28 @@ describe('AttributeRowView', () => {
     expect(mockOnDelete).toHaveBeenCalledWith(mockAttribute);
   });
 
-  it('calls onRestore when undo button is clicked', () => {
+  it('calls onUndo when undo button is clicked', () => {
+    // Enable undo for this test
+    jest.spyOn(mockAttribute, 'canUndo', 'get').mockReturnValue(true);
+    
     render(
       <AttributeRowView
         model={mockAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-        onRestore={mockOnRestore}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
-        deleted={true}
-        changed={false}
+        deleted={false}
+        changed={true}
       />
     );
 
-    fireEvent.click(screen.getByLabelText('Restore username'));
-    expect(mockOnRestore).toHaveBeenCalledWith(mockAttribute);
+    const button = screen.getByLabelText('Undo delete username');
+    expect(button).toBeEnabled();
+
+    fireEvent.click(button);
+
+    expect(mockOnUndo).toHaveBeenCalledWith(mockAttribute);
   });
 
   it('applies changed styling when changed is true', () => {
@@ -99,7 +112,6 @@ describe('AttributeRowView', () => {
         model={mockAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-        onRestore={mockOnRestore}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
         deleted={false}
@@ -117,7 +129,6 @@ describe('AttributeRowView', () => {
         model={mockAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-        onRestore={mockOnRestore}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
         deleted={true}
@@ -129,13 +140,12 @@ describe('AttributeRowView', () => {
     expect(row).toHaveClass('deleted');
   });
 
-  it('shows restore button instead of edit/delete when deleted is true', () => {
+  it('disables edit/delete buttons when deleted is true', () => {
     render(
       <AttributeRowView
         model={mockAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-        onRestore={mockOnRestore}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
         deleted={true}
@@ -143,8 +153,42 @@ describe('AttributeRowView', () => {
       />
     );
 
-    expect(screen.queryByLabelText('Edit username')).toBeNull();
-    expect(screen.queryByLabelText('Delete username')).toBeNull();
-    expect(screen.getByLabelText('Restore username')).toBeVisible();
+    expect(screen.getByLabelText('Edit username')).toBeDisabled();
+    expect(screen.getByLabelText('Delete username')).toBeDisabled();
+  });
+
+  it('applies strikethrough to text fields when deleted is true', () => {
+    render(
+      <AttributeRowView
+        model={mockAttribute}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndo={mockOnUndo}
+        onRedo={mockOnRedo}
+        deleted={true}
+        changed={false}
+      />
+    );
+
+    const nameCell = screen.getByTestId('attribute-name-username');
+    expect(nameCell).toHaveStyle('text-decoration: line-through');
+  });
+
+  it('enables undo button when deleted is true', () => {
+    jest.spyOn(mockAttribute, 'canUndo', 'get').mockReturnValue(true);
+    
+    render(
+      <AttributeRowView
+        model={mockAttribute}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+        onUndo={mockOnUndo}
+        onRedo={mockOnRedo}
+        deleted={true}
+        changed={false}
+      />
+    );
+
+    expect(screen.getByLabelText('Undo delete username')).toBeEnabled();
   });
 });
