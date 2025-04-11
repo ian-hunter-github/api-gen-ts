@@ -1,0 +1,116 @@
+.attribute-table {
+  width: 100%;
+  margin: 1rem 0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.attribute-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.attribute-table-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.add-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1976d2;
+  padding: 0.5rem;
+}
+
+.add-button:hover {
+  background-color: rgba(25, 118, 210, 0.04);
+}
+
+.table-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  background-color: #f5f5f5;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+}
+
+.table-header-cell {
+  display: flex;
+  align-items: center;
+}
+
+.sort-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  padding: 0;
+}
+
+.table-body {
+  background-color: white;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row.changed {
+  background-color: #fff8e1;
+}
+
+.table-row.deleted {
+  background-color: #ffebee;
+  opacity: 0.6;
+}
+
+.table-cell {
+  display: flex;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: #757575;
+}
+
+.actions button:hover {
+  color: #1976d2;
+}
+
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.undo-button {
+  color: #d32f2f !important;
+}
+
+.undo-button:hover {
+  color: #b71c1c !important;
+}

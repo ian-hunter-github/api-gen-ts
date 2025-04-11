@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import './AttributeList.css';
+import './AttributeTable.css';
 import type { AttributeModel } from '../types/entities/attributes';
 import { AttributeDialog } from './AttributeDialog';
 
-interface AttributeListProps {
+interface AttributeTableProps {
   attributes: AttributeModel[];
   onAdd: () => void;
   onEdit: (attribute: AttributeModel) => void;
@@ -13,7 +13,7 @@ interface AttributeListProps {
   deletedAttributes: Set<string>;
 }
 
-export const AttributeList: React.FC<AttributeListProps> = ({
+export const AttributeTable: React.FC<AttributeTableProps> = ({
   attributes,
   onAdd,
   onEdit,
@@ -74,7 +74,7 @@ export const AttributeList: React.FC<AttributeListProps> = ({
   };
 
   return (
-    <div className="attribute-list">
+    <div className="attribute-table">
       {currentAttribute && (
         <AttributeDialog
           attribute={currentAttribute}
@@ -84,16 +84,16 @@ export const AttributeList: React.FC<AttributeListProps> = ({
           open={isDialogOpen}
         />
       )}
-      <div className="attribute-list-header">
+      <div className="attribute-table-header">
         <h3>Attributes</h3>
         <button className="add-button" onClick={onAdd}>
           <span className="material-icons">add</span>
         </button>
       </div>
 
-      <div className="attribute-list-container">
-        <div className="attribute-list-header-row">
-          <div className="attribute-list-header-cell">
+      <div className="table-container">
+        <div className="table-header">
+          <div className="table-header-cell">
             Name
             <button
               className="sort-button"
@@ -106,11 +106,11 @@ export const AttributeList: React.FC<AttributeListProps> = ({
               </span>
             </button>
           </div>
-          <div className="attribute-list-header-cell">Type</div>
-          <div className="attribute-list-header-cell">Required</div>
-          <div className="attribute-list-header-cell">Actions</div>
+          <div className="table-header-cell">Type</div>
+          <div className="table-header-cell">Required</div>
+          <div className="table-header-cell">Actions</div>
         </div>
-        <div className="attribute-list-body">
+        <div className="table-body">
           {prioritizedAttributes.map((attribute) => {
               const isDeleted = deletedAttributes.has(attribute.current.name);
               const rowClass = isDeleted
@@ -120,13 +120,13 @@ export const AttributeList: React.FC<AttributeListProps> = ({
                 : '';
 
               return (
-                <div key={attribute.current.name} className={`attribute-list-row ${rowClass}`}>
-                  <div className="attribute-list-cell" data-testid="attribute-name">
+                <div key={attribute.current.name} className={`table-row ${rowClass}`}>
+                  <div className="table-cell" data-testid={`attribute-name-${attribute.current.name}`}>
                     {renderText(attribute.current.name)}
                   </div>
-                  <div className="attribute-list-cell">{renderText(attribute.current.type)}</div>
-                  <div className="attribute-list-cell">{renderText(attribute.current.required)}</div>
-                  <div className="attribute-list-cell actions">
+                  <div className="table-cell">{renderText(attribute.current.type)}</div>
+                  <div className="table-cell">{renderText(attribute.current.required)}</div>
+                  <div className="table-cell actions">
                     {isDeleted ? (
                       <button
                         className="undo-button"
