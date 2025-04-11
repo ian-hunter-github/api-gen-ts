@@ -1,7 +1,6 @@
-import React from 'react';
 import { StoryFn, Meta } from '@storybook/react';
 import { AttributeRowView } from './AttributeRowView';
-import { AttributeModel, EntityAttribute, AttributeType } from '../types/entities/attributes';
+import { AttributeModel, EntityAttribute, AttributeType } from '../../types/entities/attributes';
 
 export default {
   title: 'Components/AttributeRowView',

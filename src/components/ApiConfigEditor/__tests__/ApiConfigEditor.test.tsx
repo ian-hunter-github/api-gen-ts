@@ -1,8 +1,7 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ApiConfigEditor } from '../ApiConfigEditor';
-import type { ApiConfig } from '../../types/api.types';
+import type { ApiConfig } from '../../../types/api.types';
 
 describe('ApiConfigEditor', () => {
   const mockConfig: ApiConfig = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AttributeModel } from '../types/entities/attributes';
+import { AttributeModel } from '../../types/entities/attributes';
 import './AttributeRowView.css';
 
 interface AttributeRowViewProps {

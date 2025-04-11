@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ApiConfigEditor } from './components/ApiConfigEditor';
+import { ApiConfigEditor } from './components/ApiConfigEditor/ApiConfigEditor';
 import { ApiConfig } from './types/api.types';
 import { demoStore } from './stores/demoStore';
 import './App.css';

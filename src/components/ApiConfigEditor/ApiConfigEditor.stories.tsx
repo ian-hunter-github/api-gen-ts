@@ -1,6 +1,6 @@
 import { ApiConfigEditor } from './ApiConfigEditor';
 import type { Meta, StoryObj } from '@storybook/react';
-import type { ApiConfig } from '../types/api.types';
+import type { ApiConfig } from '../../types/api.types';
 
 const meta: Meta<typeof ApiConfigEditor> = {
   title: 'Components/ApiConfigEditor',
@@ -16,7 +16,6 @@ const sampleConfig: ApiConfig = {
   name: 'E-Commerce API',
   description: 'API for managing e-commerce operations',
   version: '1.0.0',
-  baseUrl: '/api/v1',
   entities: [],
   security: {
     authentication: {
@@ -28,15 +27,16 @@ const sampleConfig: ApiConfig = {
         audience: 'web-app'
       }
     }
+  },
+  endpoints: {
+    baseUrl: '/api/v1',
+    paths: {}
   }
 };
-
-const sampleEntities = ['Product', 'Category', 'User', 'Order'];
 
 export const Default: Story = {
   args: {
     config: sampleConfig,
-    entities: sampleEntities,
     onSave: (config) => console.log('Saved:', config)
   }
 };
@@ -48,7 +48,6 @@ export const WithChanges: Story = {
       name: 'Changed Name',
       description: 'Updated description'
     },
-    entities: sampleEntities,
     onSave: (config) => console.log('Saved:', config)
   }
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogTitle, DialogContent } from '@mui/material';
-import type { AttributeModel, EntityAttribute } from '../types/entities/attributes';
+import type { AttributeModel, EntityAttribute } from '../../types/entities/attributes';
 import './AttributeDialog.css';
 
 interface AttributeDialogProps {

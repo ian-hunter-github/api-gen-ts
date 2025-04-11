@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import './AttributesTable.css';
-import type { AttributeModel } from '../types/entities/attributes';
-import { AttributeDialog } from './AttributeDialog';
+import './AttributeTable.css';
+import type { AttributeModel } from '../../types/entities/attributes';
+import { AttributeDialog } from '../AttributeDialog/AttributeDialog';
 
-interface AttributesTableProps {
+interface AttributeTableProps {
   attributes: AttributeModel[];
   onAdd: () => void;
   onEdit: (attribute: AttributeModel) => void;
@@ -13,7 +13,7 @@ interface AttributesTableProps {
   deletedAttributes: Set<string>;
 }
 
-export const AttributesTable: React.FC<AttributesTableProps> = ({
+export const AttributeTable: React.FC<AttributeTableProps> = ({
   attributes,
   onAdd,
   onEdit,
@@ -74,7 +74,7 @@ export const AttributesTable: React.FC<AttributesTableProps> = ({
   };
 
   return (
-    <div className="attributes-table">
+    <div className="attribute-table">
       {currentAttribute && (
         <AttributeDialog
           attribute={currentAttribute}
@@ -84,7 +84,7 @@ export const AttributesTable: React.FC<AttributesTableProps> = ({
           open={isDialogOpen}
         />
       )}
-      <div className="attributes-table-header">
+      <div className="attribute-table-header">
         <h3>Attributes</h3>
         <button className="add-button" onClick={onAdd}>
           <span className="material-icons">add</span>

@@ -1,7 +1,7 @@
 import { render, fireEvent, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EntityDialog } from '../EntityDialog';
-import type { ApiEntity } from '../../types/entities/entity';
+import type { ApiEntity } from '../../../types/entities/entity';
 
 describe('EntityDialog', () => {
   const mockEntity: ApiEntity = {

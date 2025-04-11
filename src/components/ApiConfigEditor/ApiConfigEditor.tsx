@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useMemo, memo } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { MemoizedEntityList } from './EntityList';
-import { EntityDialog } from './EntityDialog';
-import type { ApiEntity } from '../types/entities/entity';
+import { MemoizedEntityList } from '../EntityList/EntityList';
+import { EntityDialog } from '../EntityDialog/EntityDialog';
+import type { ApiEntity } from '../../types/entities/entity';
 import ReactJson, { InteractionProps } from 'react-json-view';
-import type { ApiConfig } from '../types/api.types';
+import type { ApiConfig } from '../../types/api.types';
 import './ApiConfigEditor.css';
 
 const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(func: F, wait: number) => {
@@ -310,7 +310,7 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
         <EntityDialog
           entity={editingEntity}
           open={isEntityDialogOpen}
-          onSave={(updatedEntity) => {
+          onSave={(updatedEntity: ApiEntity) => {
             console.log('ApiConfigEditor - EntityDialog onSave - updating entity:', updatedEntity.name);
             setConfig({
               ...config,

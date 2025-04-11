@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@mui/material';
 import { EntityDialog } from './EntityDialog';
 import type { Meta, StoryObj } from '@storybook/react';
-import type { ApiEntity } from '../types/entities/entity';
+import type { ApiEntity } from '../../types/entities/entity';
 
 const meta: Meta<typeof EntityDialog> = {
   title: 'Components/EntityDialog',
@@ -75,7 +75,7 @@ export const WithManyAttributes: Story = {
         { name: 'endDate', type: 'date', required: false },
         { name: 'manager', type: 'string', required: false },
         { name: 'status', type: 'string', required: true },
-        { name: 'notes', type: 'text', required: false },
+        { name: 'notes', type: 'string', required: false },
         { name: 'avatar', type: 'string', required: false }
       ]
     },

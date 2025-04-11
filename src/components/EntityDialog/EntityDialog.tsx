@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { ApiEntity } from '../types/entities/entity';
-import { EntityAttribute, AttributeModel } from '../types/entities/attributes';
-import { AttributesTable } from './AttributesTable';
+import type { ApiEntity } from '../../types/entities/entity';
+import type { EntityAttribute } from '../../types/entities/attributes';
+import { AttributeModel } from '../../types/entities/attributes';
+import { AttributeTable } from '../AttributeTable/AttributeTable';
 import './EntityDialog.css';
 
 interface EntityDialogProps {
@@ -21,13 +22,13 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
 }) => {
   const [currentEntity, setCurrentEntity] = useState<ApiEntity>({ ...entity });
   const attributeModels = useMemo(() => 
-    currentEntity.attributes.map(attr => new AttributeModel(attr)),
+    currentEntity.attributes.map((attr: EntityAttribute) => new AttributeModel(attr)),
     [currentEntity.attributes]
   );
   const [changedAttributes, setChangedAttributes] = useState<Set<string>>(new Set());
   const [deletedAttributes, setDeletedAttributes] = useState<Set<string>>(new Set());
 
-  const handleAddAttribute = () => {
+  const handleAddAttribute = (): void => {
     const newAttribute: EntityAttribute = {
       name: `new_attribute_${Date.now()}`,
       type: 'string',
@@ -40,7 +41,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
     setChangedAttributes((prev: Set<string>) => new Set(prev).add(newAttribute.name));
   };
 
-  const handleEditAttribute = (attribute: EntityAttribute) => {
+  const handleEditAttribute = (attribute: EntityAttribute): void => {
     setCurrentEntity((prev: ApiEntity) => ({
       ...prev,
       attributes: prev.attributes.map((a: EntityAttribute) => 
@@ -50,11 +51,11 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
     setChangedAttributes((prev: Set<string>) => new Set(prev).add(attribute.name));
   };
 
-  const handleDeleteAttribute = (attributeName: string) => {
+  const handleDeleteAttribute = (attributeName: string): void => {
     setDeletedAttributes((prev: Set<string>) => new Set(prev).add(attributeName));
   };
 
-  const handleUndoDelete = (attributeName: string) => {
+  const handleUndoDelete = (attributeName: string): void => {
     setDeletedAttributes((prev: Set<string>) => {
       const newSet = new Set(prev);
       newSet.delete(attributeName);
@@ -62,7 +63,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
     });
   };
 
-  const handleSave = () => {
+  const handleSave = (): void => {
     const finalAttributes = currentEntity.attributes
       .filter((attr: EntityAttribute) => !deletedAttributes.has(attr.name))
       .map((attr: EntityAttribute) => {
@@ -76,7 +77,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
     });
   };
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setCurrentEntity({ ...entity });
     setChangedAttributes(new Set());
     setDeletedAttributes(new Set());
@@ -119,7 +120,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
             </div>
           </div>
 
-          <AttributesTable
+          <AttributeTable
             attributes={attributeModels}
             onAdd={handleAddAttribute}
             onEdit={(attr) => handleEditAttribute(attr.current)}

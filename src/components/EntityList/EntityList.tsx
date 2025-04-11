@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import type { ApiEntity } from '../types/entities/entity';
+import type { ApiEntity } from '../../types/entities/entity';
 import './EntityList.css';
 
 interface EntityListProps {

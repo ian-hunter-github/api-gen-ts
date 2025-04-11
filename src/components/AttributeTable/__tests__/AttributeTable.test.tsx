@@ -1,8 +1,7 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AttributeTable } from '../AttributeTable';
-import type { AttributeModel, EntityAttribute, AttributeType } from '../../types/entities/attributes';
+import type { AttributeModel, EntityAttribute, AttributeType } from '../../../types/entities/attributes';
 
 const createMockAttribute = (
   id: string,
@@ -11,7 +10,22 @@ const createMockAttribute = (
   required: boolean
 ): AttributeModel => {
   const attr: EntityAttribute = { name, type, required };
-  return {
+  
+  // Create a mock that matches the History interface structure
+  const historyMock = {
+    currentIndex: 0,
+    current: attr,
+    canUndo: false,
+    canRedo: false,
+    undo: jest.fn(),
+    redo: jest.fn(),
+    update: jest.fn(),
+    updateDeleted: jest.fn(),
+    get historyLength() { return 1; }
+  };
+
+  // Create base mock object
+  const baseMock = {
     id,
     current: attr,
     original: attr,
@@ -22,19 +36,18 @@ const createMockAttribute = (
     canUndo: false,
     canRedo: false,
     undo: jest.fn(),
-    redo: jest.fn(),
-    // @ts-expect-error - private property access for testing
-    _history: {
-      current: attr,
-      canUndo: false,
-      canRedo: false,
-      undo: jest.fn(),
-      redo: jest.fn(),
-      update: jest.fn(),
-      updateDeleted: jest.fn(),
-      get historyLength() { return 1; }
-    }
+    redo: jest.fn()
   };
+
+  // Create full mock with private history property
+  const mock = baseMock as unknown as AttributeModel;
+  Object.defineProperty(mock, 'history', {
+    value: historyMock,
+    writable: true,
+    enumerable: false
+  });
+
+  return mock;
 };
 
 const mockAttributes: AttributeModel[] = [
@@ -42,7 +55,7 @@ const mockAttributes: AttributeModel[] = [
   createMockAttribute('2', 'name', 'string', false)
 ];
 
-jest.mock('../AttributeDialog', () => ({
+jest.mock('../../AttributeDialog/AttributeDialog', () => ({
   AttributeDialog: jest.fn(({ open, onSave }) => {
     if (!open) return null;
     return (
