@@ -2,15 +2,14 @@ import React from 'react';
 import type { EntityAttribute } from '../../types/entities/attributes';
 import { Model } from '../../utils/Model';
 import { Row } from './Row';
-import './AttributeRowView.css';
+import './AttributeRow.css';
 
-interface AttributeRowViewProps {
+interface AttributeRowProps {
   model: Model<EntityAttribute>;
   onEdit: (model: Model<EntityAttribute>) => void;
   onDelete: (model: Model<EntityAttribute>) => void;
   onUndo: (model: Model<EntityAttribute>) => void;
   onRedo: (model: Model<EntityAttribute>) => void;
-  deleted: boolean;
   changed: boolean;
 }
 
@@ -37,13 +36,12 @@ const renderAttributeCells = (attr: EntityAttribute | null) => {
   ];
 };
 
-export const AttributeRowView: React.FC<AttributeRowViewProps> = ({
+export const AttributeRow: React.FC<AttributeRowProps> = ({
   model,
   onEdit,
   onDelete,
   onUndo,
   onRedo,
-  deleted,
   changed,
 }) => {
   return (
@@ -53,7 +51,6 @@ export const AttributeRowView: React.FC<AttributeRowViewProps> = ({
       onDelete={onDelete}
       onUndo={onUndo}
       onRedo={onRedo}
-      deleted={deleted}
       changed={changed}
       renderCellContent={renderAttributeCells}
     />

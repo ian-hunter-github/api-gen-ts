@@ -51,22 +51,25 @@ export class Model<T> {
   }
 
   undo(): boolean {
-    const result = this.history.undo();
-    if (result !== null) {
-      this.status = result === null ? 'deleted' : 
-                   this.original && JSON.stringify(result) === JSON.stringify(this.original) ? 
+    if (!this.history.canUndo) return false;
+    
+    this.history.undo();
+    
+    if (this.history.current === null) {
+      // Undoing to a deleted state
+      this.status = 'deleted';
+    } else {
+      this.status = this.original && JSON.stringify(this.history.current) === JSON.stringify(this.original) ? 
                    'pristine' : 'modified';
-      return true;
     }
-    return false;
+    return true;
   }
 
   redo(): boolean {
-    const result = this.history.redo();
-    if (result !== null || this.history.current === null) {
-      this.status = this.history.current === null ? 'deleted' : 'modified';
-      return true;
-    }
-    return false;
+    if (!this.history.canRedo) return false;
+    
+    this.history.redo();
+    this.status = this.history.current === null ? 'deleted' : 'modified';
+    return true;
   }
 }

@@ -1,17 +1,17 @@
 import { StoryFn, Meta } from '@storybook/react';
-import { AttributeRowView } from './AttributeRowView';
+import { AttributeRow } from './AttributeRow';
 import { EntityAttribute, AttributeType } from '../../types/entities/attributes';
 import { AttributeModel } from '../../types/entities/AttributeModel';
 
 export default {
-  title: 'Components/AttributeRowView',
-  component: AttributeRowView,
+  title: 'Components/AttributeRow',
+  component: AttributeRow,
 } as Meta;
 
-const Template: StoryFn<typeof AttributeRowView> = (args) => (
+const Template: StoryFn<typeof AttributeRow> = (args) => (
   <table>
     <tbody>
-      <AttributeRowView {...args} />
+      <AttributeRow {...args} />
     </tbody>
   </table>
 );

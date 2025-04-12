@@ -3,7 +3,7 @@ import './AttributeTable.css';
 import type { EntityAttribute } from '../../types/entities/attributes';
 import { Model } from '../../utils/Model';
 import { AttributeDialog } from '../AttributeDialog/AttributeDialog';
-import { AttributeRowView } from '../AttributeRowView/AttributeRowView';
+import { AttributeRow } from '../AttributeRow/AttributeRow';
 
 interface AttributeTableProps {
   initialAttributes: Model<EntityAttribute>[];
@@ -112,7 +112,7 @@ export const AttributeTable = React.forwardRef<{
         </div>
         <div className="table-body">
           {processedAttributes.map((attribute: Model<EntityAttribute>) => (
-            <AttributeRowView
+            <AttributeRow
               key={attribute.id}
               model={attribute}
               onEdit={() => attribute.status !== 'deleted' && handleEdit(attribute)}
@@ -127,7 +127,6 @@ export const AttributeTable = React.forwardRef<{
                 setAttributes(prev => [...prev]);
                 onChange?.();
               }}
-              deleted={attribute.status === 'deleted'}
               changed={attribute.status === 'modified'}
             />
           ))}

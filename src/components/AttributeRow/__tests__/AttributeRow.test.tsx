@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { AttributeRowView } from '../AttributeRowView';
+import { AttributeRow } from '../AttributeRow';
 import { Model } from '../../../utils/Model';
 import type { EntityAttribute } from '../../../types/entities/attributes';
 
@@ -21,7 +21,6 @@ jest.mock('../Row', () => ({
       onDelete,
       onUndo,
       onRedo,
-      deleted: false,
       changed: false
     });
 
@@ -65,7 +64,7 @@ jest.mock('../Row', () => ({
   }),
 }));
 
-describe('AttributeRowView', () => {
+describe('AttributeRow', () => {
     const mockAttribute = new Model<EntityAttribute>({
       id: 'mock-uuid-o3ecbbq',
       name: 'username', 
@@ -84,13 +83,12 @@ describe('AttributeRowView', () => {
 
   it('renders attribute name, type and required status', () => {
     render(
-      <AttributeRowView
+      <AttributeRow
         model={mockAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
-        deleted={false}
         changed={false}
       />
     );
@@ -102,13 +100,12 @@ describe('AttributeRowView', () => {
 
   it('passes correct props to Row component', () => {
     render(
-      <AttributeRowView
+      <AttributeRow
         model={mockAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
-        deleted={true}
         changed={true}
       />
     );
@@ -126,13 +123,12 @@ describe('AttributeRowView', () => {
     });
     
     const { container } = render(
-      <AttributeRowView
+      <AttributeRow
         model={nullAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
-        deleted={false}
         changed={false}
       />
     );
@@ -142,13 +138,12 @@ describe('AttributeRowView', () => {
 
   it('passes edit/delete callbacks to Row', () => {
     render(
-      <AttributeRowView
+      <AttributeRow
         model={mockAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
-        deleted={false}
         changed={false}
       />
     );
@@ -176,13 +171,12 @@ describe('AttributeRowView', () => {
 
   it('passes undo/redo callbacks to Row', () => {
     render(
-      <AttributeRowView
+      <AttributeRow
         model={mockAttribute}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
         onUndo={mockOnUndo}
         onRedo={mockOnRedo}
-        deleted={false}
         changed={false}
       />
     );
@@ -192,25 +186,5 @@ describe('AttributeRowView', () => {
 
     fireEvent.click(screen.getByLabelText('Redo username'));
     expect(mockOnRedo).toHaveBeenCalledWith(mockAttribute);
-  });
-
-  it('passes deleted/changed states to Row', () => {
-    render(
-      <AttributeRowView
-        model={mockAttribute}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onUndo={mockOnUndo}
-        onRedo={mockOnRedo}
-        deleted={true}
-        changed={true}
-      />
-    );
-
-    const editButton = screen.getByLabelText('Edit username');
-    const deleteButton = screen.getByLabelText('Delete username');
-    
-    expect(editButton).not.toBeDisabled();
-    expect(deleteButton).not.toBeDisabled();
   });
 });
