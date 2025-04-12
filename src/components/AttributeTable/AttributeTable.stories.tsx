@@ -126,11 +126,7 @@ export const Empty: Story = {
   args: {
     initialAttributes: [],
     onAdd: () => console.log('Add clicked'),
-    onEdit: (attr) => console.log('Edit clicked', attr),
-    onDelete: (name) => console.log('Delete clicked', name),
-    onUndoDelete: (name) => console.log('Undo delete clicked', name),
-    changedAttributes: new Set(),
-    deletedAttributes: new Set()
+    onEdit: (attr: AttributeModel) => console.log('Edit clicked', attr)
   }
 };
 
@@ -138,11 +134,7 @@ export const WithAttributes: Story = {
   args: {
     initialAttributes: mockAttributes,
     onAdd: () => console.log('Add clicked'),
-    onEdit: (attr) => console.log('Edit clicked', attr),
-    onDelete: (name) => console.log('Delete clicked', name),
-    onUndoDelete: (name) => console.log('Undo delete clicked', name),
-    changedAttributes: new Set(),
-    deletedAttributes: new Set()
+    onEdit: (attr: AttributeModel) => console.log('Edit clicked', attr)
   }
 };
 
@@ -150,11 +142,7 @@ export const WithChangedAttributes: Story = {
   args: {
     initialAttributes: mockAttributesWithUndo,
     onAdd: () => console.log('Add clicked'),
-    onEdit: (attr) => console.log('Edit clicked', attr),
-    onDelete: (name) => console.log('Delete clicked', name),
-    onUndoDelete: (name) => console.log('Undo delete clicked', name),
-    changedAttributes: new Set(['name', 'isActive']),
-    deletedAttributes: new Set()
+    onEdit: (attr: AttributeModel) => console.log('Edit clicked', attr)
   }
 };
 
@@ -162,10 +150,6 @@ export const WithDeletedAttributes: Story = {
   args: {
     initialAttributes: mockAttributesWithDeleted,
     onAdd: () => console.log('Add clicked'),
-    onEdit: (attr) => console.log('Edit clicked', attr),
-    onDelete: (name) => console.log('Delete clicked', name),
-    onUndoDelete: (name) => console.log('Undo delete clicked', name),
-    changedAttributes: new Set(),
-    deletedAttributes: new Set(['age'])
+    onEdit: (attr: AttributeModel) => console.log('Edit clicked', attr)
   }
 };

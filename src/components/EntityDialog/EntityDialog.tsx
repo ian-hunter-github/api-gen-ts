@@ -93,8 +93,10 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
     // Implementation needed
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleEditAttribute = (attribute: AttributeModel): void => {
-    const name = attribute.current?.name ?? 'unknown';
+    console.log('Editing attribute:', attribute.current?.name ?? 'unknown');
+    // TODO: Implement attribute editing (will use the attribute parameter)
   };
 
   const handleSave = (): void => {

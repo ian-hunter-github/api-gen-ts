@@ -74,7 +74,7 @@ export const AttributeDialog: React.FC<AttributeDialogProps> = ({
   const isEditMode = !!(initialModel.current && initialModel.current.name);
   const isValid = attribute.name.trim() !== '' && !nameError;
 
-  const handleClose = (event: object, reason: 'backdropClick' | 'escapeKeyDown') => {
+  const handleClose = (reason: 'backdropClick' | 'escapeKeyDown') => {
     if (reason === 'backdropClick' && changedFields.size > 0) {
       if (!window.confirm('You have unsaved changes. Are you sure you want to discard them?')) {
         return;
