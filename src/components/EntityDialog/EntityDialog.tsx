@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog';
 import type { ApiEntity } from '../../types/entities/entity';
 import type { EntityAttribute } from '../../types/entities/attributes';
-import { AttributeModel } from '../../types/entities/attributes';
+import { Model } from '../../utils/Model';
 import { AttributeTable } from '../AttributeTable/AttributeTable';
 import './EntityDialog.css';
 
@@ -83,18 +83,18 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
   };
 
   const attributeModels = useMemo(() => 
-    currentEntity.attributes.map((attr: EntityAttribute) => new AttributeModel(attr)),
+    currentEntity.attributes.map((attr: EntityAttribute) => new Model<EntityAttribute>(attr)),
     [currentEntity.attributes]
   );
 
-  const attributeTableRef = React.useRef<{ getAttributes: () => AttributeModel[] }>(null);
+  const attributeTableRef = React.useRef<{ getAttributes: () => Model<EntityAttribute>[] }>(null);
 
   const handleAddAttribute = (): void => {
     // Implementation needed
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleEditAttribute = (attribute: AttributeModel): void => {
+  const handleEditAttribute = (attribute: Model<EntityAttribute>): void => {
     console.log('Editing attribute:', attribute.current?.name ?? 'unknown');
     // TODO: Implement attribute editing (will use the attribute parameter)
   };

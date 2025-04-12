@@ -1,29 +1,30 @@
 import React, { useState, useMemo } from 'react';
 import './AttributeTable.css';
-import type { AttributeModel } from '../../types/entities/attributes';
+import type { EntityAttribute } from '../../types/entities/attributes';
+import { Model } from '../../utils/Model';
 import { AttributeDialog } from '../AttributeDialog/AttributeDialog';
 import { AttributeRowView } from '../AttributeRowView/AttributeRowView';
 
 interface AttributeTableProps {
-  initialAttributes: AttributeModel[];
+  initialAttributes: Model<EntityAttribute>[];
   onAdd: () => void;
-  onEdit: (attribute: AttributeModel) => void;
+  onEdit: (attribute: Model<EntityAttribute>) => void;
   onChange?: () => void;
 }
 
 export const AttributeTable = React.forwardRef<{
-  getAttributes: () => AttributeModel[];
+  getAttributes: () => Model<EntityAttribute>[];
 }, AttributeTableProps>(({
   initialAttributes,
   onAdd,
   onEdit,
   onChange,
 }, ref) => {
-  const [attributes, setAttributes] = useState<AttributeModel[]>(initialAttributes);
-  const [currentAttribute, setCurrentAttribute] = useState<AttributeModel | null>(null);
+  const [attributes, setAttributes] = useState<Model<EntityAttribute>[]>(initialAttributes);
+  const [currentAttribute, setCurrentAttribute] = useState<Model<EntityAttribute> | null>(null);
   const [isAttributeDialogOpen, setIsAttributeDialogOpen] = useState(false);
 
-  const handleEdit = (attribute: AttributeModel) => {
+  const handleEdit = (attribute: Model<EntityAttribute>) => {
     // Skip edit if attribute is deleted or has no current state
     if (attribute.status === 'deleted' || !attribute.current) {
       return;
@@ -56,7 +57,7 @@ export const AttributeTable = React.forwardRef<{
     [attributes]
   );
 
-  const handleSave = (attribute: AttributeModel) => {
+  const handleSave = (attribute: Model<EntityAttribute>) => {
     if (!attribute.current) return;
     
     setAttributes(prev => 
@@ -107,7 +108,7 @@ export const AttributeTable = React.forwardRef<{
           <div className="table-header-cell">Actions</div>
         </div>
         <div className="table-body">
-          {processedAttributes.map((attribute: AttributeModel) => (
+          {processedAttributes.map((attribute: Model<EntityAttribute>) => (
             <AttributeRowView
               key={attribute.id}
               model={attribute}

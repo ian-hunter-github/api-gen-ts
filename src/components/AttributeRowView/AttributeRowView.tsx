@@ -1,13 +1,14 @@
 import React from 'react';
-import { AttributeModel } from '../../types/entities/attributes';
+import type { EntityAttribute } from '../../types/entities/attributes';
+import { Model } from '../../utils/Model';
 import './AttributeRowView.css';
 
 interface AttributeRowViewProps {
-  model: AttributeModel;
-  onEdit: (model: AttributeModel) => void;
-  onDelete: (model: AttributeModel) => void;
-  onUndo: (model: AttributeModel) => void;
-  onRedo: (model: AttributeModel) => void;
+  model: Model<EntityAttribute>;
+  onEdit: (model: Model<EntityAttribute>) => void;
+  onDelete: (model: Model<EntityAttribute>) => void;
+  onUndo: (model: Model<EntityAttribute>) => void;
+  onRedo: (model: Model<EntityAttribute>) => void;
   deleted: boolean;
   changed: boolean;
 }

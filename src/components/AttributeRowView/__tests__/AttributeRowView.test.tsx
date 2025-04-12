@@ -2,10 +2,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import '../AttributeRowView.css';
 import { AttributeRowView } from '../AttributeRowView';
-import { AttributeModel } from '../../../types/entities/attributes';
+import { Model } from '../../../utils/Model';
+import type { EntityAttribute } from '../../../types/entities/attributes';
 
 describe('AttributeRowView', () => {
-  const mockAttribute = new AttributeModel({
+  const mockAttribute = new Model<EntityAttribute>({
     name: 'username',
     type: 'string',
     required: true

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogTitle, DialogContent } from '@mui/material';
-import type { AttributeModel, EntityAttribute } from '../../types/entities/attributes';
+import type { Model } from '../../utils/Model';
+import type { EntityAttribute } from '../../types/entities/attributes';
 import './AttributeDialog.css';
 
 interface AttributeDialogProps {
-  attribute: AttributeModel;
+  attribute: Model<EntityAttribute>;
   existingNames: string[];
-  onSave: (attribute: AttributeModel) => void;
+  onSave: (attribute: Model<EntityAttribute>) => void;
   onCancel: () => void;
   open: boolean;
 }

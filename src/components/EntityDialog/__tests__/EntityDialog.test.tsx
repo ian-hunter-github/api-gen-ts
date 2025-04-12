@@ -2,12 +2,12 @@ import { render, fireEvent, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EntityDialog } from '../EntityDialog';
 import type { ApiEntity } from '../../../types/entities/entity';
-import { AttributeModel } from '../../../types/entities/attributes';
+import { Model } from '../../../utils/Model';
 import type { EntityAttribute } from '../../../types/entities/attributes';
 
-class MockAttributeModel extends AttributeModel {
-  constructor(attribute: EntityAttribute, status: 'pristine' | 'modified' | 'deleted' | 'new' = 'pristine') {
-    super(attribute, status);
+class MockAttributeModel extends Model<EntityAttribute> {
+  constructor(attribute: EntityAttribute) {
+    super(attribute);
     // Mock methods
     this.update = jest.fn();
     this.delete = jest.fn();

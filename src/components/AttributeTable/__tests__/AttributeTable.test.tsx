@@ -1,7 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AttributeTable } from '../AttributeTable';
-import type { AttributeModel, EntityAttribute, AttributeType } from '../../../types/entities/attributes';
+import type { EntityAttribute, AttributeType } from '../../../types/entities/attributes';
+import type { AttributeModel } from '../../../types/entities/AttributeModel';
 
 const createMockAttribute = (
   id: string,

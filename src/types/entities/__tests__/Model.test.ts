@@ -1,7 +1,7 @@
-import { AttributeModel } from '../attributes';
+import { Model } from '../../../utils/Model';
 import { EntityAttribute } from '../attributes';
 
-describe('AttributeModel', () => {
+describe('Model<EntityAttribute>', () => {
   const testAttribute: EntityAttribute = {
     name: 'testName',
     type: 'string',
@@ -10,13 +10,13 @@ describe('AttributeModel', () => {
   };
 
   it('creates with pristine status by default', () => {
-    const model = new AttributeModel(testAttribute);
+    const model = new Model<EntityAttribute>(testAttribute);
     expect(model.status).toBe('pristine');
     expect(model.original).toEqual(testAttribute);
   });
 
   it('tracks changes with update()', () => {
-    const model = new AttributeModel(testAttribute);
+    const model = new Model<EntityAttribute>(testAttribute);
     model.update({ required: false });
     expect(model.current?.required).toBe(false);
     expect(model.status).toBe('modified');
@@ -24,20 +24,20 @@ describe('AttributeModel', () => {
   });
 
   it('handles delete()', () => {
-    const model = new AttributeModel(testAttribute);
+    const model = new Model<EntityAttribute>(testAttribute);
     model.delete();
     expect(model.status).toBe('deleted');
   });
 
   it('handles restore()', () => {
-    const model = new AttributeModel(testAttribute);
+    const model = new Model<EntityAttribute>(testAttribute);
     model.delete();
     model.restore();
     expect(model.status).toBe('pristine');
   });
 
   it('supports undo/redo', () => {
-    const model = new AttributeModel(testAttribute);
+    const model = new Model<EntityAttribute>(testAttribute);
     
     // First update
     model.update({ required: false });
@@ -70,7 +70,7 @@ describe('AttributeModel', () => {
   });
 
   it('clears redo stack after new edit following undo', () => {
-    const model = new AttributeModel(testAttribute);
+    const model = new Model<EntityAttribute>(testAttribute);
     
     // Initial state
     expect(model.current?.description).toBe('testDescription');
@@ -113,7 +113,7 @@ describe('AttributeModel', () => {
   });
 
   it('handles new attributes', () => {
-    const model = new AttributeModel(testAttribute, 'new');
+    const model = new Model<EntityAttribute>(testAttribute, 'new');
     expect(model.status).toBe('new');
     expect(model.original).toBeUndefined();
   });

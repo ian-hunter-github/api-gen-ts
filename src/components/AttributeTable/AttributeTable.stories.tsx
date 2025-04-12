@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { AttributeTable } from './AttributeTable';
-import type { AttributeModel, AttributeType } from '../../types/entities/attributes';
+import type { AttributeType } from '../../types/entities/attributes';
+import type { AttributeModel } from '../../types/entities/AttributeModel';
 
 const createMockAttribute = (
   name: string,
