@@ -17,6 +17,7 @@ describe('APIConfig Schema Validation', () => {
           description: 'System user',
           attributes: [
             {
+              id: 'attr-id-string',
               name: 'id',
               type: 'string',
               description: 'User ID'

@@ -17,58 +17,68 @@ const Template: StoryFn<typeof AttributeRowView> = (args) => (
 );
 
 const baseAttribute: EntityAttribute = {
+  id: 'attr-test-string',
   name: 'test',
   type: 'string' as AttributeType,
   required: true
 };
 
 const dateAttribute: EntityAttribute = {
+  id: 'attr-birthDate-date',
   name: 'birthDate',
   type: 'date',
   required: false
 };
 
 const datetimeAttribute: EntityAttribute = {
+  id: 'attr-createdAt-datetime',
   name: 'createdAt',
   type: 'datetime',
   required: true
 };
 
 const timestampAttribute: EntityAttribute = {
+  id: 'attr-updatedAt-timestamp',
   name: 'updatedAt',
   type: 'timestamp',
   required: true
 };
 
 const uuidAttribute: EntityAttribute = {
+  id: 'attr-id-uuid',
   name: 'id',
   type: 'uuid',
   required: true
 };
 
 const objectAttribute: EntityAttribute = {
+  id: 'attr-metadata-object',
   name: 'metadata',
   type: 'object',
   required: false
 };
 
 const arrayAttribute: EntityAttribute = {
+  id: 'attr-tags-array',
   name: 'tags',
   type: 'array',
   required: false,
   items: {
+    id: 'attr-tag-string',
     name: 'tag',
     type: 'string'
   }
 };
 
 const referenceAttribute: EntityAttribute = {
+  id: 'attr-userId-reference',
   name: 'userId',
   type: 'reference',
   required: true
 };
 
 const enumAttribute: EntityAttribute = {
+  id: 'attr-status-enum',
   name: 'status',
   type: 'enum',
   required: true,

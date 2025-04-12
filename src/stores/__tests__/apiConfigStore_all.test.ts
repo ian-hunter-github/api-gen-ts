@@ -61,11 +61,11 @@ describe('apiConfigStore - Comprehensive Chat API Example', () => {
           name: 'User',
           description: 'Chat application user',
           attributes: [
-            { name: 'id', type: 'uuid', required: true },
-            { name: 'username', type: 'string', required: true, unique: true },
-            { name: 'email', type: 'string', required: true, unique: true },
-            { name: 'status', type: 'enum', values: ['online', 'offline', 'away'], default: 'offline' },
-            { name: 'lastSeen', type: 'timestamp' }
+            { id : 'id', name: 'id', type: 'uuid', required: true },
+            { id : 'username', name: 'username', type: 'string', required: true, unique: true },
+            { id : 'email', name: 'email', type: 'string', required: true, unique: true },
+            { id : 'status', name: 'status', type: 'enum', values: ['online', 'offline', 'away'], default: 'offline' },
+            { id : 'lastSeen', name: 'lastSeen', type: 'timestamp' }
           ],
           relationships: [
             {
@@ -88,12 +88,12 @@ describe('apiConfigStore - Comprehensive Chat API Example', () => {
           name: 'ChatRoom',
           description: 'Chat room where users can communicate',
           attributes: [
-            { name: 'id', type: 'uuid', required: true },
-            { name: 'name', type: 'string', required: true },
-            { name: 'description', type: 'string' },
-            { name: 'type', type: 'enum', values: ['public', 'private'], default: 'public' },
-            { name: 'createdAt', type: 'timestamp', required: true },
-            { name: 'createdBy', type: 'uuid', required: true }
+            { id : 'id',  name: 'id', type: 'uuid', required: true },
+            { id : 'name', name: 'name', type: 'string', required: true },
+            { id : 'description',name: 'description', type: 'string' },
+            { id : 'type',name: 'type', type: 'enum', values: ['public', 'private'], default: 'public' },
+            { id : 'createdAt',name: 'createdAt', type: 'timestamp', required: true },
+            { id : 'createdBy',name: 'createdBy', type: 'uuid', required: true }
           ],
           relationships: [
             {
@@ -117,10 +117,10 @@ describe('apiConfigStore - Comprehensive Chat API Example', () => {
           name: 'Message',
           description: 'Chat message',
           attributes: [
-            { name: 'id', type: 'uuid', required: true },
-            { name: 'content', type: 'string', required: true },
-            { name: 'timestamp', type: 'timestamp', required: true },
-            { name: 'edited', type: 'boolean', default: false }
+            { id : 'id', name: 'id', type: 'uuid', required: true },
+            { id : 'content', name: 'content', type: 'string', required: true },
+            { id : 'timestamp', name: 'timestamp', type: 'timestamp', required: true },
+            { id : 'edited', name: 'edited', type: 'boolean', default: false }
           ],
           relationships: [
             {
@@ -143,10 +143,10 @@ describe('apiConfigStore - Comprehensive Chat API Example', () => {
           name: 'UserChatRoom',
           description: 'Join table for users and rooms',
           attributes: [
-            { name: 'userId', type: 'uuid', required: true },
-            { name: 'roomId', type: 'uuid', required: true },
-            { name: 'joinedAt', type: 'timestamp', required: true },
-            { name: 'role', type: 'enum', values: ['member', 'admin'], default: 'member' }
+            { id: 'userId', name: 'userId', type: 'uuid', required: true },
+            { id: 'roomId', name: 'roomId', type: 'uuid', required: true },
+            { id: 'joinedAt', name: 'joinedAt', type: 'timestamp', required: true },
+            { id: 'role',  name: 'role', type: 'enum', values: ['member', 'admin'], default: 'member' }
           ]
         }
       ],

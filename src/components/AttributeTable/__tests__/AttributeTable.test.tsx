@@ -10,7 +10,7 @@ const createMockAttribute = (
   type: AttributeType,
   required: boolean
 ): AttributeModel => {
-  const attr: EntityAttribute = { name, type, required };
+  const attr: EntityAttribute = { id, name, type, required };
   
   // Create a mock that matches the History interface structure
   const historyMock = {
@@ -96,7 +96,8 @@ describe('AttributeTable', () => {
         {...mockCallbacks}
       />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Edit id' }));
+    const editButton = screen.getByLabelText('Edit id');
+    fireEvent.click(editButton);
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(mockCallbacks.onEdit).toHaveBeenCalledWith(mockAttributes[0]);
   });
@@ -108,9 +109,8 @@ describe('AttributeTable', () => {
         {...mockCallbacks}
       />
     );
-    const deleteButton = screen.getByRole('button', { name: 'Delete id' });
-    deleteButton.onclick = mockCallbacks.onDelete;
+    const deleteButton = screen.getByLabelText('Delete id');
     fireEvent.click(deleteButton);
-    expect(mockCallbacks.onDelete).toHaveBeenCalled();
+    expect(mockCallbacks.onDelete).toHaveBeenCalledWith(mockAttributes[0]);
   });
 });

@@ -9,6 +9,7 @@ interface AttributeTableProps {
   initialAttributes: Model<EntityAttribute>[];
   onAdd: () => void;
   onEdit: (attribute: Model<EntityAttribute>) => void;
+  onDelete?: (attribute: Model<EntityAttribute>) => void;
   onChange?: () => void;
 }
 
@@ -18,6 +19,7 @@ export const AttributeTable = React.forwardRef<{
   initialAttributes,
   onAdd,
   onEdit,
+  onDelete,
   onChange,
 }, ref) => {
   const [attributes, setAttributes] = useState<Model<EntityAttribute>[]>(initialAttributes);
@@ -40,6 +42,7 @@ export const AttributeTable = React.forwardRef<{
     if (attribute) {
       attribute.delete();
       setAttributes(prev => [...prev]); // Force re-render
+      onDelete?.(attribute);
       onChange?.();
     }
   };

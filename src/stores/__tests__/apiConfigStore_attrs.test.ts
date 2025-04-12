@@ -36,11 +36,11 @@ describe('apiConfigStore - Entity Attribute Operations', () => {
         {
           name: 'User',
           attributes: [
-            { name: 'id', type: 'uuid', required: true },
-            { name: 'name', type: 'string' },
-            { name: 'age', type: 'number' },
-            { name: 'isActive', type: 'boolean' },
-            { name: 'createdAt', type: 'datetime' }
+            { id: 'id', name: 'id', type: 'uuid', required: true },
+            { id: 'name', name: 'name', type: 'string' },
+            { id: 'age', name: 'age', type: 'number' },
+            { id: 'isActive', name: 'isActive', type: 'boolean' },
+            { id: 'createdAt', name: 'createdAt', type: 'datetime' }
           ]
         }
       ]
@@ -49,11 +49,11 @@ describe('apiConfigStore - Entity Attribute Operations', () => {
     const api = getStore().getApi(apiId);
     expect(api).toBeDefined();
     expect(api?.entities[0].attributes).toEqual([
-      { name: 'id', type: 'uuid', required: true },
-      { name: 'name', type: 'string' },
-      { name: 'age', type: 'number' },
-      { name: 'isActive', type: 'boolean' },
-      { name: 'createdAt', type: 'datetime' },
+      { id: 'id', name: 'id', type: 'uuid', required: true },
+      { id: 'name', name: 'name', type: 'string' },
+      { id: 'age', name: 'age', type: 'number' },
+      { id: 'isActive', name: 'isActive', type: 'boolean' },
+      { id: 'createdAt', name: 'createdAt', type: 'datetime' },
     ]);
   });
 
@@ -86,9 +86,11 @@ describe('apiConfigStore - Entity Attribute Operations', () => {
           name: 'User',
           attributes: [
             { 
+              id: 'tags',
               name: 'tags',
               type: 'array',
               items: {
+                id: 'tag',
                 name: 'tag',
                 type: 'string'
               }
@@ -102,9 +104,11 @@ describe('apiConfigStore - Entity Attribute Operations', () => {
     expect(api).toBeDefined();
     expect(api?.entities[0].attributes).toEqual([
       { 
+        id: 'tags',
         name: 'tags',
         type: 'array',
         items: {
+          id: 'tag',
           name: 'tag',
           type: 'string'
         }
@@ -140,19 +144,23 @@ describe('apiConfigStore - Entity Attribute Operations', () => {
         {
           name: 'User',
           attributes: [
-            { name: 'id', type: 'uuid', required: true },
+            { id: 'id', name: 'id', type: 'uuid', required: true },
             { 
+              id: 'profile',
               name: 'profile', 
               type: 'object',
               items: {
+                id: 'profile',
                 name: 'profile',
                 type: 'object'
               }
             },
             { 
+              id: 'addresses',
               name: 'addresses',
               type: 'array',
               items: {
+                id: 'address',
                 name: 'address',
                 type: 'string'
               }
@@ -165,19 +173,23 @@ describe('apiConfigStore - Entity Attribute Operations', () => {
     const api = getStore().getApi(apiId);
     expect(api).toBeDefined();
     expect(api?.entities[0].attributes).toEqual([
-      { name: 'id', type: 'uuid', required: true },
+      { id: 'id', name: 'id', type: 'uuid', required: true },
       { 
+        id: 'profile',
         name: 'profile',
         type: 'object',
         items: {
+          id: 'profile',
           name: 'profile',
           type: 'object'
         }
       },
       { 
+        id: 'addresses',
         name: 'addresses',
         type: 'array',
         items: {
+          id: 'address',
           name: 'address',
           type: 'string'
         }

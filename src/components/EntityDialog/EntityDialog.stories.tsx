@@ -27,8 +27,8 @@ const mockEntity: ApiEntity = {
   name: 'TestEntity',
   description: 'Test description',
   attributes: [
-    { name: 'id', type: 'string', required: true },
-    { name: 'createdAt', type: 'date', required: false }
+    { id: 'attr-id-string', name: 'id', type: 'string', required: true },
+    { id: 'attr-createdAt-date', name: 'createdAt', type: 'date', required: false }
   ]
 };
 
@@ -57,26 +57,26 @@ export const WithManyAttributes: Story = {
     entity: {
       ...mockEntity,
       attributes: [
-        { name: 'id', type: 'string', required: true },
-        { name: 'name', type: 'string', required: true },
-        { name: 'email', type: 'string', required: true },
-        { name: 'age', type: 'number', required: false },
-        { name: 'createdAt', type: 'date', required: false },
-        { name: 'updatedAt', type: 'date', required: false },
-        { name: 'isActive', type: 'boolean', required: false },
-        { name: 'address', type: 'string', required: false },
-        { name: 'phone', type: 'string', required: false },
-        { name: 'birthDate', type: 'date', required: false },
-        { name: 'gender', type: 'string', required: false },
-        { name: 'salary', type: 'number', required: false },
-        { name: 'department', type: 'string', required: true },
-        { name: 'position', type: 'string', required: true },
-        { name: 'startDate', type: 'date', required: true },
-        { name: 'endDate', type: 'date', required: false },
-        { name: 'manager', type: 'string', required: false },
-        { name: 'status', type: 'string', required: true },
-        { name: 'notes', type: 'string', required: false },
-        { name: 'avatar', type: 'string', required: false }
+        { id: 'attr-id-string', name: 'id', type: 'string', required: true },
+        { id: 'attr-name-string', name: 'name', type: 'string', required: true },
+        { id: 'attr-email-string', name: 'email', type: 'string', required: true },
+        { id: 'attr-age-number', name: 'age', type: 'number', required: false },
+        { id: 'attr-createdAt-date', name: 'createdAt', type: 'date', required: false },
+        { id: 'attr-updatedAt-date', name: 'updatedAt', type: 'date', required: false },
+        { id: 'attr-isActive-boolean', name: 'isActive', type: 'boolean', required: false },
+        { id: 'attr-address-string', name: 'address', type: 'string', required: false },
+        { id: 'attr-phone-string', name: 'phone', type: 'string', required: false },
+        { id: 'attr-birthDate-date', name: 'birthDate', type: 'date', required: false },
+        { id: 'attr-gender-string', name: 'gender', type: 'string', required: false },
+        { id: 'attr-salary-number', name: 'salary', type: 'number', required: false },
+        { id: 'attr-department-string', name: 'department', type: 'string', required: true },
+        { id: 'attr-position-string', name: 'position', type: 'string', required: true },
+        { id: 'attr-startDate-date', name: 'startDate', type: 'date', required: true },
+        { id: 'attr-endDate-date', name: 'endDate', type: 'date', required: false },
+        { id: 'attr-manager-string', name: 'manager', type: 'string', required: false },
+        { id: 'attr-status-string', name: 'status', type: 'string', required: true },
+        { id: 'attr-notes-string', name: 'notes', type: 'string', required: false },
+        { id: 'attr-avatar-string', name: 'avatar', type: 'string', required: false }
       ]
     },
     open: true

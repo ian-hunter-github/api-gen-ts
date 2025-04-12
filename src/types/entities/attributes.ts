@@ -6,6 +6,7 @@ export type AttributeType =
   | 'object' | 'array' | 'reference' | 'enum';
 
 export type EntityAttribute = {
+  id: string;
   name: string;
   type: AttributeType;
   required?: boolean;

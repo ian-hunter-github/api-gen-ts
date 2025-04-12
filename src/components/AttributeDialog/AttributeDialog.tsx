@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { Dialog, DialogTitle, DialogContent } from '@mui/material';
 import type { Model } from '../../utils/Model';
 import type { EntityAttribute } from '../../types/entities/attributes';
@@ -20,6 +21,7 @@ export const AttributeDialog: React.FC<AttributeDialogProps> = ({
   open = false
 }) => {
   const [attribute, setAttribute] = useState<EntityAttribute>(initialModel.current || {
+    id: uuidv4(),
     name: '',
     type: 'string',
     required: false,

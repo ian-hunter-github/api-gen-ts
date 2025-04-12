@@ -39,7 +39,7 @@ describe('apiConfigStore - Entity Relationship Operations', () => {
         {
           name: 'User',
           attributes: [
-            { name: 'id', type: 'uuid', required: true }
+            { id: 'id', name: 'id', type: 'uuid', required: true }
           ],
           relationships: [
             {
@@ -54,7 +54,7 @@ describe('apiConfigStore - Entity Relationship Operations', () => {
         {
           name: 'Post',
           attributes: [
-            { name: 'id', type: 'uuid', required: true }
+            { id: 'id', name: 'id', type: 'uuid', required: true }
           ],
           relationships: [
             {
@@ -122,7 +122,7 @@ describe('apiConfigStore - Entity Relationship Operations', () => {
         {
           name: 'User',
           attributes: [
-            { name: 'id', type: 'uuid', required: true }
+            { id: 'id', name: 'id', type: 'uuid', required: true }
           ],
           relationships: [
             { 
@@ -136,14 +136,14 @@ describe('apiConfigStore - Entity Relationship Operations', () => {
         {
           name: 'Role',
           attributes: [
-            { name: 'id', type: 'uuid', required: true }
+            { id: 'id', name: 'id', type: 'uuid', required: true }
           ]
         },
         {
           name: 'UserRole',
           attributes: [
-            { name: 'userId', type: 'uuid', required: true },
-            { name: 'roleId', type: 'uuid', required: true }
+            { id: 'userId', name: 'userId', type: 'uuid', required: true },
+            { id: 'roleId', name: 'roleId', type: 'uuid', required: true }
           ]
         }
       ]
@@ -162,8 +162,8 @@ describe('apiConfigStore - Entity Relationship Operations', () => {
     expect(api?.entities[2]).toEqual({
       name: 'UserRole',
       attributes: [
-        { name: 'userId', type: 'uuid', required: true },
-        { name: 'roleId', type: 'uuid', required: true }
+        { id: 'userId', name: 'userId', type: 'uuid', required: true },
+        { id: 'roleId', name: 'roleId', type: 'uuid', required: true }
       ],
       relationships: []
     });
@@ -201,7 +201,7 @@ describe('apiConfigStore - Entity Relationship Operations', () => {
           {
             name: 'User',
             attributes: [
-              { name: 'id', type: 'uuid', required: true }
+              { id: 'id', name: 'id', type: 'uuid', required: true }
             ],
             relationships: [
               { name: 'posts', type: 'one-to-many', source: 'User', target: 'Post' }

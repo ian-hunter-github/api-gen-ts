@@ -3,10 +3,11 @@ import { EntityAttribute } from '../attributes';
 
 describe('Model<EntityAttribute>', () => {
   const testAttribute: EntityAttribute = {
-    name: 'testName',
+    id: 'test-id',
+    name: 'test',
     type: 'string',
-    description: 'testDescription',
-    required: true
+    description: 'test description',
+    required: true,
   };
 
   it('creates with pristine status by default', () => {
@@ -50,7 +51,7 @@ describe('Model<EntityAttribute>', () => {
     // Undo second update
     expect(model.canUndo).toBe(true);
     model.undo();
-    expect(model.current?.description).toBe('testDescription');
+    expect(model.current?.description).toBe('test description');
     expect(model.current?.required).toBe(false);
     
     // Redo second update
@@ -65,7 +66,7 @@ describe('Model<EntityAttribute>', () => {
     // Undo second update again
     expect(model.canUndo).toBe(true);
     model.undo();
-    expect(model.current?.description).toBe('testDescription');
+    expect(model.current?.description).toBe('test description');
     expect(model.current?.required).toBe(false);
   });
 
@@ -73,7 +74,7 @@ describe('Model<EntityAttribute>', () => {
     const model = new Model<EntityAttribute>(testAttribute);
     
     // Initial state
-    expect(model.current?.description).toBe('testDescription');
+    expect(model.current?.description).toBe('test description');
     
     // First update
     model.update({ description: 'firstUpdate' });
@@ -99,7 +100,7 @@ describe('Model<EntityAttribute>', () => {
     expect(model.current?.description).toBe('firstUpdate');
     
     model.undo();
-    expect(model.current?.description).toBe('testDescription');
+    expect(model.current?.description).toBe('test description');
     
     // Verify we can't redo after new edit
     model.redo();

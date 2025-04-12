@@ -39,8 +39,8 @@ describe('apiConfigStore - Endpoint Operations', () => {
         {
           name: 'User',
           attributes: [
-            { name: 'id', type: 'uuid', required: true },
-            { name: 'name', type: 'string' }
+            { id: 'id', name: 'id', type: 'uuid', required: true },
+            { id: 'name', name: 'name', type: 'string' }
           ],
           endpoints: [
             {
@@ -125,8 +125,8 @@ describe('apiConfigStore - Endpoint Operations', () => {
         {
           name: 'User',
           attributes: [
-            { name: 'id', type: 'uuid', required: true },
-            { name: 'name', type: 'string' }
+            { id: 'id', name: 'id', type: 'uuid', required: true },
+            { id: 'name', name: 'name', type: 'string' }
           ],
           endpoints: [
             {
@@ -207,8 +207,8 @@ describe('apiConfigStore - Endpoint Operations', () => {
         {
           name: 'User',
           attributes: [
-            { name: 'id', type: 'uuid', required: true },
-            { name: 'name', type: 'string' }
+            { id: 'id', name: 'id', type: 'uuid', required: true },
+            { id: 'name', name: 'name', type: 'string' }
           ],
           endpoints: [
             {
@@ -287,8 +287,8 @@ describe('apiConfigStore - Endpoint Operations', () => {
         {
           name: 'User',
           attributes: [
-            { name: 'id', type: 'uuid', required: true },
-            { name: 'name', type: 'string' }
+            { id: 'id', name: 'id', type: 'uuid', required: true },
+            { id: 'name', name: 'name', type: 'string' }
           ],
           endpoints: [
             {
@@ -382,8 +382,8 @@ describe('apiConfigStore - Endpoint Operations', () => {
         {
           name: 'User',
           attributes: [
-            { name: 'id', type: 'uuid', required: true },
-            { name: 'name', type: 'string' }
+            { id: 'id', name: 'id', type: 'uuid', required: true },
+            { id: 'name', name: 'name', type: 'string' }
           ],
           endpoints: [
             {
