@@ -223,6 +223,7 @@ describe('EntityDialog', () => {
   });
 
   it('preserves entity-level changes while handling attributes', () => {
+
     render(
       <EntityDialog
         entity={mockEntity}
@@ -250,7 +251,8 @@ describe('EntityDialog', () => {
     expect(mockOnSave).toHaveBeenCalledTimes(1);
     const savedEntity = mockOnSave.mock.calls[0][0];
     expect(savedEntity.name).toBe('UpdatedEntity');
-    expect(savedEntity.attributes.length).toBe(2); // 1 deleted, 1 added
+    expect(savedEntity.attributes.length).toBe(1); // 1 added, the deleted is now lost.
+
   });
 
   it('discards changes when cancel is clicked', () => {

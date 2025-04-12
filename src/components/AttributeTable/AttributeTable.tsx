@@ -114,42 +114,12 @@ export const AttributeTable = React.forwardRef<{
               onEdit={() => attribute.status !== 'deleted' && handleEdit(attribute)}
               onDelete={() => attribute.current ? handleDelete(attribute.current.name) : undefined}
               onUndo={() => {
-                console.log('=== DEBUG: Before Undo ===');
-                console.log('Model:', {
-                  name: attribute.current?.name || attribute.previous?.name,
-                  status: attribute.status,
-                  canUndo: attribute.canUndo,
-                  canRedo: attribute.canRedo
-                });
-                const result = attribute.undo();
-                console.log('=== DEBUG: After Undo ===');
-                console.log('Undo result:', result);
-                console.log('Model:', {
-                  name: attribute.current?.name || attribute.previous?.name,
-                  status: attribute.status,
-                  canUndo: attribute.canUndo,
-                  canRedo: attribute.canRedo
-                });
+                attribute.undo();
                 setAttributes(prev => [...prev]);
                 onChange?.();
               }}
               onRedo={() => {
-                console.log('=== DEBUG: Before Redo ===');
-                console.log('Model:', {
-                  name: attribute.current?.name || attribute.previous?.name,
-                  status: attribute.status,
-                  canUndo: attribute.canUndo,
-                  canRedo: attribute.canRedo
-                });
-                const result = attribute.redo();
-                console.log('=== DEBUG: After Redo ===');
-                console.log('Redo result:', result);
-                console.log('Model:', {
-                  name: attribute.current?.name || attribute.previous?.name,
-                  status: attribute.status,
-                  canUndo: attribute.canUndo,
-                  canRedo: attribute.canRedo
-                });
+                attribute.redo();
                 setAttributes(prev => [...prev]);
                 onChange?.();
               }}

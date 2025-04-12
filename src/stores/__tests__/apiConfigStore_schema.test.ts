@@ -84,9 +84,7 @@ describe('APIConfig Schema Validation', () => {
     v.addSchema(securitySchema, securitySchema.$id);
     v.addSchema(deploymentSchema, deploymentSchema.$id);
     const validationResult = v.validate(complexConfig, apiConfigSchema);
-    if (!validationResult.valid) {
-      console.log('Validation errors:', validationResult.errors);
-    }
+
     expect(validationResult.valid).toBe(true);
     expect(validationResult.errors).toEqual([]);
   });

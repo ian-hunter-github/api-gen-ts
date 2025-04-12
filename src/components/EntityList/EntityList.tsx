@@ -85,7 +85,6 @@ const EntityListComponent: React.FC<EntityListProps> = ({
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log('EntityList delete clicked for:', entity.name);
                       onDelete(entity.name);
                     }}
                     aria-label="Delete"

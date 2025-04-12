@@ -65,24 +65,7 @@ export const AttributeRowView: React.FC<AttributeRowViewProps> = ({
           </button>
           <button
             onClick={() => {
-              console.log('=== DEBUG: Before Delete ===');
-              console.log('Model:', {
-                name: current.name,
-                status: model.status,
-                canUndo: model.canUndo,
-                canRedo: model.canRedo
-              });
-              console.log('Props:', { deleted, changed });
               onDelete(model);
-              setTimeout(() => {
-                console.log('=== DEBUG: After Delete ===');
-                console.log('Model:', {
-                  name: current.name,
-                  status: model.status,
-                  canUndo: model.canUndo,
-                  canRedo: model.canRedo
-                });
-              }, 100);
             }}
             disabled={deleted}
             aria-label={`Delete ${current.name}`}

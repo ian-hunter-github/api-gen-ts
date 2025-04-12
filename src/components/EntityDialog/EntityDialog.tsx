@@ -25,7 +25,6 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
   const [hasChanges, setHasChanges] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
-  console.log('EntityDialog mounted with initial changes:', hasChanges);
 
   const handleConfirmAction = useCallback((action: () => void) => {
     if (hasChanges) {
@@ -50,7 +49,6 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
   };
 
   const checkForChanges = (newEntity: ApiEntity): void => {
-    console.log('Checking for changes ...');
 
     // Check basic fields
     const basicFieldsChanged = newEntity.name !== entity.name || 
@@ -63,7 +61,6 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
       // Check for any modified, new, or deleted attributes
       attributesChanged = currentAttributes.some(attr => {
         const isChanged = attr.status !== 'pristine';
-        console.log(`Attribute ${attr.current?.name || attr.previous?.name}: status=${attr.status}, changed=${isChanged}`);
         return isChanged;
       });
 
@@ -77,13 +74,11 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
       );
       
       if (hasDeletedAttributes) {
-        console.log('Detected fully deleted attributes');
         attributesChanged = true;
       }
     }
 
     const changed = basicFieldsChanged || attributesChanged;
-    console.log('Change detected - basic:', basicFieldsChanged, 'attributes:', attributesChanged);
     setHasChanges(changed);
   };
 
@@ -100,7 +95,6 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
 
   const handleEditAttribute = (attribute: AttributeModel): void => {
     const name = attribute.current?.name ?? 'unknown';
-    console.log('Editing attribute:', name);
   };
 
   const handleSave = (): void => {

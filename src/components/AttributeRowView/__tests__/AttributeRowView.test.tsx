@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import '../AttributeRowView.css';
 import { AttributeRowView } from '../AttributeRowView';
 import { AttributeModel } from '../../../types/entities/attributes';
 
@@ -120,7 +121,7 @@ describe('AttributeRowView', () => {
     );
 
     const row = screen.getByText('username').closest('.attribute-row');
-    expect(row).toHaveClass('changed');
+    expect(row).toHaveClass('modified');
   });
 
   it('applies deleted styling when deleted is true', () => {
@@ -157,7 +158,7 @@ describe('AttributeRowView', () => {
     expect(screen.getByLabelText('Delete username')).toBeDisabled();
   });
 
-  it('applies strikethrough to text fields when deleted is true', () => {
+  it('applies deleted class to row when deleted is true', () => {
     render(
       <AttributeRowView
         model={mockAttribute}
@@ -170,8 +171,8 @@ describe('AttributeRowView', () => {
       />
     );
 
-    const nameCell = screen.getByTestId('attribute-name-username');
-    expect(nameCell).toHaveStyle('text-decoration: line-through');
+    const row = screen.getByText('username').closest('.attribute-row');
+    expect(row).toHaveClass('deleted');
   });
 
   it('enables undo button when deleted is true', () => {
