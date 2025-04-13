@@ -2,20 +2,11 @@ import React, { useState, useCallback, useMemo, memo } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { MemoizedEntityList } from '../EntityList/EntityList';
 import { EntityDialog } from '../EntityDialog/EntityDialog';
+import { JsonEditorPanel } from './JsonEditorPanel';
+import { debounce } from '../../utils/debounce';
 import type { ApiEntity } from '../../types/entities/entity';
-import ReactJson, { InteractionProps } from 'react-json-view';
 import type { ApiConfig } from '../../types/api.types';
 import './ApiConfigEditor.css';
-
-const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(func: F, wait: number) => {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
-  return (...args: Parameters<F>) => {
-    if (timeout !== null) {
-      clearTimeout(timeout);
-    }
-    timeout = setTimeout(() => func(...args), wait);
-  };
-};
 
 const InputField = memo(({
   name,
@@ -91,14 +82,6 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
   const [changes, setChanges] = useState<Set<string>>(new Set());
   const [errors, setErrors] = useState<Set<string>>(new Set());
   const [editMode, setEditMode] = useState<boolean>(false);
-  const [theme, setTheme] = useState<
-    'summerfruit:inverted' | 'monokai' | 'solarized' | 'bright' | 
-    'apathy:inverted' | 'ashes' | 'bespin' | 'brewer' | 'chalk' | 'codeschool' |
-    'colors' | 'eighties' | 'embers' | 'flat' | 'google' | 'grayscale' | 
-    'greenscreen' | 'harmonic' | 'hopscotch' | 'isotope' | 'marrakesh' | 
-    'mocha' | 'ocean' | 'paraiso' | 'pop' | 'railscasts' | 
-    'rjv-default' | 'shapeshifter' | 'tomorrow' | 'tube' | 'twilight'
-  >('summerfruit:inverted');
   const [editingEntity, setEditingEntity] = useState<ApiEntity | null>(null);
   const [isEntityDialogOpen, setIsEntityDialogOpen] = useState(false);
 
@@ -232,77 +215,19 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
         </Panel>
         <PanelResizeHandle className="resize-handle" />
         <Panel defaultSize={50} minSize={30}>
-          <div className="json-panel">
-            <div className="json-controls">
-              <button 
-                className={`mode-toggle ${editMode ? 'edit-active' : 'view-active'}`}
-                onClick={() => setEditMode(!editMode)}
-              >
-                {editMode ? '✏️ Editing JSON' : '👁️ Viewing JSON'}
-              </button>
-              <select
-                value={theme}
-                onChange={(e) => setTheme(e.target.value as typeof theme)}
-                className="theme-selector"
-              >
-                <option value="summerfruit:inverted">Summerfruit (Default)</option>
-                <option value="monokai">Monokai</option>
-                <option value="solarized">Solarized</option>
-                <option value="bright">Bright</option>
-                <option value="apathy:inverted">Apathy</option>
-                <option value="ashes">Ashes</option>
-                <option value="bespin">Bespin</option>
-                <option value="brewer">Brewer</option>
-                <option value="chalk">Chalk</option>
-                <option value="codeschool">Codeschool</option>
-                <option value="colors">Colors</option>
-                <option value="eighties">Eighties</option>
-                <option value="embers">Embers</option>
-                <option value="flat">Flat</option>
-                <option value="google">Google</option>
-                <option value="grayscale">Grayscale</option>
-                <option value="greenscreen">Greenscreen</option>
-                <option value="harmonic">Harmonic</option>
-                <option value="hopscotch">Hopscotch</option>
-                <option value="isotope">Isotope</option>
-                <option value="marrakesh">Marrakesh</option>
-                <option value="mocha">Mocha</option>
-                <option value="ocean">Ocean</option>
-                <option value="paraiso">Paraiso</option>
-                <option value="pop">Pop</option>
-                <option value="railscasts">Railscasts</option>
-                <option value="rjv-default">Default</option>
-                <option value="shapeshifter">Shapeshifter</option>
-                <option value="tomorrow">Tomorrow</option>
-                <option value="tube">Tube</option>
-                <option value="twilight">Twilight</option>
-              </select>
-            </div>
-            <ReactJson
-              src={memoizedConfig}
-              name={false}
-              theme={theme}
-              displayDataTypes={false}
-              enableClipboard={false}
-              collapsed={1}
-              collapseStringsAfterLength={50}
-              onEdit={editMode ? debounce((edit: InteractionProps) => {
-                const updatedConfig = edit.updated_src as ApiConfig;
+            <JsonEditorPanel
+              config={memoizedConfig}
+              editMode={editMode}
+              onToggleEditMode={() => setEditMode(!editMode)}
+              onConfigChange={(updatedConfig) => {
                 setConfig(updatedConfig);
                 setChanges(prev => new Set(prev).add('json'));
                 validateConfig(updatedConfig);
-                // Update tab title if name changed in JSON editor
-                if (edit.name === 'name' || (edit.name === 'root' && 'name' in updatedConfig)) {
+                if ('name' in updatedConfig) {
                   onSave(updatedConfig);
                 }
-              }, 1000) : false}
-              style={{
-                backgroundColor: 'transparent',
-                fontSize: '14px',
-                fontFamily: 'monospace'
               }}
             />
-          </div>
         </Panel>
       </PanelGroup>
 

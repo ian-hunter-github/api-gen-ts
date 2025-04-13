@@ -1,5 +1,25 @@
 .attribute-row {
   transition: background-color 0.2s ease;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.attribute-cell {
+  padding: 0 0.5rem;
+}
+
+.attribute-cell.actions {
+  min-width: 0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .attribute-row.pristine {
@@ -7,16 +27,16 @@
 }
 
 .attribute-row.modified {
-  background-color: #fff3e0;
+  background-color: var(--state-modified);
 }
 
 .attribute-row.new {
-  background-color: #e8f5e9;
+  background-color: var(--state-new);
 }
 
 .attribute-row.deleted {
-  background-color: #fff9c4;
-  opacity: 0.7;
+  background-color: var(--state-deleted);
+  opacity: 0.6;
 }
 
 .attribute-row.deleted .attribute-cell:not(.actions) {
@@ -25,38 +45,18 @@
   user-select: none;
 }
 
-.attribute-row {
-  display: flex;
-  align-items: center;
+.attribute-row:hover {
+  background-color: var(--header-bg);
 }
 
-.attribute-cell {
-  padding: 8px 12px;
-  flex: 1;
+.attribute-row.deleted:hover {
+  background-color: var(--state-deleted);
 }
 
-.attribute-cell.actions {
-  flex: 0 0 180px;
-  justify-content: flex-end;
+.attribute-row.modified:hover {
+  background-color: var(--state-modified);
 }
 
-.attribute-row .actions {
-  display: flex;
-  gap: 8px;
-}
-
-.attribute-row button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-}
-
-.attribute-row button:hover {
-  opacity: 0.8;
-}
-
-.attribute-row button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.attribute-row.new:hover {
+  background-color: var(--state-new);
 }

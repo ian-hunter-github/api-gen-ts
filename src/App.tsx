@@ -2,9 +2,16 @@ import { useState, useEffect } from 'react';
 import { ApiConfigEditor } from './components/ApiConfigEditor/ApiConfigEditor';
 import { ApiConfig } from './types/api.types';
 import { demoStore } from './stores/demoStore';
+import { useTheme } from './contexts/ThemeContext';
+import { ThemeToggle } from './components/ThemeToggle/ThemeToggle';
 import './App.css';
 
 function App() {
+  const { isDarkMode } = useTheme();
+
+  useEffect(() => {
+    document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
   const [tabs, setTabs] = useState<Array<{
     id: number;
     title: string;
@@ -73,6 +80,7 @@ function App() {
 
   return (
     <div className="app-container">
+      <ThemeToggle />
       <header className="app-header">
         <h1>API Configuration Editor</h1>
       </header>

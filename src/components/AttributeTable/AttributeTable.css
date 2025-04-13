@@ -21,16 +21,16 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #1976d2;
+  color: var(--primary);
   padding: 0.5rem;
 }
 
 .add-button:hover {
-  background-color: rgba(25, 118, 210, 0.04);
+  background-color: color-mix(in srgb, var(--primary) 4%, transparent);
 }
 
 .table-container {
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -38,7 +38,7 @@
 .table-header {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
-  background-color: #f5f5f5;
+  background-color: var(--header-bg);
   padding: 0.75rem 1rem;
   font-weight: 500;
 }
@@ -57,14 +57,14 @@
 }
 
 .table-body {
-  background-color: white;
+  background-color: var(--bg-color);
 }
 
 .table-row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .table-row:last-child {
@@ -72,11 +72,11 @@
 }
 
 .table-row.changed {
-  background-color: #fff8e1;
+  background-color: var(--state-modified);
 }
 
 .table-row.deleted {
-  background-color: #ffebee;
+  background-color: var(--state-deleted);
   opacity: 0.6;
 }
 
@@ -95,22 +95,23 @@
   border: none;
   cursor: pointer;
   padding: 0.25rem;
-  color: #757575;
+  color: var(--text-secondary);
 }
 
 .actions button:hover {
-  color: #1976d2;
+  color: var(--primary);
 }
 
 .actions button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  color: var(--text-disabled);
 }
 
 .undo-button {
-  color: #d32f2f !important;
+  color: var(--error) !important;
 }
 
 .undo-button:hover {
-  color: #b71c1c !important;
+  color: var(--error-dark) !important;
 }
