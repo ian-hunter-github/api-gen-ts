@@ -1,10 +1,11 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog';
-import type { ApiEntity } from '../../types/entities/entity';
-import type { EntityAttribute } from '../../types/entities/attributes';
-import { Model } from '../../utils/Model';
-import { AttributeTable } from '../AttributeTable/AttributeTable';
-import './EntityDialog.css';
+import React, { useState, useCallback } from "react";
+import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
+import { AttributeDialog } from "../AttributeDialog/AttributeDialog";
+import type { ApiEntity } from "../../types/entities/entity";
+import type { EntityAttribute } from "../../types/entities/attributes";
+import { Model } from "../../utils/Model";
+import { Table } from "../common/Table/Table";
+import "./EntityDialog.css";
 
 interface EntityDialogProps {
   entity: ApiEntity;
@@ -14,26 +15,33 @@ interface EntityDialogProps {
   onClose: () => void;
 }
 
-export const EntityDialog: React.FC<EntityDialogProps> = ({ 
-  entity, 
+export const EntityDialog: React.FC<EntityDialogProps> = ({
+  entity,
   open,
-  onSave, 
+  onSave,
   onCancel,
-  onClose
+  onClose,
 }) => {
   const [currentEntity, setCurrentEntity] = useState<ApiEntity>({ ...entity });
+
+  React.useEffect(() => {
+    setCurrentEntity({ ...entity });
+  }, [entity]);
   const [hasChanges, setHasChanges] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
 
-  const handleConfirmAction = useCallback((action: () => void) => {
-    if (hasChanges) {
-      setConfirmAction(() => action);
-      setShowConfirmDialog(true);
-    } else {
-      action();
-    }
-  }, [hasChanges]);
+  const handleConfirmAction = useCallback(
+    (action: () => void) => {
+      if (hasChanges) {
+        setConfirmAction(() => action);
+        setShowConfirmDialog(true);
+      } else {
+        action();
+      }
+    },
+    [hasChanges]
+  );
 
   const handleConfirm = useCallback(() => {
     setShowConfirmDialog(false);
@@ -51,74 +59,87 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
   const checkForChanges = (newEntity: ApiEntity): void => {
 
     // Check basic fields
-    const basicFieldsChanged = newEntity.name !== entity.name || 
-                             newEntity.description !== entity.description;
+    const basicFieldsChanged =
+      newEntity.name !== entity.name ||
+      newEntity.description !== entity.description;
 
-    // Check attributes if ref is available
-    let attributesChanged = false;
-    if (attributeTableRef.current) {
-      const currentAttributes = attributeTableRef.current.getAttributes();
-      // Check for any modified, new, or deleted attributes
-      attributesChanged = currentAttributes.some(attr => {
-        const isChanged = attr.status !== 'pristine';
-        return isChanged;
-      });
+    // Check for any modified, new, or deleted attributes
+    const attributesChanged = attributeModels.some((model: Model<EntityAttribute>) => {
+      return model.status !== "pristine";
+    });
 
-      // Also check if any original attributes are now missing (fully deleted)
-      const currentNames = new Set(currentAttributes
-        .filter(a => a.status !== 'deleted')
-        .map(a => a.current?.name || a.previous?.name));
-      
-      const hasDeletedAttributes = entity.attributes.some(origAttr => 
-        !currentNames.has(origAttr.name)
-      );
-      
-      if (hasDeletedAttributes) {
-        attributesChanged = true;
+    // Check if any original attributes are now missing (fully deleted)
+    const currentNames = new Set(
+      attributeModels
+        .filter((model: Model<EntityAttribute>) => model.status !== "deleted")
+        .map((model) => model.current?.name || model.previous?.name)
+    );
+
+    const hasDeletedAttributes = entity.attributes.some(
+      (origAttr: EntityAttribute) => {
+        const deleted = !currentNames.has(origAttr.name);
+        return deleted;
       }
-    }
+    );
 
-    const changed = basicFieldsChanged || attributesChanged;
-    setHasChanges(changed);
+    setHasChanges(basicFieldsChanged || attributesChanged || hasDeletedAttributes);
+
   };
 
-  const attributeModels = useMemo(() => 
-    currentEntity.attributes.map((attr: EntityAttribute) => new Model<EntityAttribute>(attr)),
-    [currentEntity.attributes]
+  const [attributeModels, setAttributeModels] = useState<Model<EntityAttribute>[]>(
+    currentEntity.attributes.map((attr: EntityAttribute) => {
+      return new Model(attr);
+    })
   );
 
-  const attributeTableRef = React.useRef<{ getAttributes: () => Model<EntityAttribute>[] }>(null);
 
-  const handleAddAttribute = (): void => {
-    // Implementation needed
+  const [editingAttribute, setEditingAttribute] = useState<Model<EntityAttribute> | null>(null);
+  const [isAttributeDialogOpen, setIsAttributeDialogOpen] = useState(false);
+
+  const handleEditAttribute = (attribute: Model<EntityAttribute>): void => {
+    setEditingAttribute(attribute);
+    // Use setTimeout to ensure state is updated before opening dialog
+    setTimeout(() => {
+      setIsAttributeDialogOpen(true);
+    }, 0);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleEditAttribute = (attribute: Model<EntityAttribute>): void => {
-    console.log('Editing attribute:', attribute.current?.name ?? 'unknown');
-    // TODO: Implement attribute editing (will use the attribute parameter)
+  const handleSaveAttribute = (attribute: Model<EntityAttribute>): void => {
+    setIsAttributeDialogOpen(false);
+    setEditingAttribute(null);
+    // Find and update the model in attributeModels
+    const updatedModels = attributeModels.map(model => {
+      if (model === editingAttribute) {
+        return attribute;
+      }
+      return model;
+    });
+    setAttributeModels(updatedModels);
+    checkForChanges(currentEntity);
+  };
+
+  const handleCancelAttribute = (): void => {
+    setIsAttributeDialogOpen(false);
+    setEditingAttribute(null);
   };
 
   const handleSave = (): void => {
-    if (!attributeTableRef.current) return;
-    
-    const attributeModels = attributeTableRef.current.getAttributes();
-    const finalAttributes = attributeModels
-      .filter(model => model.status !== 'deleted')
-      .map(model => model.current)
+    let finalAttributes = currentEntity.attributes;
+
+    finalAttributes = attributeModels
+      .filter((model) => model.status !== "deleted")
+      .map((model) => model.current)
       .filter((attr): attr is EntityAttribute => attr !== null);
-    
+
     onSave({
       ...currentEntity,
-      attributes: finalAttributes
+      attributes: finalAttributes,
     });
   };
 
   const handleCancel = (): void => {
-    handleConfirmAction(() => {
-      setCurrentEntity({ ...entity });
-      onCancel();
-    });
+    setCurrentEntity({ ...entity });
+    onCancel();
   };
 
   if (!open) return null;
@@ -126,9 +147,9 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
   return (
     <>
       <div className="entity-dialog-overlay" onClick={handleClose}>
-        <div className="entity-dialog" onClick={e => e.stopPropagation()}>
+        <div className="entity-dialog" onClick={(e) => e.stopPropagation()}>
           <div className="dialog-header">
-            <h2>{entity.name ? `Edit ${entity.name}` : 'Create New Entity'}</h2>
+            <h2>{entity.name ? `Edit ${entity.name}` : "Create New Entity"}</h2>
           </div>
 
           <div className="dialog-content">
@@ -142,7 +163,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
                   onChange={(e) => {
                     const newEntity = {
                       ...currentEntity,
-                      name: e.target.value
+                      name: e.target.value,
                     };
                     setCurrentEntity(newEntity);
                     checkForChanges(newEntity);
@@ -153,11 +174,11 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
                 <label htmlFor="entity-description">Description</label>
                 <textarea
                   id="entity-description"
-                  value={currentEntity.description || ''}
+                  value={currentEntity.description || ""}
                   onChange={(e) => {
                     const newEntity = {
                       ...currentEntity,
-                      description: e.target.value
+                      description: e.target.value,
                     };
                     setCurrentEntity(newEntity);
                     checkForChanges(newEntity);
@@ -166,12 +187,22 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
               </div>
             </div>
 
-            <AttributeTable
-              ref={attributeTableRef}
-              initialAttributes={attributeModels}
-              onAdd={handleAddAttribute}
+            <Table<EntityAttribute>
+              models={attributeModels}
               onEdit={handleEditAttribute}
-              onChange={() => checkForChanges(currentEntity)}
+              onDelete={() => {
+                checkForChanges(currentEntity);
+              }}
+              onUndo={(model) => {
+                model.undo();
+                setAttributeModels([...attributeModels]);
+                checkForChanges(currentEntity);
+              }}
+              onRedo={(model) => {
+                model.redo();
+                setAttributeModels([...attributeModels]);
+                checkForChanges(currentEntity);
+              }}
             />
           </div>
 
@@ -189,6 +220,19 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
         onConfirm={handleConfirm}
         onCancel={handleCancelConfirm}
       />
+
+      {isAttributeDialogOpen && editingAttribute && (
+        <AttributeDialog
+          attribute={editingAttribute}
+          existingNames={attributeModels
+            .filter(model => model !== editingAttribute)
+            .map(model => model.current?.name || "")
+            .filter(Boolean)}
+          onSave={handleSaveAttribute}
+          onCancel={handleCancelAttribute}
+          open={isAttributeDialogOpen}
+        />
+      )}
     </>
   );
 };

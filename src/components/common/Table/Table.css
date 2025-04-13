@@ -1,38 +1,9 @@
-.attribute-table {
+.table-container {
   width: 100%;
   margin: 1rem 0;
   border-radius: 4px;
   overflow: hidden;
-}
-
-.attribute-table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.attribute-table-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-}
-
-.add-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--primary);
-  padding: 0.5rem;
-}
-
-.add-button:hover {
-  background-color: color-mix(in srgb, var(--primary) 4%, transparent);
-}
-
-.table-container {
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  overflow: hidden;
 }
 
 .table-header {
@@ -78,6 +49,10 @@
 .table-row.deleted {
   background-color: var(--state-deleted);
   opacity: 0.6;
+}
+
+.table-row.deleted .table-cell {
+  text-decoration: line-through;
 }
 
 .table-cell {

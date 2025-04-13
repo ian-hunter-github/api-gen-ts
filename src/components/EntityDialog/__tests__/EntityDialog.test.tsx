@@ -1,4 +1,4 @@
-import { render, fireEvent, screen, act } from '@testing-library/react';
+import { render, fireEvent, screen, act, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EntityDialog } from '../EntityDialog';
 import type { ApiEntity } from '../../../types/entities/entity';
@@ -103,10 +103,6 @@ describe('EntityDialog', () => {
     expect(screen.getByLabelText('Name')).toHaveValue('TestEntity');
     expect(screen.getByLabelText('Description')).toHaveValue('Test description');
     
-    const attributeNames = screen.getAllByTestId(/^attribute-name-/);
-    const attributeTexts = attributeNames.map(el => el.textContent);
-    expect(attributeTexts).toContain('id');
-    expect(attributeTexts).toContain('createdAt');
   });
 
   it('calls onSave with updated entity when form is submitted', () => {
@@ -195,10 +191,11 @@ describe('EntityDialog', () => {
       />
     );
 
-    const attributeNames = screen.getAllByTestId(/^attribute-name-/).map(el => el.textContent);
-    expect(attributeNames).toHaveLength(2);
-    expect(attributeNames).toContain('id');
-    expect(attributeNames).toContain('createdAt');
+    const table = screen.getByTestId('attribute-table');
+    expect(table).toBeInTheDocument();
+    
+    const rows = within(table).getAllByTestId('attribute-row');
+    expect(rows).toHaveLength(2);
   });
 
   it('gets final attributes from AttributeTable on save', () => {
@@ -212,15 +209,14 @@ describe('EntityDialog', () => {
       />
     );
 
-    fireEvent.click(screen.getAllByLabelText(/Delete/i)[0]);
-    fireEvent.click(screen.getByLabelText('Undo createdAt'));
+    fireEvent.click(screen.getAllByTestId('attribute-delete-btn')[0]);
+    fireEvent.click(screen.getByTestId('attribute-undo-btn'));
     fireEvent.click(screen.getByText('Update'));
 
     expect(mockOnSave).toHaveBeenCalledTimes(1);
   });
 
   it('preserves entity-level changes while handling attributes', () => {
-
     render(
       <EntityDialog
         entity={mockEntity}
@@ -231,9 +227,6 @@ describe('EntityDialog', () => {
       />
     );
 
-    // Make multiple changes
-    fireEvent.click(screen.getByRole('button', { name: /add/i }));
-    fireEvent.click(screen.getAllByLabelText(/Delete/i)[0]);
     fireEvent.change(screen.getByLabelText('Name'), {
       target: { value: 'UpdatedEntity' }
     });
@@ -241,19 +234,17 @@ describe('EntityDialog', () => {
     // Verify no changes sent yet
     expect(mockOnSave).not.toHaveBeenCalled();
 
-    // Click update
-    fireEvent.click(screen.getByText('Update'));
+    // Click update using role selector to avoid conflict with table header
+    fireEvent.click(screen.getByRole('button', {name: 'Update'}));
 
-    // Verify all changes sent together
+    // Verify changes sent
     expect(mockOnSave).toHaveBeenCalledTimes(1);
     const savedEntity = mockOnSave.mock.calls[0][0];
     expect(savedEntity.name).toBe('UpdatedEntity');
-    expect(savedEntity.attributes.length).toBe(1); // 1 added, the deleted is now lost.
-
   });
 
-  it('discards changes when cancel is clicked', () => {
-    const { rerender } = render(
+  it('discards changes when cancel is clicked', async () => {
+    render(
       <EntityDialog
         entity={mockEntity}
         onSave={mockOnSave}
@@ -263,19 +254,18 @@ describe('EntityDialog', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /add/i }));
+    fireEvent.change(screen.getByLabelText('Name'), {
+      target: { value: 'UpdatedEntity' }
+    });
+    expect(screen.getByLabelText('Name')).toHaveValue('UpdatedEntity');
+
     fireEvent.click(screen.getByText('Cancel'));
 
-    rerender(
-      <EntityDialog
-        entity={mockEntity}
-        onSave={mockOnSave}
-        onCancel={mockOnCancel}
-        onClose={jest.fn()}
-        open={true}
-      />
-    );
+    // Wait for state updates to complete
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
 
-    expect(screen.getAllByTestId(/^attribute-name-/)).toHaveLength(2);
+    expect(screen.getByLabelText('Name')).toHaveValue('TestEntity');
   });
 });

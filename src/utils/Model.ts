@@ -4,7 +4,7 @@ export type ModelStatus = 'pristine' | 'modified' | 'deleted' | 'new';
 
 export class Model<T> {
   id: string;
-  private history: History<T>;
+  history: History<T>;
   original?: T;
   status: ModelStatus;
 
