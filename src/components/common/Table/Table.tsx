@@ -77,7 +77,8 @@ export function Table<T extends Record<string, unknown>>({
           
           const rowClass = [
             'table-row',
-            model.status === 'modified' ? 'changed' : ''
+            model.status === 'modified' ? 'changed' : '',
+            model.status === 'deleted' ? 'deleted' : '',
           ].filter(Boolean).join(' ');
 
           return (
