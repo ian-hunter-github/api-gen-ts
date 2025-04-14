@@ -1,5 +1,6 @@
 import React from 'react';
 import { Model } from '../../../utils/Model';
+import { ActionButtons } from '../ActionButtons/ActionButtons';
 import './Row.css';
 
 export interface RowProps<T extends Record<string, unknown>> {
@@ -9,6 +10,7 @@ export interface RowProps<T extends Record<string, unknown>> {
   onUndo?: (model: Model<T>) => void;
   onRedo?: (model: Model<T>) => void;
   renderCellContent?: (value: T | null) => React.ReactNode[];
+  'data-testid'?: string;
 }
 
 export function Row<T extends Record<string, unknown>>({
@@ -17,66 +19,45 @@ export function Row<T extends Record<string, unknown>>({
   onDelete,
   onUndo,
   onRedo,
+  'data-testid': testId,
   renderCellContent = (value) => {
     if (!value) return [];
     return Object.entries(value)
       .filter(([key]) => key !== 'id')
       .map(([key, val]) => <span key={key}>{String(val)}</span>);
   },
-
 }: RowProps<T>) {
-  const content = renderCellContent(model.current);
+  const content = renderCellContent(model.current || model.previous);
+  // Standardize labels to match test expectations
+  const itemName = 'row';
 
-  const rowClass = model.status === 'modified' ? 'table-row modified' : 'table-row';
+  const rowClass = [
+    'row',
+    model.status === 'modified' ? 'modified' : '',
+    model.status === 'deleted' ? 'deleted' : '',
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className={rowClass} id={model.id}>
+      <div 
+        className={rowClass}
+        role="row"
+        aria-label={`${itemName} row`}
+        data-testid={testId || `row-${model.id}`}
+      >
       {content.map((cell, index) => (
-        <div key={index} className="table-cell">
+        <div key={index} className="table-cell" role="cell" data-testid={`${itemName}-${model.id}`}>
           {cell}
         </div>
       ))}
       {(onEdit || onDelete || onUndo || onRedo) && (
-        <div className="table-cell actions">
-          {onEdit && (
-            <button 
-              onClick={() => onEdit(model)} 
-
-              aria-label={model.current && 'name' in model.current ? `Edit ${model.current.name}` : 'Edit row'}
-              disabled={model.status === 'deleted'}
-            >
-              Edit
-            </button>
-          )}
-          {onDelete && (
-            <button 
-              onClick={() => onDelete(model)} 
-
-              aria-label={model.current && 'name' in model.current ? `Delete ${model.current.name}` : 'Delete row'}
-              disabled={model.status === 'deleted'}
-            >
-              Delete
-            </button>
-          )}
-          {onUndo && (
-            <button 
-              onClick={() => onUndo(model)} 
-
-              aria-label="Undo row"
-              disabled={!model.canUndo}
-            >
-              Undo
-            </button>
-          )}
-          {onRedo && (
-            <button 
-              onClick={() => onRedo(model)} 
-
-              aria-label="Redo row"
-              disabled={!model.canRedo}
-            >
-              Redo
-            </button>
-          )}
+        <div className="table-cell actions" role="cell">
+          <ActionButtons
+            model={model}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onUndo={onUndo}
+            onRedo={onRedo}
+          />
         </div>
       )}
     </div>

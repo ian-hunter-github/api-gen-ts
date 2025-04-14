@@ -1,43 +1,33 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Row } from '../Row';
-import { History } from '../../../../utils/History';
+import { Model, ModelStatus } from '../../../../utils/Model';
 
-interface TestData {
+interface TestData extends Record<string, unknown> {
   id: string;
   name: string;
+  [key: string]: unknown;
 }
 
 describe('Row', () => {
-  const createTestModel = (status: 'pristine' | 'modified' | 'deleted' | 'new') => {
-    const history = new History<TestData>({ id: '1', name: 'Test Item' });
-    
-    jest.spyOn(history, 'update').mockImplementation();
-    jest.spyOn(history, 'updateDeleted').mockImplementation();
-    jest.spyOn(history, 'undo').mockImplementation();
-    jest.spyOn(history, 'redo').mockImplementation();
+  const testDataName = 'TheName';
+  const modifiedTestDataName = `${testDataName}-modified`;
+  let idCounter = 0;
+  const createTestModel = (status: ModelStatus) => {
 
-    const model = {
-      id: '1',
-      original: status === 'pristine' ? { id: '1', name: 'Test Item' } : undefined,
+    const testData = { id: `${++idCounter}`, name: testDataName };
+    const model = new Model<TestData>(
+      testData,
       status,
-      history: history,
-      get current() { return history.current || null; },
-      get previous() { return history.previous || null; },
-      get canUndo() { return Boolean(history.canUndo); },
-      get canRedo() { return Boolean(history.canRedo); },
-      update: history.update,
-      delete: history.updateDeleted,
-      restore: jest.fn(),
-      undo: () => {
-        const result = history.undo();
-        return result !== null;
-      },
-      redo: () => {
-        const result = history.redo();
-        return result !== null;
-      },
-    };
+      () => `test-id-${idCounter}`
+    );
+    
+    if (status === ModelStatus.Deleted) {
+      model.delete();
+    } else if (status === ModelStatus.Modified) {
+      model.update({ name: modifiedTestDataName });
+    }
+    
     return model;
   };
 
@@ -46,8 +36,12 @@ describe('Row', () => {
     <span key="name">{value?.name}</span>,
   ];
 
+  beforeEach(() => {
+    idCounter = 0;
+  });
+
   it('renders row data correctly', () => {
-    const testModel = createTestModel('modified');
+    const testModel = createTestModel(ModelStatus.Modified);
     const { container } = render(
       <Row
         model={testModel}
@@ -60,13 +54,13 @@ describe('Row', () => {
     );
 
     expect(screen.getByText('1')).toBeInTheDocument();
-    expect(screen.getByText('Test Item')).toBeInTheDocument();
+    expect(screen.getByText('TheName-modified')).toBeInTheDocument();
     expect(container.firstChild).toHaveStyle('background-color: var(--state-modified)');
   });
 
   it('calls onEdit when edit button is clicked', () => {
     const mockEdit = jest.fn();
-    const testModel = createTestModel('modified');
+    const testModel = createTestModel(ModelStatus.Modified);
     const { container } = render(
       <Row
         model={testModel}
@@ -79,13 +73,13 @@ describe('Row', () => {
     );
 
     expect(container.firstChild).toHaveStyle('background-color: var(--state-modified)');
-    fireEvent.click(screen.getByLabelText('Edit Test Item'));
+    fireEvent.click(screen.getByLabelText('Edit row'));
     expect(mockEdit).toHaveBeenCalledWith(testModel);
   });
 
   it('calls onDelete when delete button is clicked', () => {
     const mockDelete = jest.fn();
-    const testModel = createTestModel('modified');
+    const testModel = createTestModel(ModelStatus.Modified);
     
     render(
       <Row
@@ -98,12 +92,12 @@ describe('Row', () => {
       />
     );
 
-    fireEvent.click(screen.getByLabelText('Delete Test Item'));
+    fireEvent.click(screen.getByLabelText('Delete row'));
     expect(mockDelete).toHaveBeenCalledWith(testModel);
   });
 
   it('disables buttons when row is deleted', () => {
-    const deletedModel = createTestModel('deleted');
+    const deletedModel = createTestModel(ModelStatus.Deleted);
     render(
       <Row
         model={deletedModel}
@@ -115,12 +109,12 @@ describe('Row', () => {
       />
     );
 
-    expect(screen.getByLabelText('Edit Test Item')).toBeDisabled();
-    expect(screen.getByLabelText('Delete Test Item')).toBeDisabled();
+    expect(screen.getByLabelText('Edit row')).toBeDisabled();
+    expect(screen.getByLabelText('Delete row')).toBeDisabled();
   });
 
   it('applies modified class when changed prop is true', () => {
-    const testModel = createTestModel('modified');
+    const testModel = createTestModel(ModelStatus.Modified);
     const { container } = render(
       <Row
         model={testModel}
@@ -136,12 +130,9 @@ describe('Row', () => {
   });
 
   it('handles undo/redo button states based on model.canUndo/canRedo', () => {
-    const testModel = {
-      ...createTestModel('modified'),
-      get canUndo() { return true; },
-      get canRedo() { return false; }
-    };
-
+    const testModel = createTestModel(ModelStatus.Modified);
+    testModel.update({ name: 'updated' }); // Create history for undo
+    
     render(
       <Row
         model={testModel}
@@ -158,11 +149,9 @@ describe('Row', () => {
   });
 
   it('handles empty/null current value gracefully', () => {
-    const testModel = {
-      ...createTestModel('modified'),
-      get current() { return null; }
-    };
-
+    const testModel = createTestModel(ModelStatus.Modified);
+    testModel.delete(); // Sets current to null
+    
     render(
       <Row
         model={testModel}

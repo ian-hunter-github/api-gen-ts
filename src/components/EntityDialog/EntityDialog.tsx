@@ -190,7 +190,9 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
             <Table<EntityAttribute>
               models={attributeModels}
               onEdit={handleEditAttribute}
-              onDelete={() => {
+              onDelete={(model) => {
+                model.delete();
+                setAttributeModels([...attributeModels]);
                 checkForChanges(currentEntity);
               }}
               onUndo={(model) => {

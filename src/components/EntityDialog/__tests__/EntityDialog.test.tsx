@@ -2,12 +2,15 @@ import { render, fireEvent, screen, act, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EntityDialog } from '../EntityDialog';
 import type { ApiEntity } from '../../../types/entities/entity';
-import { Model } from '../../../utils/Model';
+import { Model, ModelStatus } from '../../../utils/Model';
 import type { EntityAttribute } from '../../../types/entities/attributes';
+
+let idCounter = 0;
 
 class MockAttributeModel extends Model<EntityAttribute> {
   constructor(attribute: EntityAttribute) {
-    super(attribute, 'pristine', () => attribute.id);
+    super(attribute, ModelStatus.Pristine, () => attribute.id);
+    this.id = `test-id-${idCounter++}`; // Ensure predictable ID for testing
     // Mock methods
     this.update = jest.fn();
     this.delete = jest.fn();
@@ -27,24 +30,25 @@ class MockAttributeModel extends Model<EntityAttribute> {
 }
 
 const createMockAttribute = (
-  id: string,
   name: string,
   type: EntityAttribute['type'],
   required: boolean
 ): MockAttributeModel & EntityAttribute => {
-  const attr: EntityAttribute = { id, name, type, required };
+  const attr: EntityAttribute = { id: `test-id-${idCounter++}`, name, type, required };
   const mock = new MockAttributeModel(attr);
   // Mix in EntityAttribute properties
   return Object.assign(mock, attr);
 };
+
+
 
 describe('EntityDialog', () => {
   const mockEntity: ApiEntity = {
     name: 'TestEntity',
     description: 'Test description',
     attributes: [
-    createMockAttribute('1', 'id', 'string', true),
-    createMockAttribute('2', 'createdAt', 'date', false)
+    createMockAttribute('id', 'string', true),
+    createMockAttribute('createdAt', 'date', false)
     ]
   };
 
@@ -205,10 +209,11 @@ describe('EntityDialog', () => {
         onClose={jest.fn()}
         open={true}
       />
+
     );
 
-    fireEvent.click(screen.getAllByTestId('attribute-delete-btn')[0]);
-    fireEvent.click(screen.getAllByTestId('attribute-undo-btn')[0]);
+    fireEvent.click(screen.getAllByRole('button', {name: 'Delete row'})[0]);
+    fireEvent.click(screen.getAllByRole('button', {name: 'Undo row'})[0]);
     fireEvent.click(screen.getByRole('button', {name: 'Update'}));
 
     expect(mockOnSave).toHaveBeenCalledTimes(1);

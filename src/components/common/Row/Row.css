@@ -22,7 +22,7 @@
 }
 
 .row.modified {
-  background-color: var(--state-modified);
+  background-color: var(--state-modified) !important;
 }
 
 .row.new {
@@ -34,10 +34,15 @@
   opacity: 0.6;
 }
 
-.row.deleted .row-cell:not(.actions) {
+.row.deleted .table-cell:not(.actions, .action-buttons) {
   text-decoration: line-through;
   pointer-events: none;
   user-select: none;
+}
+
+.row.modified {
+  background-color: var(--state-modified) !important;
+  outline: 2px solid var(--state-modified-outline);
 }
 
 .row:hover {
@@ -66,7 +71,7 @@
 
 .action-buttons {
   display: flex;
-  gap: 0.25rem;
-  flex-wrap: nowrap;
-  overflow: hidden;
+  gap: 0.15rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }

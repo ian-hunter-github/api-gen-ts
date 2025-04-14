@@ -68,11 +68,13 @@
 
 .table-row.deleted {
   background-color: var(--state-deleted);
-  opacity: 0.6;
+  opacity: 0.8;
+  border-left: 3px solid var(--error);
 }
 
 .table-row.deleted .table-cell {
   text-decoration: line-through;
+  text-decoration-thickness: 2px;
 }
 
 .table-cell {

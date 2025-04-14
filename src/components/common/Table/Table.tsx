@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Model } from '../../../utils/Model';
 import { AttributeDialog } from '../../AttributeDialog/AttributeDialog';
+import { Row } from '../Row/Row';
 import type { EntityAttribute } from '../../../types/entities/attributes';
 import './Table.css';
 
@@ -36,11 +37,6 @@ export function Table<T extends Record<string, unknown>>({
     setIsDialogOpen(false);
   };
 
-  const handleDelete = (model: Model<T>) => {
-    model.delete();
-    onDelete?.(model);
-  };
-
   if (models.length === 0) {
     return <div className="table-empty">No data available</div>;
   }
@@ -62,7 +58,7 @@ export function Table<T extends Record<string, unknown>>({
       role="table" 
       aria-label="Data table" 
       data-testid="attribute-table"
-      key={models.length} // Force re-render when models change
+      key={models.length + models.filter(m => m.status === 'deleted').length} // Force re-render when models or deletions change
     >
       <div className="table-header" role="rowgroup">
         {headers.map((header) => (
@@ -75,91 +71,18 @@ export function Table<T extends Record<string, unknown>>({
         )}
       </div>
       <div className="table-body" role="rowgroup">
-        {models.map((model) => {
-          const toDisplay = (model.current === null) ? model.previous : model.current;
-          if (!toDisplay) {
-            return null;
-          }
-          
-          const rowClass = [
-            'table-row',
-            model.status === 'modified' ? 'changed' : '',
-            model.status === 'deleted' ? 'deleted' : '',
-          ].filter(Boolean).join(' ');
-
-          return (
-            <div 
-              key={toDisplay.id as string} 
-              className={rowClass}
-              role="row"
-              data-testid="attribute-row"
-            >
-              {Object.entries(toDisplay)
-                .filter(([key]) => key !== 'id')
-                .filter(([, value]) => 
-                  value !== undefined && 
-                  value !== null &&
-                  (typeof value === 'string' || 
-                   typeof value === 'number' || 
-                   typeof value === 'boolean')
-                )
-                .map(([key, value]) => {
-                  const cellContent = renderCellContent 
-                    ? renderCellContent(toDisplay)[0] 
-                    : String(value);
-                  return (
-                    <div key={key} className="table-cell" role="cell">
-                      {cellContent}
-                    </div>
-                  );
-                })}
-              <div className="actions">
-                {onEdit && (
-                  <button 
-                    onClick={() => onEdit(model)}
-                    aria-label="Edit row"
-                    data-testid="attribute-edit-btn"
-                    disabled={model.status === 'deleted'}
-                  >
-                    Edit
-                  </button>
-                )}
-                {onDelete && (
-                  <button 
-                    onClick={() => handleDelete(model)}
-                    aria-label="Delete row"
-                    data-testid="attribute-delete-btn"
-                    disabled={model.status === 'deleted'}
-                  >
-                    Delete
-                  </button>
-                )}
-                {onUndo && (
-                  <button 
-                    className="undo-button"
-                    onClick={() => onUndo(model)}
-                    aria-label="Undo row"
-                    data-testid="attribute-undo-btn"
-                    disabled={!model.canUndo}
-                  >
-                    Undo
-                  </button>
-                )}
-                {onRedo && (
-                  <button 
-                    className="redo-button"
-                    onClick={() => onRedo(model)}
-                    aria-label="Redo row"
-                    data-testid="attribute-redo-btn"
-                    disabled={!model.canRedo || model.status === 'deleted'}
-                  >
-                    Redo
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {models.map((model) => (
+          <Row
+            key={model.id}
+            model={model}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onUndo={onUndo}
+            onRedo={onRedo}
+            renderCellContent={renderCellContent}
+            data-testid="attribute-row"
+          />
+        ))}
       </div>
     </div>
   );
