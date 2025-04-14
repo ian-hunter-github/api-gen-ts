@@ -2,33 +2,43 @@
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
-  padding: 0.5rem;
 }
 
-.actions button {
-  padding: 0.25rem 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: white;
+.action-button {
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: inherit;
 }
 
-.actions button:hover:not(:disabled) {
-  background-color: #f0f0f0;
+.action-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
-.actions button:disabled {
+.action-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.undo-button {
-  color: #007bff;
-  border-color: #007bff;
+.action-button .icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
 }
 
-.redo-button {
-  color: #28a745;
-  border-color: #28a745;
+.edit {
+  color: #1a73e8;
+}
+
+.delete {
+  color: #d32f2f;
+}
+
+.undo, .redo {
+  color: #5f6368;
 }

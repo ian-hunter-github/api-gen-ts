@@ -43,6 +43,6 @@ describe('Table', () => {
     const onEdit = jest.fn();
     render(<Table models={testModels} onEdit={onEdit} />);
     
-    expect(screen.getByText('Actions')).toBeInTheDocument();
+    expect(screen.getAllByRole('columnheader')[2]).toBeEmptyDOMElement();
   });
 });

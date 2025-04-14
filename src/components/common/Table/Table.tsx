@@ -5,9 +5,18 @@ import { Row } from '../Row/Row';
 import type { EntityAttribute } from '../../../types/entities/attributes';
 import './Table.css';
 
+export interface TableMetadata<T> {
+  visibleColumns: Array<keyof T>;
+  columnWidths?: Partial<Record<keyof T, string>>;
+  columnFormatters?: Partial<Record<keyof T, (value: unknown) => React.ReactNode>> & {
+    [key: string]: (value: unknown) => React.ReactNode;
+  };
+}
+
 export interface TableProps<T extends Record<string, unknown>> {
   showAttributeDialog?: boolean;
   models: Array<Model<T>>;
+  metadata?: TableMetadata<T>;
   onEdit?: (model: Model<T>) => void;
   onDelete?: (model: Model<T>) => void;
   onUndo?: (model: Model<T>) => void;
@@ -18,6 +27,7 @@ export interface TableProps<T extends Record<string, unknown>> {
 
 export function Table<T extends Record<string, unknown>>({
   models,
+  metadata,
   onEdit,
   onDelete,
   onUndo,
@@ -41,15 +51,16 @@ export function Table<T extends Record<string, unknown>>({
     return <div className="table-empty">No data available</div>;
   }
 
-  // Get headers from all models' combined keys
-  const headers = Array.from(
-    new Set(
-      models.flatMap(model => 
-        Object.keys(model.current || {})
-          .filter(key => key !== 'id')
+  // Get headers from metadata or all models' combined keys
+  const headers = metadata?.visibleColumns || 
+    Array.from(
+      new Set(
+        models.flatMap(model => 
+          Object.keys(model.current || {})
+            .filter(key => key !== 'id')
+        )
       )
-    )
-  ).map(key => key.charAt(0).toUpperCase() + key.slice(1));
+    );
 
 
   return (
@@ -61,13 +72,16 @@ export function Table<T extends Record<string, unknown>>({
       key={models.length + models.filter(m => m.status === 'deleted').length} // Force re-render when models or deletions change
     >
       <div className="table-header" role="rowgroup">
-        {headers.map((header) => (
-          <div className="table-header-cell" key={header} role="columnheader">
-            {header}
-          </div>
-        ))}
+        {headers.map((header) => {
+          const headerStr = String(header);
+          return (
+            <div className="table-header-cell" key={headerStr} role="columnheader">
+              {headerStr.charAt(0).toUpperCase() + headerStr.slice(1)}
+            </div>
+          );
+        })}
         {(onEdit || onDelete || onUndo || onRedo) && (
-          <div className="table-header-cell">Actions</div>
+          <div className="table-header-cell"></div>
         )}
       </div>
       <div className="table-body" role="rowgroup">
@@ -80,6 +94,7 @@ export function Table<T extends Record<string, unknown>>({
             onUndo={onUndo}
             onRedo={onRedo}
             renderCellContent={renderCellContent}
+            metadata={metadata}
             data-testid="attribute-row"
           />
         ))}

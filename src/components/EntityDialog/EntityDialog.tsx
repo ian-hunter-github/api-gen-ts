@@ -189,6 +189,13 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
 
             <Table<EntityAttribute>
               models={attributeModels}
+              metadata={{
+                visibleColumns: ['name', 'type', 'required'],
+                columnFormatters: {
+                  required: (value) => value ? '✅' : '❌',
+                  type: (value) => <span style={{ textTransform: 'capitalize' }}>{String(value)}</span>
+                }
+              }}
               onEdit={handleEditAttribute}
               onDelete={(model) => {
                 model.delete();

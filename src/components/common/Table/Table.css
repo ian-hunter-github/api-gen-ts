@@ -17,6 +17,12 @@
 .table-header-cell {
   display: flex;
   align-items: center;
+  padding: 0.5rem;
+  border-right: 1px solid var(--border-color);
+}
+
+.table-header-cell:last-child {
+  border-right: none;
 }
 
 .sort-button {
@@ -40,12 +46,26 @@
   align-items: center;
 }
 
+.table-cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.5rem;
+  border-right: 1px solid var(--border-color);
+}
+
+.table-cell:last-child {
+  border-right: none;
+}
+
 .table-row.edit-mode {
   grid-template-columns: minmax(150px, 2fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(120px, auto);
 }
 
 .table-row.edit-mode .table-cell {
-  min-width: 0; /* Prevent flex items from overflowing */
+  min-width: 0;
 }
 
 .table-row.edit-mode .actions {
@@ -62,8 +82,6 @@
 
 .table-row.changed {
   background-color: var(--state-modified);
-  /* display: grid; Ensure grid layout is maintained */
-  /* grid-template-columns: inherit; Inherit parent's grid template */
 }
 
 .table-row.deleted {
@@ -75,14 +93,6 @@
 .table-row.deleted .table-cell {
   text-decoration: line-through;
   text-decoration-thickness: 2px;
-}
-
-.table-cell {
-  display: flex;
-  align-items: center;
-  min-width: 0; /* Prevent flex items from overflowing */
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .actions {

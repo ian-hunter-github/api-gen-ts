@@ -2,8 +2,7 @@ import React from 'react';
 import { Model } from '../../../utils/Model';
 import './ActionButtons.css';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface ActionButtonsProps<T = any> {
+export interface ActionButtonsProps<T extends Record<string, unknown> = Record<string, unknown>> {
   model: Model<T>;
   onEdit?: (model: Model<T>) => void;
   onDelete?: (model: Model<T>) => void;
@@ -12,8 +11,7 @@ export interface ActionButtonsProps<T = any> {
   containerComponent?: React.ElementType;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function ActionButtons<T = any>({
+export function ActionButtons<T extends Record<string, unknown>>({
   model,
   onEdit,
   onDelete,
@@ -38,8 +36,9 @@ export function ActionButtons<T = any>({
           data-testid={`action-edit-btn-${model.id}`}
           className={`action-button edit ${model.status === 'deleted' ? 'disabled' : ''}`}
           disabled={model.status === 'deleted'}
+          title="Edit"
         >
-          Edit
+          <span className="icon">✏️</span>
         </button>
       )}
       {onDelete && (
@@ -49,8 +48,9 @@ export function ActionButtons<T = any>({
           data-testid={`action-delete-btn-${model.id}`}
           className={`action-button delete ${model.status === 'deleted' ? 'disabled' : ''}`}
           disabled={model.status === 'deleted'}
+          title={model.status === 'deleted' ? 'Deleted' : 'Delete'}
         >
-          {model.status === 'deleted' ? 'Deleted' : 'Delete'}
+          <span className="icon">🗑️</span>
         </button>
       )}
       {onUndo && (
@@ -60,8 +60,9 @@ export function ActionButtons<T = any>({
           data-testid={`action-undo-btn-${model.id}`}
           className="action-button undo"
           disabled={!model.canUndo}
+          title="Undo"
         >
-          Undo
+          <span className="icon">↩️</span>
         </button>
       )}
       {onRedo && model.canRedo !== undefined && (
@@ -71,8 +72,9 @@ export function ActionButtons<T = any>({
           data-testid={`action-redo-btn-${model.id}`}
           className="action-button redo"
           disabled={!model.canRedo}
+          title="Redo"
         >
-          Redo
+          <span className="icon">↪️</span>
         </button>
       )}
     </Container>
