@@ -8,8 +8,12 @@ export class Model<T> {
   original?: T;
   status: ModelStatus;
 
-  constructor(data: T, status: ModelStatus = 'pristine') {
-    this.id = crypto.randomUUID();
+  constructor(
+    data: T, 
+    status: ModelStatus = 'pristine',
+    idGenerator: () => string = () => crypto.randomUUID()
+  ) {
+    this.id = idGenerator();
     this.history = new History({...data});
     this.status = status;
     if (status === 'pristine') {

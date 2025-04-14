@@ -8,7 +8,7 @@
 
 .table-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
   background-color: var(--header-bg);
   padding: 0.75rem 1rem;
   font-weight: 500;
@@ -33,9 +33,27 @@
 
 .table-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 2fr);
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-color);
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.table-row.edit-mode {
+  grid-template-columns: minmax(150px, 2fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(120px, auto);
+}
+
+.table-row.edit-mode .table-cell {
+  min-width: 0; /* Prevent flex items from overflowing */
+}
+
+.table-row.edit-mode .actions {
+  grid-column: 5;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .table-row:last-child {
@@ -44,6 +62,8 @@
 
 .table-row.changed {
   background-color: var(--state-modified);
+  /* display: grid; Ensure grid layout is maintained */
+  /* grid-template-columns: inherit; Inherit parent's grid template */
 }
 
 .table-row.deleted {
@@ -58,11 +78,16 @@
 .table-cell {
   display: flex;
   align-items: center;
+  min-width: 0; /* Prevent flex items from overflowing */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .actions {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
 }
 
 .actions button {

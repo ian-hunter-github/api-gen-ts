@@ -45,10 +45,15 @@ export function Table<T extends Record<string, unknown>>({
     return <div className="table-empty">No data available</div>;
   }
 
-  // Get headers from first model's keys
-  const headers = Object.keys(models[0].current || {})
-    .filter((key) => key !== 'id')
-    .map((key) => key.charAt(0).toUpperCase() + key.slice(1));
+  // Get headers from all models' combined keys
+  const headers = Array.from(
+    new Set(
+      models.flatMap(model => 
+        Object.keys(model.current || {})
+          .filter(key => key !== 'id')
+      )
+    )
+  ).map(key => key.charAt(0).toUpperCase() + key.slice(1));
 
 
   return (
@@ -71,9 +76,10 @@ export function Table<T extends Record<string, unknown>>({
       </div>
       <div className="table-body" role="rowgroup">
         {models.map((model) => {
-
           const toDisplay = (model.current === null) ? model.previous : model.current;
-          if (!toDisplay) return null;
+          if (!toDisplay) {
+            return null;
+          }
           
           const rowClass = [
             'table-row',
@@ -90,13 +96,23 @@ export function Table<T extends Record<string, unknown>>({
             >
               {Object.entries(toDisplay)
                 .filter(([key]) => key !== 'id')
-                .map(([key, value]) => (
-                  <div key={key} className="table-cell" role="cell">
-                    {renderCellContent 
-                      ? renderCellContent(toDisplay)[0] 
-                      : String(value)}
-                  </div>
-                ))}
+                .filter(([, value]) => 
+                  value !== undefined && 
+                  value !== null &&
+                  (typeof value === 'string' || 
+                   typeof value === 'number' || 
+                   typeof value === 'boolean')
+                )
+                .map(([key, value]) => {
+                  const cellContent = renderCellContent 
+                    ? renderCellContent(toDisplay)[0] 
+                    : String(value);
+                  return (
+                    <div key={key} className="table-cell" role="cell">
+                      {cellContent}
+                    </div>
+                  );
+                })}
               <div className="actions">
                 {onEdit && (
                   <button 

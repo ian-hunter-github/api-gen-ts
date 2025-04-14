@@ -7,7 +7,11 @@ This document describes a lightweight Git feature branching workflow using shell
 ## 📁 Available Scripts
 
 ### 1. `start-feature.sh <feature-name>`
-Creates and checks out a new feature branch from `main`.
+Creates and checks out a new feature branch from `main`. If you are currently on another branch, it will:
+- Stash any uncommitted changes
+- Switch to `main` and pull the latest changes
+- Create and check out the new feature branch from updated `main`
+- Reapply your stashed changes (if any)
 
 **Example:**
 ```bash
@@ -42,6 +46,7 @@ Deletes a feature branch both locally and remotely.
 
 - If no name is provided, uses the current branch
 - You can run it from any branch if you provide the feature name
+- Gracefully handles the case where the remote branch doesn't exist
 
 **Examples:**
 ```bash
@@ -51,8 +56,6 @@ Deletes a feature branch both locally and remotely.
 ./abort-feature.sh search-bar
 # Deletes feature/search-bar from local and remote
 ```
-
-Handles missing local or remote branches gracefully.
 
 ---
 
@@ -94,6 +97,17 @@ Switches to an existing local feature branch.
 
 ---
 
+### 6. `clean-feature.sh`
+Discards all **uncommitted changes** (staged or unstaged) in the current feature branch.
+
+**Example:**
+```bash
+./clean-feature.sh
+```
+Useful if you want to abandon current edits but keep the branch for future work.
+
+---
+
 ## 🔀 Typical Workflow
 
 ### ✅ Start a Feature
@@ -115,6 +129,11 @@ Switches to an existing local feature branch.
 ### ❌ Abort a Feature
 ```bash
 ./abort-feature.sh buggy-idea
+```
+
+### 🧼 Discard Current Changes (but keep branch)
+```bash
+./clean-feature.sh
 ```
 
 ### 📋 List In-Progress Features

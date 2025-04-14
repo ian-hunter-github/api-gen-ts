@@ -7,7 +7,7 @@ import type { EntityAttribute } from '../../../types/entities/attributes';
 
 class MockAttributeModel extends Model<EntityAttribute> {
   constructor(attribute: EntityAttribute) {
-    super(attribute);
+    super(attribute, 'pristine', () => attribute.id);
     // Mock methods
     this.update = jest.fn();
     this.delete = jest.fn();
@@ -34,8 +34,6 @@ const createMockAttribute = (
 ): MockAttributeModel & EntityAttribute => {
   const attr: EntityAttribute = { id, name, type, required };
   const mock = new MockAttributeModel(attr);
-  // Set mock ID
-  Object.defineProperty(mock, 'id', { value: id });
   // Mix in EntityAttribute properties
   return Object.assign(mock, attr);
 };
@@ -210,10 +208,11 @@ describe('EntityDialog', () => {
     );
 
     fireEvent.click(screen.getAllByTestId('attribute-delete-btn')[0]);
-    fireEvent.click(screen.getByTestId('attribute-undo-btn'));
-    fireEvent.click(screen.getByText('Update'));
+    fireEvent.click(screen.getAllByTestId('attribute-undo-btn')[0]);
+    fireEvent.click(screen.getByRole('button', {name: 'Update'}));
 
     expect(mockOnSave).toHaveBeenCalledTimes(1);
+    expect(mockOnSave.mock.calls[0][0].attributes).toHaveLength(2);
   });
 
   it('preserves entity-level changes while handling attributes', () => {
