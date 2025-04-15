@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Model } from '../../../utils/Model';
+import { Header } from '../Header/Header';
 import { Row } from '../Row/Row';
 import './Table.css';
 
@@ -99,13 +100,12 @@ export function Table<T extends Record<string, unknown>>({
       key={models.length + models.filter(m => m.status === 'deleted').length}
     >
       <div role="rowgroup" aria-label="Table header">
-        <Row
+        <Header
           key={headerModel.id}
           model={headerModel}
           gridTemplateColumns={headerGridTemplate}
           actionButtonsContent={"Actions"}
           data-testid="attribute-row-header"
-          isHeader={true}
         />
       </div>
       <div 
