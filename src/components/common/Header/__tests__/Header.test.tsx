@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Header } from '../Header';
 import { Model, ModelStatus } from '../../../../utils/Model';
@@ -19,8 +19,8 @@ describe('Header', () => {
     const model = new Model<TestData>(
       testData,
       status,
+      () => `test-id-${idCounter}`,
       false, // isNew
-      () => `test-id-${idCounter}`
     );
     
     return model;

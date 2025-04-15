@@ -19,8 +19,8 @@ export class Model<T> {
   constructor(
     data: T, 
     status: ModelStatus = ModelStatus.Pristine,
+    idGenerator: () => string = () => crypto.randomUUID(),
     isNew: boolean = false,
-    idGenerator: () => string = () => crypto.randomUUID()
   ) {
     this.isNew = isNew;
     this.id = idGenerator();

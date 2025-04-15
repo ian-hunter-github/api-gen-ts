@@ -131,7 +131,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
       type: "string",
       required: false,
       description: ""
-    }, ModelStatus.New, true); // true marks it as a new attribute
+    }, ModelStatus.New, () => crypto.randomUUID(), true); // true marks it as a new attribute
     setEditingAttribute(newAttribute);
     setAttributeModels([...attributeModels, newAttribute]);
     setTimeout(() => {

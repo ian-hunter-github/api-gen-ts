@@ -1,2 +1,2 @@
-export { Row } from './Row';
-export type { RowProps } from './Row';
+export { Header } from './Header';
+export type { HeaderProps } from './Header';
