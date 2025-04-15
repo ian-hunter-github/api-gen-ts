@@ -14,12 +14,15 @@ export class Model<T> {
   history: History<T>;
   original?: T;
   status: ModelStatus;
+  isNew: boolean;
 
   constructor(
     data: T, 
     status: ModelStatus = ModelStatus.Pristine,
+    isNew: boolean = false,
     idGenerator: () => string = () => crypto.randomUUID()
   ) {
+    this.isNew = isNew;
     this.id = idGenerator();
     this.history = new History({...data});
     this.status = status;

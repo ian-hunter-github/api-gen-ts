@@ -19,6 +19,7 @@ describe('Header', () => {
     const model = new Model<TestData>(
       testData,
       status,
+      false, // isNew
       () => `test-id-${idCounter}`
     );
     

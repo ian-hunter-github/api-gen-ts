@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from "react";
+import { Plus } from "react-feather";
 import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
 import { AttributeDialog } from "../AttributeDialog/AttributeDialog";
 import type { ApiEntity } from "../../types/entities/entity";
 import type { EntityAttribute } from "../../types/entities/attributes";
-import { Model } from "../../utils/Model";
+import { Model, ModelStatus } from "../../utils/Model";
 import { Table } from "../common/Table/Table";
 import "./EntityDialog.css";
 
@@ -123,6 +124,21 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
     setEditingAttribute(null);
   };
 
+  const handleAddAttribute = (): void => {
+    const newAttribute = new Model<EntityAttribute>({
+      id: `temp-${Date.now()}`,
+      name: "",
+      type: "string",
+      required: false,
+      description: ""
+    }, ModelStatus.New, true); // true marks it as a new attribute
+    setEditingAttribute(newAttribute);
+    setAttributeModels([...attributeModels, newAttribute]);
+    setTimeout(() => {
+      setIsAttributeDialogOpen(true);
+    }, 0);
+  };
+
   const handleSave = (): void => {
     let finalAttributes = currentEntity.attributes;
 
@@ -203,9 +219,21 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
                 checkForChanges(currentEntity);
               }}
               onUndo={(model) => {
-                model.undo();
-                setAttributeModels([...attributeModels]);
-                checkForChanges(currentEntity);
+                console.log('Undo triggered for model:', model);
+                console.log('Current attributeModels:', attributeModels);
+                if (model.isNew) {
+                  const updatedModels = attributeModels.filter(m => {
+                    console.log('Comparing:', m, 'with', model, 'result:', m !== model);
+                    return m !== model;
+                  });
+                  console.log('Updated models after filter:', updatedModels);
+                  setAttributeModels(updatedModels);
+                  checkForChanges(currentEntity);
+                } else {
+                  model.undo();
+                  setAttributeModels([...attributeModels]);
+                  checkForChanges(currentEntity);
+                }
               }}
               onRedo={(model) => {
                 model.redo();
@@ -219,6 +247,14 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
             <button onClick={handleCancel}>Cancel</button>
             <button onClick={handleSave}>Update</button>
           </div>
+          
+          <button 
+            className="create-attribute-fab"
+            onClick={handleAddAttribute}
+            title="Add attribute"
+          >
+            <Plus />
+          </button>
         </div>
       </div>
 

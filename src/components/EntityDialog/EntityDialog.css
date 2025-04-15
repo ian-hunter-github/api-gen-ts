@@ -21,6 +21,7 @@
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+
 .entity-dialog-overlay {
   position: fixed;
   top: 0;
@@ -223,4 +224,43 @@ textarea.changed {
       background: #333;
     }
   }
+}
+
+.entity-dialog {
+  position: relative;
+  /* ... rest of existing styles ... */
+}
+
+/* Floating Action Button */
+.create-attribute-fab {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 1;
+  transition: var(--transition);
+}
+
+.create-attribute-fab:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.create-attribute-fab:active {
+  transform: scale(0.98);
+}
+
+.create-attribute-fab svg {
+  width: 32px;
+  height: 32px;
+  stroke-width: 2px;
 }

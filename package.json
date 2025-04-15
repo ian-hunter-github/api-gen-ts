@@ -27,6 +27,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-feather": "^2.0.10",
     "react-json-view": "^1.21.3",
     "react-resizable-panels": "^2.1.7",
     "react-test-renderer": "^19.1.0",
