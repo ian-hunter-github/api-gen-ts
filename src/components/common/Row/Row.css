@@ -1,21 +1,27 @@
 .row {
   transition: background-color 0.2s ease;
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr 1.5fr auto;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border-color);
   width: 100%;
-  min-width: 800px;
+  align-items: center;
+}
+
+.table-cell {
+  padding: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.table-cell.actions {
+  display: flex;
+  justify-content: flex-start;
   gap: 0.5rem;
 }
 
-.row-cell {
-  padding: 0 0.5rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+/* Removed row-cell styles since we're using table-cell from Table.css */
 
 .row.pristine {
   background-color: inherit;
@@ -23,6 +29,7 @@
 
 .row.modified {
   background-color: var(--state-modified) !important;
+  outline: 2px solid var(--state-modified-outline);
 }
 
 .row.new {
@@ -32,17 +39,14 @@
 .row.deleted {
   background-color: var(--state-deleted);
   opacity: 0.6;
+  border-left: 3px solid var(--error);
 }
 
-.row.deleted .table-cell:not(.actions, .action-buttons) {
+.row.deleted .row-cell {
   text-decoration: line-through;
+  text-decoration-thickness: 2px;
   pointer-events: none;
   user-select: none;
-}
-
-.row.modified {
-  background-color: var(--state-modified) !important;
-  outline: 2px solid var(--state-modified-outline);
 }
 
 .row:hover {
@@ -59,19 +63,4 @@
 
 .row.new:hover {
   background-color: var(--state-new);
-}
-
-.row-cell {
-  padding: 0 0.5rem;
-}
-
-.row-cell.actions {
-  min-width: 0;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.15rem;
-  flex-wrap: wrap;
-  justify-content: flex-end;
 }

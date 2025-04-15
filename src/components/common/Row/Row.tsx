@@ -13,6 +13,7 @@ export interface RowProps<T extends Record<string, unknown>> {
   onRedo?: (model: Model<T>) => void;
   renderCellContent?: (value: T | null) => React.ReactNode[];
   'data-testid'?: string;
+  gridTemplateColumns?: string;
 }
 
 export function Row<T extends Record<string, unknown>>({
@@ -23,6 +24,7 @@ export function Row<T extends Record<string, unknown>>({
   onUndo,
   onRedo,
   'data-testid': testId,
+  gridTemplateColumns,
   renderCellContent = (value) => {
     if (!value) return [];
     const entries = Object.entries(value)
@@ -66,6 +68,7 @@ export function Row<T extends Record<string, unknown>>({
         role="row"
         aria-label={`${itemName} row`}
         data-testid={testId || `row-${model.id}`}
+        style={{ gridTemplateColumns }}
       >
       {content.map((cell, index) => (
         <div key={index} className="table-cell" role="cell" data-testid={`${itemName}-${model.id}`}>

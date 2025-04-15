@@ -8,7 +8,6 @@
 
 .table-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
   background-color: var(--header-bg);
   padding: 0.75rem 1rem;
   font-weight: 500;
@@ -19,6 +18,8 @@
   align-items: center;
   padding: 0.5rem;
   border-right: 1px solid var(--border-color);
+  min-width: 0;
+  width: 100%;
 }
 
 .table-header-cell:last-child {
@@ -39,11 +40,14 @@
 
 .table-row {
   display: grid;
-  grid-template-columns: minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 2fr);
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-color);
   gap: 0.5rem;
   align-items: center;
+}
+
+.table-row:last-child {
+  border-bottom: none;
 }
 
 .table-cell {
@@ -54,76 +58,9 @@
   text-overflow: ellipsis;
   padding: 0.5rem;
   border-right: 1px solid var(--border-color);
+  width: 100%;
 }
 
 .table-cell:last-child {
   border-right: none;
-}
-
-.table-row.edit-mode {
-  grid-template-columns: minmax(150px, 2fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(120px, auto);
-}
-
-.table-row.edit-mode .table-cell {
-  min-width: 0;
-}
-
-.table-row.edit-mode .actions {
-  grid-column: 5;
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.table-row:last-child {
-  border-bottom: none;
-}
-
-.table-row.changed {
-  background-color: var(--state-modified);
-}
-
-.table-row.deleted {
-  background-color: var(--state-deleted);
-  opacity: 0.8;
-  border-left: 3px solid var(--error);
-}
-
-.table-row.deleted .table-cell {
-  text-decoration: line-through;
-  text-decoration-thickness: 2px;
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-}
-
-.actions button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  color: var(--text-secondary);
-}
-
-.actions button:hover {
-  color: var(--primary);
-}
-
-.actions button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  color: var(--text-disabled);
-}
-
-.undo-button {
-  color: var(--error) !important;
-}
-
-.undo-button:hover {
-  color: var(--error-dark) !important;
 }

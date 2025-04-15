@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import { Model } from '../../../utils/Model';
-import { AttributeDialog } from '../../AttributeDialog/AttributeDialog';
 import { Row } from '../Row/Row';
-import type { EntityAttribute } from '../../../types/entities/attributes';
 import './Table.css';
 
 export interface TableMetadata<T> {
@@ -33,34 +31,47 @@ export function Table<T extends Record<string, unknown>>({
   onUndo,
   onRedo,
   renderCellContent,
-  existingNames = [],
-  showAttributeDialog = false,
 }: TableProps<T>) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleSave = (model: Model<T>) => {
-    setIsDialogOpen(false);
-    onEdit?.(model);
-  };
+  // Calculate visible columns and grid template in one pass
+  const { visibleColumns, headerGridTemplate, bodyGridTemplate } = useMemo(() => {
+    if (models.length === 0) {
+      return { visibleColumns: [], gridTemplateColumns: '' };
+    }
 
-  const handleCancel = () => {
-    setIsDialogOpen(false);
-  };
+    const visibleColumns = metadata?.visibleColumns || 
+      Array.from(
+        new Set(
+          models.flatMap(model => 
+            Object.keys(model.current || {})
+              .filter(key => key !== 'id')
+          )
+        )
+      );
+    
+    // Header uses fixed 182px width, data rows use 1fr
+    const headerGridTemplate = [
+      ...visibleColumns.map(() => '1fr'), // '182px'),
+      '1fr' //'182px'
+    ].join(' ');
+    
+    const bodyGridTemplate = [
+      ...visibleColumns.map(() => '1fr'),
+      '1fr'
+    ].join(' ');
+
+    return { 
+      visibleColumns, 
+      headerGridTemplate, 
+      bodyGridTemplate 
+    };
+  }, [models, metadata]);
 
   if (models.length === 0) {
     return <div className="table-empty">No data available</div>;
   }
 
-  // Get headers from metadata or all models' combined keys
-  const headers = metadata?.visibleColumns || 
-    Array.from(
-      new Set(
-        models.flatMap(model => 
-          Object.keys(model.current || {})
-            .filter(key => key !== 'id')
-        )
-      )
-    );
+  const headers = visibleColumns;
 
 
   return (
@@ -71,7 +82,11 @@ export function Table<T extends Record<string, unknown>>({
       data-testid="attribute-table"
       key={models.length + models.filter(m => m.status === 'deleted').length} // Force re-render when models or deletions change
     >
-      <div className="table-header" role="rowgroup">
+      <div 
+        className="table-header" 
+        role="rowgroup"
+        style={{ gridTemplateColumns: headerGridTemplate }}
+      >
         {headers.map((header) => {
           const headerStr = String(header);
           return (
@@ -84,35 +99,26 @@ export function Table<T extends Record<string, unknown>>({
           <div className="table-header-cell" role="columnheader"></div>
         )}
       </div>
-      <div className="table-body" role="rowgroup">
+      <div 
+        className="table-body" 
+        role="rowgroup"
+        style={{ gridTemplateColumns: bodyGridTemplate }}
+      >
         {models.map((model) => (
-          <Row
-            key={model.id}
-            model={model}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onUndo={onUndo}
-            onRedo={onRedo}
-            renderCellContent={renderCellContent}
-            metadata={metadata}
-            data-testid="attribute-row"
-          />
+            <Row
+              key={model.id}
+              model={model}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onUndo={onUndo}
+              onRedo={onRedo}
+              renderCellContent={renderCellContent}
+              metadata={metadata}
+              data-testid="attribute-row"
+              gridTemplateColumns={bodyGridTemplate}
+            />
         ))}
       </div>
     </div>
-  );
-
-  return (
-    <>
-      {isDialogOpen && showAttributeDialog && (
-        <AttributeDialog
-          attribute={{} as Model<EntityAttribute>}
-          existingNames={existingNames}
-          onSave={handleSave as unknown as (model: Model<EntityAttribute>) => void}
-          onCancel={handleCancel}
-          open={isDialogOpen}
-        />
-      )}
-    </>
   );
 }
