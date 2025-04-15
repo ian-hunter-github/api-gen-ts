@@ -193,7 +193,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
                 visibleColumns: ['name', 'type', 'required'],
                 columnFormatters: {
                   required: (value) => value ? '✅' : '❌',
-                  type: (value) => <span style={{ textTransform: 'capitalize' }}>{String(value)}</span>
+                  type: (value) => <span>{String(value)}</span>
                 }
               }}
               onEdit={handleEditAttribute}
