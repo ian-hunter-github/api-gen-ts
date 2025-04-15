@@ -81,7 +81,7 @@ export function Table<T extends Record<string, unknown>>({
           );
         })}
         {(onEdit || onDelete || onUndo || onRedo) && (
-          <div className="table-header-cell"></div>
+          <div className="table-header-cell" role="columnheader"></div>
         )}
       </div>
       <div className="table-body" role="rowgroup">

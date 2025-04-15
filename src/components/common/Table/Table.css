@@ -99,7 +99,7 @@
   display: flex;
   gap: 0.5rem;
   flex-wrap: nowrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .actions button {
