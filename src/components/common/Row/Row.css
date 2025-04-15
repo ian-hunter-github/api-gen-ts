@@ -5,23 +5,7 @@
   align-items: center;
 }
 
-.table-cell {
-  padding: 0.5rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.table-cell.actions {
-  display: flex;
-  justify-content: flex-start;
-  gap: 0.5rem;
-}
-
-/* Removed row-cell styles since we're using table-cell from Table.css */
+/* Cell styles moved to Table.css - only row-specific styles remain here */
 
 .row.pristine {
   background-color: inherit;
@@ -63,4 +47,12 @@
 
 .row.new:hover {
   background-color: var(--state-new);
+}
+
+.row.header {
+  font-weight: bold;
+}
+
+.row.header .table-cell {
+  font-weight: bold;
 }

@@ -33,7 +33,7 @@ export function Table<T extends Record<string, unknown>>({
   renderCellContent,
 }: TableProps<T>) {
 
-  // Calculate visible columns and grid template in one pass
+  // Calculate grid templates for header and body
   const { visibleColumns, headerGridTemplate, bodyGridTemplate } = useMemo(() => {
     if (models.length === 0) {
       return { visibleColumns: [], gridTemplateColumns: '' };
@@ -71,8 +71,24 @@ export function Table<T extends Record<string, unknown>>({
     return <div className="table-empty">No data available</div>;
   }
 
-  const headers = visibleColumns;
+  interface HeaderData extends Record<string, unknown> {
+    id: string;
+    [key: `header${number}`]: string; // Replace ColumnType with actual type
+  }
+  
+  const headerData: HeaderData = {id: "header-row"};
+  visibleColumns.forEach((col, index) => {
+    const colName = `header${index + 1}` as const;
+    headerData[colName] = String(col).charAt(0).toUpperCase() + String(col).slice(1);
+  });
 
+  // Add empty action column header if action handlers exist
+  if (onEdit || onDelete || onUndo || onRedo) {
+    const actionColName = `header${visibleColumns.length + 1}` as const;
+    headerData[actionColName] = "";
+  }
+
+  const headerModel = new Model<HeaderData>(headerData);
 
   return (
     <div 
@@ -80,24 +96,17 @@ export function Table<T extends Record<string, unknown>>({
       role="table" 
       aria-label="Data table" 
       data-testid="attribute-table"
-      key={models.length + models.filter(m => m.status === 'deleted').length} // Force re-render when models or deletions change
+      key={models.length + models.filter(m => m.status === 'deleted').length}
     >
-      <div 
-        className="table-header" 
-        role="rowgroup"
-        style={{ gridTemplateColumns: headerGridTemplate }}
-      >
-        {headers.map((header) => {
-          const headerStr = String(header);
-          return (
-            <div className="table-header-cell" key={headerStr} role="columnheader">
-              {headerStr.charAt(0).toUpperCase() + headerStr.slice(1)}
-            </div>
-          );
-        })}
-        {(onEdit || onDelete || onUndo || onRedo) && (
-          <div className="table-header-cell" role="columnheader"></div>
-        )}
+      <div role="rowgroup" aria-label="Table header">
+        <Row
+          key={headerModel.id}
+          model={headerModel}
+          gridTemplateColumns={headerGridTemplate}
+          actionButtonsContent={"Actions"}
+          data-testid="attribute-row-header"
+          isHeader={true}
+        />
       </div>
       <div 
         className="table-body" 

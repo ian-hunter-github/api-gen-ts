@@ -14,6 +14,8 @@ export interface RowProps<T extends Record<string, unknown>> {
   renderCellContent?: (value: T | null) => React.ReactNode[];
   'data-testid'?: string;
   gridTemplateColumns?: string;
+  actionButtonsContent?: React.ReactNode;
+  isHeader?: boolean;
 }
 
 export function Row<T extends Record<string, unknown>>({
@@ -25,6 +27,8 @@ export function Row<T extends Record<string, unknown>>({
   onRedo,
   'data-testid': testId,
   gridTemplateColumns,
+  actionButtonsContent,
+  isHeader,
   renderCellContent = (value) => {
     if (!value) return [];
     const entries = Object.entries(value)
@@ -60,7 +64,15 @@ export function Row<T extends Record<string, unknown>>({
     'row',
     model.status === 'modified' ? 'modified' : '',
     model.status === 'deleted' ? 'deleted' : '',
+    isHeader ? 'header' : '',
   ].filter(Boolean).join(' ');
+
+  const rowStyle = {
+    gridTemplateColumns,
+    ...(isHeader && {
+      backgroundColor: 'var(--header-bg)'
+    })
+  };
 
   return (
       <div 
@@ -68,7 +80,7 @@ export function Row<T extends Record<string, unknown>>({
         role="row"
         aria-label={`${itemName} row`}
         data-testid={testId || `row-${model.id}`}
-        style={{ gridTemplateColumns }}
+        style={rowStyle}
       >
       {content.map((cell, index) => (
         <div key={index} className="table-cell" role="cell" data-testid={`${itemName}-${model.id}`}>
@@ -77,13 +89,15 @@ export function Row<T extends Record<string, unknown>>({
       ))}
       {(onEdit || onDelete || onUndo || onRedo) && (
         <div className="table-cell actions" role="cell">
-          <ActionButtons
-            model={model}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onUndo={onUndo}
-            onRedo={onRedo}
-          />
+          {actionButtonsContent || (
+            <ActionButtons
+              model={model}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onUndo={onUndo}
+              onRedo={onRedo}
+            />
+          )}
         </div>
       )}
     </div>

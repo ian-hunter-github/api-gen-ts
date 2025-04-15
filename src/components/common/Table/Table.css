@@ -17,7 +17,6 @@
   display: flex;
   align-items: center;
   padding: 0.5rem;
-  border-right: 1px solid var(--border-color);
   min-width: 0;
   width: 100%;
 }
@@ -57,10 +56,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 0.5rem;
-  border-right: 1px solid var(--border-color);
   width: 100%;
 }
 
 .table-cell:last-child {
   border-right: none;
+}
+
+.table-cell.actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.5rem;
 }
