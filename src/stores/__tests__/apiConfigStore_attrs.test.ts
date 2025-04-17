@@ -11,6 +11,7 @@ describe('apiConfigStore - Entity Attribute Operations', () => {
   it('should create API with basic attributes', () => {
     const apiId = getStore().addApi({
       name: 'Test API',
+      description: 'Test API description',
       version: '1.0.0',
       security: {
         authentication: {
@@ -60,6 +61,7 @@ describe('apiConfigStore - Entity Attribute Operations', () => {
   it('should handle array attributes', () => {
     const apiId = getStore().addApi({
       name: 'Test API',
+      description: 'Test API for array attributes',
       version: '1.0.0',
       security: {
         authentication: {
@@ -119,6 +121,7 @@ describe('apiConfigStore - Entity Attribute Operations', () => {
   it('should handle complex attribute scenarios', () => {
     const apiId = getStore().addApi({
       name: 'Test API',
+      description: 'Test API for complex attributes',
       version: '1.0.0',
       security: {
         authentication: {

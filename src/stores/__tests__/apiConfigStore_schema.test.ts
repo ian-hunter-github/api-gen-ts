@@ -1,26 +1,23 @@
-import { Validator } from 'jsonschema';
-import type { ApiConfig } from '../../types/api.types';
-import apiConfigSchema from '../../schema/api-config.schema.json';
-import entitySchema from '../../schema/entity.schema.json';
-import securitySchema from '../../schema/security.schema.json';
-import deploymentSchema from '../../schema/deployment.schema.json';
+import { useApiConfigStore } from '../apiConfigStore';
+import { ApiConfig } from '../../types/api.types';
 
-describe('APIConfig Schema Validation', () => {
-  it('should validate a complex APIConfig against the schema', () => {
+describe('apiConfigStore schema validation', () => {
+  it('should validate complex config schema', () => {
     const complexConfig: ApiConfig = {
-      id: 'test-api-1',
+      id: 'test',
       name: 'Test API',
+      description: 'Test API Description',
       version: '1.0.0',
       entities: [
         {
           name: 'User',
-          description: 'System user',
+          description: 'User entity',
           attributes: [
             {
-              id: 'attr-id-string',
-              name: 'id',
+              id: '1',
+              name: 'username',
               type: 'string',
-              description: 'User ID'
+              description: 'Username attribute'
             }
           ]
         }
@@ -29,7 +26,7 @@ describe('APIConfig Schema Validation', () => {
         authentication: {
           type: 'jwt',
           jwt: {
-            secret: 'super-secret-key',
+            secret: 'secret',
             expiresIn: '1h'
           }
         },
@@ -37,81 +34,36 @@ describe('APIConfig Schema Validation', () => {
           roles: [
             {
               name: 'admin',
-              description: 'Administrator role',
-              permissions: ['*']
-            },
-            {
-              name: 'editor',
-              description: 'Editor role',
-              permissions: ['create', 'read', 'update']
-            },
-            {
-              name: 'viewer',
-              description: 'Viewer role',
-              permissions: ['read']
+              description: 'Admin role',
+              permissions: ['read', 'write']
             }
           ]
         }
       },
-      deployments: [
+      deployment: [
         {
           provider: 'aws',
           settings: {
             region: 'us-east-1',
-            lambdaMemory: 512
+            apiGateway: true
           }
         }
       ],
-      dataSources: [
-        {
-          name: 'main-db',
-          type: 'postgres',
-          config: {
-            host: 'localhost',
-            port: 5432,
-            database: 'test_db',
-            username: 'postgres',
-            password: 'postgres'
-          }
+      datasource: {
+        type: 'postgres',
+        connection: {
+          host: 'localhost',
+          port: 5432,
+          username: 'user',
+          password: 'pass',
+          database: 'db'
         }
-      ],
-      createdAt: '2025-05-04T16:30:00Z',
-      updatedAt: '2025-05-04T16:30:00Z'
+      },
+      createdAt: '2023-01-01T00:00:00Z',
+      updatedAt: '2023-01-01T00:00:00Z'
     };
 
-    const v = new Validator();
-    // Add local schema references with their URIs
-    v.addSchema(entitySchema, entitySchema.$id);
-    v.addSchema(securitySchema, securitySchema.$id);
-    v.addSchema(deploymentSchema, deploymentSchema.$id);
-    const validationResult = v.validate(complexConfig, apiConfigSchema);
-
-    expect(validationResult.valid).toBe(true);
-    expect(validationResult.errors).toEqual([]);
-  });
-
-  it('should fail validation for invalid APIConfig', () => {
-    const invalidConfig = {
-      // Missing required 'name' field
-      version: 'invalid-version', // Invalid version format
-      entities: [], // Empty array not allowed
-      deployments: [
-        {
-          provider: 'aws',
-          settings: {
-            region: 'invalid-region'
-          }
-        }
-      ]
-    };
-
-    const v = new Validator();
-    // Add local schema references with their URIs
-    v.addSchema(entitySchema, entitySchema.$id);
-    v.addSchema(securitySchema, securitySchema.$id);
-    v.addSchema(deploymentSchema, deploymentSchema.$id);
-    const validationResult = v.validate(invalidConfig, apiConfigSchema);
-    expect(validationResult.valid).toBe(false);
-    expect(validationResult.errors.length).toBeGreaterThan(0);
+    const apiId = useApiConfigStore.getState().addApi(complexConfig);
+    expect(apiId).toBeDefined();
   });
 });

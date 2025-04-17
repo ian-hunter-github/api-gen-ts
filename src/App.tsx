@@ -41,7 +41,8 @@ function App() {
             authentication: {
               type: 'none'
             }
-          }
+          },
+          createdAt: new Date().toISOString()
         }
       }]);
     }
@@ -63,7 +64,8 @@ function App() {
           authentication: {
             type: 'none'
           }
-        }
+        },
+        createdAt: new Date().toISOString()
       } as ApiConfig
     }]);
     setActiveTab(newTabId);

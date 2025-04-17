@@ -15,6 +15,7 @@ describe('apiConfigStore - Basic CRUD Operations', () => {
       const newApi: ApiConfig = {
         id: 'test-api',
         name: 'Test API',
+        description: 'Test API description',
         version: '1.0.0',
         entities: [],
         security: {
@@ -40,6 +41,8 @@ describe('apiConfigStore - Basic CRUD Operations', () => {
             ]
           }
         },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
       const apiId = getStore().addApi(newApi);
@@ -64,6 +67,7 @@ describe('apiConfigStore - Basic CRUD Operations', () => {
       const newApi: ApiConfig = {
         id: 'test-api',
         name: 'Test API',
+        description: 'Test API description',
         version: '1.0.0',
         entities: [],
         security: {
@@ -83,6 +87,8 @@ describe('apiConfigStore - Basic CRUD Operations', () => {
             }]
           }
         },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
       const apiId = getStore().addApi(newApi);
@@ -100,6 +106,7 @@ describe('apiConfigStore - Basic CRUD Operations', () => {
       const newApi: ApiConfig = {
         id: 'test-api',
         name: 'Test API',
+        description: 'Test API description',
         version: '1.0.0',
         entities: [],
         security: {
@@ -119,6 +126,8 @@ describe('apiConfigStore - Basic CRUD Operations', () => {
             }]
           }
         },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
       const apiId = getStore().addApi(newApi);
@@ -136,6 +145,7 @@ describe('apiConfigStore - Basic CRUD Operations', () => {
       const initialApi: ApiConfig = {
         id: 'test-api',
         name: 'Immutable API',
+        description: 'Immutable API description',
         version: '1.0.0',
         entities: [],
         security: {
@@ -155,6 +165,8 @@ describe('apiConfigStore - Basic CRUD Operations', () => {
             }]
           }
         },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
       const apiId = getStore().addApi(initialApi);
@@ -176,6 +188,7 @@ describe('apiConfigStore - Basic CRUD Operations', () => {
       const newApi: ApiConfig = {
         id: 'test-api',
         name: 'Test API',
+        description: 'Test API description',
         version: '1.0.0',
         entities: [],
         security: {
@@ -195,6 +208,8 @@ describe('apiConfigStore - Basic CRUD Operations', () => {
             }]
           }
         },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
       const apiId = getStore().addApi(newApi);

@@ -1,8 +1,6 @@
 import { ApiSecurity } from './security';
 import { ApiComponents } from './components';
-import { DataSource } from './datasource';
 import { DeploymentConfig } from './deployment';
-import { CICDConfig } from './cicd';
 import { VCSConfig } from './version-control';
 import { ApiEntity } from './entities/entity';
 
@@ -12,16 +10,36 @@ import { ApiEntity } from './entities/entity';
 export type ApiConfig = {
   id: string;
   name: string;
-  description?: string;
+  description: string;
   isDemo?: boolean;
   version: string;
+  basePath?: string;
+  documentation?: {
+    enabled: boolean;
+    format: 'openapi' | 'asyncapi' | 'markdown';
+  };
   entities: ApiEntity[];
   security: ApiSecurity;
   components?: ApiComponents;
-  dataSources?: DataSource[];
-  deployments?: DeploymentConfig[];
-  ciCd?: CICDConfig[];
+  datasource?: {
+    type: string;
+    connection?: {
+      url?: string;
+      host?: string;
+      port?: number;
+      database?: string;
+      username?: string;
+      password?: string;
+    };
+  };
+  deployment?: DeploymentConfig[];
+  cicd?: {
+    enabled: boolean;
+    stages?: string[];
+  };
   versionControl?: VCSConfig;
+  createdAt: string;
+  updatedAt?: string;
   endpoints?: {
     baseUrl: string;
     paths: Record<string, {
@@ -50,8 +68,6 @@ export type ApiConfig = {
       }>;
     }>;
   };
-  createdAt?: string;
-  updatedAt?: string;
 };
 
 export type ApiConfigCollection = Record<string, ApiConfig>;
@@ -65,9 +81,13 @@ export function isApiConfig(config: unknown): config is ApiConfig {
     'version' in config &&
     'entities' in config && 
     'security' in config &&
+    'description' in config &&
+    'createdAt' in config &&
     typeof (config as Record<string, unknown>).id === 'string' &&
     typeof (config as Record<string, unknown>).name === 'string' && 
     typeof (config as Record<string, unknown>).version === 'string' &&
+    typeof (config as Record<string, unknown>).description === 'string' &&
+    typeof (config as Record<string, unknown>).createdAt === 'string' &&
     Array.isArray((config as Record<string, unknown>).entities) &&
     typeof (config as Record<string, unknown>).security === 'object'
   );

@@ -1,0 +1,159 @@
+.tanstack-table {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.tanstack-table table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.tanstack-table th {
+  background-color: #f5f5f5;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 500;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tanstack-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+.tanstack-table tr:last-child td {
+  border-bottom: none;
+}
+
+.tanstack-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Modified state */
+.tanstack-table tr.modified {
+  background-color: #fff8e1;
+}
+
+.tanstack-table .table-cell.modified {
+  background-color: #fff8e1;
+}
+
+/* Error state */
+.tanstack-table tr.error {
+  background-color: #fce4ec;
+}
+
+.tanstack-table .table-cell.error {
+  background-color: #fce4ec;
+  position: relative;
+}
+
+.tanstack-table .table-cell.error::after {
+  content: attr(data-error);
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  font-size: 12px;
+  color: #d32f2f;
+  white-space: nowrap;
+}
+
+/* Action buttons */
+.tanstack-table .table-cell.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Editable cells */
+.tanstack-table .table-cell[contenteditable="true"] {
+  outline: 2px solid #1976d2;
+  border-radius: 2px;
+  padding: 4px 8px;
+}
+
+.tanstack-table .table-cell[contenteditable="true"]:focus {
+  background-color: white;
+}
+
+/* Editable cells */
+.tanstack-table .table-cell.editable {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tanstack-table .table-cell.editable:hover {
+  background-color: rgba(25, 118, 210, 0.08);
+}
+
+.tanstack-table .table-cell[contenteditable="true"] {
+  outline: 2px solid #1976d2;
+  background-color: white;
+  border-radius: 4px;
+  padding: 8px;
+  cursor: text;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.table-actions button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.02857em;
+}
+
+.table-actions button.primary {
+  background: #1976d2;
+  color: white;
+  border: none;
+}
+
+.table-actions button.primary:hover {
+  background: #1565c0;
+}
+
+.table-actions button.secondary {
+  background: transparent;
+  color: #1976d2;
+  border: 1px solid rgba(25, 118, 210, 0.5);
+}
+
+.table-actions button.secondary:hover {
+  background: rgba(25, 118, 210, 0.04);
+  border-color: #1976d2;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.bulk-actions button {
+  padding: 6px 12px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bulk-actions button:hover {
+  background: #1565c0;
+}

@@ -4,7 +4,7 @@
   "title": "APIConfig",
   "description": "Schema for validating API configurations",
   "type": "object",
-  "required": ["name", "version", "entities"],
+  "required": ["name", "version", "entities", "description", "createdAt"],
   "properties": {
     "name": {
       "type": "string",
@@ -17,7 +17,8 @@
     },
     "description": {
       "type": "string",
-      "description": "Description of the API"
+      "description": "Description of the API",
+      "default": ""
     },
     "basePath": {
       "type": "string",
