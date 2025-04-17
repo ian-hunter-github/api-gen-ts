@@ -236,7 +236,7 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
           entity={editingEntity}
           open={isEntityDialogOpen}
           onSave={(updatedEntity: ApiEntity) => {
-            console.log('ApiConfigEditor - EntityDialog onSave - updating entity:', updatedEntity.name);
+
             setConfig({
               ...config,
               entities: (config.entities || []).map(e => 
@@ -246,7 +246,6 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
             setChanges(prev => new Set(prev).add('entities'));
             setIsEntityDialogOpen(false);
             setEditingEntity(null);
-            console.log('ApiConfigEditor - EntityDialog onSave - updated config and closed dialog');
           }}
           onCancel={() => {
             setIsEntityDialogOpen(false);

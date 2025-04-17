@@ -219,14 +219,10 @@ export const EntityDialog: React.FC<EntityDialogProps> = ({
                 checkForChanges(currentEntity);
               }}
               onUndo={(model) => {
-                console.log('Undo triggered for model:', model);
-                console.log('Current attributeModels:', attributeModels);
                 if (model.isNew) {
                   const updatedModels = attributeModels.filter(m => {
-                    console.log('Comparing:', m, 'with', model, 'result:', m !== model);
                     return m !== model;
                   });
-                  console.log('Updated models after filter:', updatedModels);
                   setAttributeModels(updatedModels);
                   checkForChanges(currentEntity);
                 } else {

@@ -45,21 +45,8 @@ export class Model<T> {
   }
 
   delete(): void {
-    console.debug('Model.delete() called on model:', this.id);
-    console.debug('Current model state:', JSON.stringify({
-      id: this.id,
-      status: this.status,
-      current: this.current,
-      original: this.original
-    }, null, 2));
     this.history.updateDeleted();
     this.status = ModelStatus.Deleted;
-    console.debug('Model after delete:', JSON.stringify({
-      id: this.id,
-      status: this.status,
-      current: this.current,
-      original: this.original
-    }, null, 2));
   }
 
   restore(): void {

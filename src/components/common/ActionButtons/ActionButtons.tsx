@@ -20,10 +20,7 @@ export function ActionButtons<T extends Record<string, unknown>>({
   containerComponent: Container = 'div',
 }: ActionButtonsProps<T>) {
   const handleDelete = (model: Model<T>) => {
-    console.debug('ActionButtons: Attempting to delete model', model.id, 'with status:', model.status);
-    console.debug('Model before delete:', JSON.stringify(model, null, 2));
     model.delete();
-    console.debug('Model after delete:', JSON.stringify(model, null, 2));
     onDelete?.(model);
   };
 
