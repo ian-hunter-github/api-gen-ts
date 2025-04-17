@@ -11,6 +11,7 @@ describe('apiConfigStore - Endpoint Operations', () => {
   it('should create API with basic endpoints', () => {
     const apiId = getStore().addApi({
       name: 'Test API',
+      description: 'Test API for endpoint operations',
       version: '1.0.0',
       security: {
         authentication: {
@@ -97,6 +98,7 @@ describe('apiConfigStore - Endpoint Operations', () => {
   it('should handle endpoint with parameters', () => {
     const apiId = getStore().addApi({
       name: 'Test API',
+      description: 'Test API for endpoint operations',
       version: '1.0.0',
       security: {
         authentication: {
@@ -179,6 +181,7 @@ describe('apiConfigStore - Endpoint Operations', () => {
   it('should handle endpoint with request body', () => {
     const apiId = getStore().addApi({
       name: 'Test API',
+      description: 'Test API for endpoint operations',
       version: '1.0.0',
       security: {
         authentication: {
@@ -259,6 +262,7 @@ describe('apiConfigStore - Endpoint Operations', () => {
   it('should update existing endpoint', () => {
     const apiId = getStore().addApi({
       name: 'Test API',
+      description: 'Test API for endpoint operations',
       version: '1.0.0',
       security: {
         authentication: {
@@ -354,6 +358,7 @@ describe('apiConfigStore - Endpoint Operations', () => {
   it('should remove endpoint', () => {
     const apiId = getStore().addApi({
       name: 'Test API',
+      description: 'Test API for endpoint operations',
       version: '1.0.0',
       security: {
         authentication: {

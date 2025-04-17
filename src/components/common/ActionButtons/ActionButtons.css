@@ -1,0 +1,46 @@
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: inherit;
+}
+
+.action-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-button .icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}
+
+.edit {
+  color: #1a73e8;
+}
+
+.delete {
+  color: #d32f2f;
+}
+
+.undo, .redo {
+  color: #5f6368;
+}

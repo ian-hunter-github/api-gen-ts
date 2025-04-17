@@ -12,42 +12,61 @@ export default meta;
 type Story = StoryObj<typeof ApiConfigEditor>;
 
 const sampleConfig: ApiConfig = {
-  id: 'ecom-api',
-  name: 'E-Commerce API',
-  description: 'API for managing e-commerce operations',
+  id: 'test-api',
+  name: 'Test API',
+  description: 'Test Description',
   version: '1.0.0',
   entities: [],
   security: {
     authentication: {
       type: 'jwt',
       jwt: {
-        secret: 'secret-key',
+        secret: 'test-secret',
         expiresIn: '1h',
-        issuer: 'api-service',
-        audience: 'web-app'
+        issuer: 'test-issuer',
+        audience: 'test-audience'
       }
+    },
+    authorization: {
+      roles: [
+        {
+          name: 'admin',
+          description: 'Administrator role',
+          permissions: ['*']
+        }
+      ],
+      policies: []
     }
   },
   endpoints: {
-    baseUrl: '/api/v1',
-    paths: {}
-  }
+    baseUrl: 'https://api.example.com',
+    paths: {
+      '/users': {
+        path: '/users',
+        method: 'get',
+        description: 'Returns a list of all users',
+        responses: {
+          '200': {
+            description: 'Successful operation',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/User'
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  createdAt: '2025-01-01T00:00:00Z',
+  updatedAt: '2025-01-01T00:00:00Z'
 };
 
 export const Default: Story = {
   args: {
     config: sampleConfig,
-    onSave: (config) => console.log('Saved:', config)
-  }
-};
-
-export const WithChanges: Story = {
-  args: {
-    config: {
-      ...sampleConfig,
-      name: 'Changed Name',
-      description: 'Updated description'
-    },
     onSave: (config) => console.log('Saved:', config)
   }
 };

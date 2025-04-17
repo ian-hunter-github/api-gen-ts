@@ -1,14 +1,37 @@
 #!/bin/bash
-# start-feature.sh
 
-if [ -z "$1" ]; then
-  echo "Usage: $0 feature-name"
+FEATURE=$1
+
+if [ -z "$FEATURE" ]; then
+  echo "Usage: $0 <feature-name>"
   exit 1
 fi
 
-FEATURE="feature/$1"
+FEATURE_BRANCH="feature/$FEATURE"
 
-# Create and switch to new branch
-git checkout -b "$FEATURE"
+# Save current branch
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-echo "Switched to new branch: $FEATURE"
+# Stash uncommitted changes
+STASHED=false
+if ! git diff --quiet || ! git diff --cached --quiet; then
+  echo "🔒 Stashing uncommitted changes..."
+  git stash push -u -m "temp-stash-before-feature-switch"
+  STASHED=true
+fi
+
+# Switch to main and update
+echo "📦 Switching to main and pulling latest..."
+git checkout main && git pull
+
+# Create new feature branch
+echo "🌱 Creating new branch $FEATURE_BRANCH..."
+git checkout -b "$FEATURE_BRANCH"
+
+# Reapply stashed changes if needed
+if $STASHED; then
+  echo "🔁 Reapplying stashed changes..."
+  git stash pop
+fi
+
+echo "✅ Switched to $FEATURE_BRANCH"

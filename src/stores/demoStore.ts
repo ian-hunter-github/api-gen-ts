@@ -11,6 +11,8 @@ export const demoStore: ApiConfig[] = [
     name: 'E-Commerce API',
     version: '2.3.0',
     description: 'Full e-commerce platform API',
+    createdAt: '2024-01-15T09:30:00Z',
+    updatedAt: '2024-04-10T14:25:00Z',
     security: {
       authentication: {
         type: 'jwt',
@@ -38,21 +40,23 @@ export const demoStore: ApiConfig[] = [
       {
         name: 'Product',
         attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'name', name: 'name', type: 'string', required: true },
-          { id: 'description', name: 'description', type: 'string', required: false },
-          { id: 'price', name: 'price', type: 'number', required: true },
-          { id: 'stock', name: 'stock', type: 'number', required: true },
+          { id: 'id', name: 'id', type: 'string', required: true, description: 'Unique product identifier' },
+          { id: 'name', name: 'name', type: 'string', required: true, description: 'Product name' },
+          { id: 'description', name: 'description', type: 'string', required: false, description: 'Detailed product description' },
+          { id: 'price', name: 'price', type: 'number', required: true, description: 'Product price in USD' },
+          { id: 'stock', name: 'stock', type: 'number', required: true, description: 'Current inventory quantity' },
           { 
             id: 'categories',
             name: 'categories', 
             type: 'array',
             required: false,
+            description: 'Product categories',
             items: { 
               id: 'category',
               name: 'category',
               type: 'string',
-              required: false
+              required: false,
+              description: 'Individual category name'
             }
           },
           { 
@@ -60,15 +64,17 @@ export const demoStore: ApiConfig[] = [
             name: 'images', 
             type: 'array',
             required: false,
+            description: 'Product images',
             items: { 
               id: 'image',
               name: 'image',
               type: 'string',
-              required: false
+              required: false,
+              description: 'Image URL'
             }
           },
-          { id: 'createdAt', name: 'createdAt', type: 'datetime', required: true },
-          { id: 'updatedAt', name: 'updatedAt', type: 'datetime', required: true }
+          { id: 'createdAt', name: 'createdAt', type: 'datetime', required: true, description: 'Creation timestamp' },
+          { id: 'updatedAt', name: 'updatedAt', type: 'datetime', required: true, description: 'Last update timestamp' }
         ],
         endpoints: [
           { method: 'GET', path: '/products', description: 'List all products' },
@@ -92,12 +98,12 @@ export const demoStore: ApiConfig[] = [
       {
         name: 'Review',
         attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'productId', name: 'productId', type: 'string', required: true },
-          { id: 'userId', name: 'userId', type: 'string', required: true },
-          { id: 'rating', name: 'rating', type: 'number', required: true },
-          { id: 'comment', name: 'comment', type: 'string', required: false },
-          { id: 'createdAt', name: 'createdAt', type: 'datetime', required: true }
+          { id: 'id', name: 'id', type: 'string', required: true, description: 'Unique review identifier' },
+          { id: 'productId', name: 'productId', type: 'string', required: true, description: 'Reviewed product ID' },
+          { id: 'userId', name: 'userId', type: 'string', required: true, description: 'Review author ID' },
+          { id: 'rating', name: 'rating', type: 'number', required: true, description: 'Rating (1-5)' },
+          { id: 'comment', name: 'comment', type: 'string', required: false, description: 'Review text content' },
+          { id: 'createdAt', name: 'createdAt', type: 'datetime', required: true, description: 'Review creation timestamp' }
         ],
         endpoints: [
           { method: 'GET', path: '/products/:productId/reviews', description: 'Get product reviews' },
@@ -130,6 +136,8 @@ export const demoStore: ApiConfig[] = [
     name: 'User API',
     version: '1.0.0',
     description: 'API for managing users',
+    createdAt: '2023-11-20T08:15:00Z',
+    updatedAt: '2024-03-05T11:40:00Z',
     security: {
       authentication: {
         type: 'jwt',
@@ -157,10 +165,10 @@ export const demoStore: ApiConfig[] = [
       {
         name: 'User',
         attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'name', name: 'name', type: 'string', required: true },
-          { id: 'email', name: 'email', type: 'string', required: true },
-          { id: 'createdAt', name: 'createdAt', type: 'datetime', required: true }
+          { id: 'id', name: 'id', type: 'string', required: true, description: 'Unique user identifier' },
+          { id: 'name', name: 'name', type: 'string', required: true, description: 'User full name' },
+          { id: 'email', name: 'email', type: 'string', required: true, description: 'User email address' },
+          { id: 'createdAt', name: 'createdAt', type: 'datetime', required: true, description: 'Account creation timestamp' }
         ],
         endpoints: [
           { method: 'GET', path: '/users', description: 'List all users' },
@@ -171,10 +179,10 @@ export const demoStore: ApiConfig[] = [
       {
         name: 'Product',
         attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'name', name: 'name', type: 'string', required: true },
-          { id: 'price', name: 'price', type: 'number', required: true },
-          { id: 'category', name: 'category', type: 'string', required: false }
+          { id: 'id', name: 'id', type: 'string', required: true, description: 'Unique product identifier' },
+          { id: 'name', name: 'name', type: 'string', required: true, description: 'Product name' },
+          { id: 'price', name: 'price', type: 'number', required: true, description: 'Product price' },
+          { id: 'category', name: 'category', type: 'string', required: false, description: 'Product category' }
         ],
         endpoints: [
           { method: 'GET', path: '/products', description: 'List all products' },
@@ -189,6 +197,8 @@ export const demoStore: ApiConfig[] = [
     name: 'Order API',
     version: '1.2.0',
     description: 'API for managing orders',
+    createdAt: '2024-02-01T10:00:00Z',
+    updatedAt: '2024-04-12T16:20:00Z',
     security: {
       authentication: {
         type: 'api-key',
@@ -221,11 +231,11 @@ export const demoStore: ApiConfig[] = [
       {
         name: 'Order',
         attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'userId', name: 'userId', type: 'string', required: true },
-          { id: 'productId', name: 'productId', type: 'string', required: true },
-          { id: 'quantity', name: 'quantity', type: 'number', required: true },
-          { id: 'status', name: 'status', type: 'string', required: true }
+          { id: 'id', name: 'id', type: 'string', required: true, description: 'Unique order identifier' },
+          { id: 'userId', name: 'userId', type: 'string', required: true, description: 'Ordering user ID' },
+          { id: 'productId', name: 'productId', type: 'string', required: true, description: 'Ordered product ID' },
+          { id: 'quantity', name: 'quantity', type: 'number', required: true, description: 'Product quantity ordered' },
+          { id: 'status', name: 'status', type: 'string', required: true, description: 'Order status (pending, completed, cancelled)' }
         ],
         endpoints: [
           { method: 'GET', path: '/orders', description: 'List all orders' },
@@ -240,6 +250,8 @@ export const demoStore: ApiConfig[] = [
     name: 'Inventory API',
     version: '2.1.0',
     description: 'API for inventory management',
+    createdAt: '2023-12-10T13:45:00Z',
+    updatedAt: '2024-04-08T09:10:00Z',
     security: {
       authentication: {
         type: 'jwt',
@@ -267,10 +279,10 @@ export const demoStore: ApiConfig[] = [
       {
         name: 'Warehouse',
         attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'name', name: 'name', type: 'string', required: true },
-          { id: 'location', name: 'location', type: 'string', required: true },
-          { id: 'capacity', name: 'capacity', type: 'number', required: true }
+          { id: 'id', name: 'id', type: 'string', required: true, description: 'Unique warehouse identifier' },
+          { id: 'name', name: 'name', type: 'string', required: true, description: 'Warehouse name' },
+          { id: 'location', name: 'location', type: 'string', required: true, description: 'Warehouse physical location' },
+          { id: 'capacity', name: 'capacity', type: 'number', required: true, description: 'Total storage capacity in cubic meters' }
         ],
         endpoints: [
           { method: 'GET', path: '/warehouses', description: 'List all warehouses' },
@@ -281,11 +293,11 @@ export const demoStore: ApiConfig[] = [
       {
         name: 'InventoryItem',
         attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'name', name: 'name', type: 'string', required: true },
-          { id: 'quantity', name: 'quantity', type: 'number', required: true },
-          { id: 'warehouseId', name: 'warehouseId', type: 'string', required: true },
-          { id: 'lastStocked', name: 'lastStocked', type: 'datetime', required: false }
+          { id: 'id', name: 'id', type: 'string', required: true, description: 'Unique item identifier' },
+          { id: 'name', name: 'name', type: 'string', required: true, description: 'Item name' },
+          { id: 'quantity', name: 'quantity', type: 'number', required: true, description: 'Current stock quantity' },
+          { id: 'warehouseId', name: 'warehouseId', type: 'string', required: true, description: 'Warehouse location ID' },
+          { id: 'lastStocked', name: 'lastStocked', type: 'datetime', required: false, description: 'Last restock timestamp' }
         ],
         endpoints: [
           { method: 'GET', path: '/items', description: 'List all inventory items' },
@@ -294,39 +306,40 @@ export const demoStore: ApiConfig[] = [
           { method: 'PATCH', path: '/items/:id/stock', description: 'Update item stock' }
         ]
       }
-    ],
+    ]
   },
   {
     id: 'demo-999',
     name: 'Demo Data (can be removed)',
     version: '1.0.0',
     description: 'Sample data for development purposes',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-04-15T12:00:00Z',
     security: {
       authentication: {
         type: 'none'
       }
     },
-    dataSources: [{
-      name: 'main_db',
+    datasource: {
       type: 'postgres',
-      config: {
+      connection: {
         host: 'localhost',
         port: 5432,
         database: 'demo_db',
         username: 'demo_user',
         password: 'demo_pass'
       }
-    }],
+    },
     entities: [
       {
         name: 'Customer',
         attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'firstName', name: 'firstName', type: 'string', required: true },
-          { id: 'lastName', name: 'lastName', type: 'string', required: true },
-          { id: 'email', name: 'email', type: 'string', required: true },
-          { id: 'phone', name: 'phone', type: 'string', required: false },
-          { id: 'address', name: 'address', type: 'string', required: false }
+          { id: 'id', name: 'id', type: 'string', required: true, description: 'Unique customer identifier' },
+          { id: 'firstName', name: 'firstName', type: 'string', required: true, description: 'Customer first name' },
+          { id: 'lastName', name: 'lastName', type: 'string', required: true, description: 'Customer last name' },
+          { id: 'email', name: 'email', type: 'string', required: true, description: 'Customer email address' },
+          { id: 'phone', name: 'phone', type: 'string', required: false, description: 'Customer phone number' },
+          { id: 'address', name: 'address', type: 'string', required: false, description: 'Customer physical address' }
         ],
         endpoints: [
           { method: 'GET', path: '/customers', description: 'List customers' },
@@ -355,11 +368,11 @@ export const demoStore: ApiConfig[] = [
       {
         name: 'Order',
         attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'customerId', name: 'customerId', type: 'string', required: true },
-          { id: 'orderDate', name: 'orderDate', type: 'datetime', required: true },
-          { id: 'totalAmount', name: 'totalAmount', type: 'number', required: true },
-          { id: 'status', name: 'status', type: 'string', required: true }
+          { id: 'id', name: 'id', type: 'string', required: true, description: 'Unique order identifier' },
+          { id: 'customerId', name: 'customerId', type: 'string', required: true, description: 'Customer who placed the order' },
+          { id: 'orderDate', name: 'orderDate', type: 'datetime', required: true, description: 'Order creation timestamp' },
+          { id: 'totalAmount', name: 'totalAmount', type: 'number', required: true, description: 'Total order amount' },
+          { id: 'status', name: 'status', type: 'string', required: true, description: 'Order status (pending, shipped, delivered)' }
         ],
         endpoints: [
           { method: 'GET', path: '/orders', description: 'List orders' },
@@ -396,11 +409,11 @@ export const demoStore: ApiConfig[] = [
       {
         name: 'Product',
         attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'name', name: 'name', type: 'string', required: true },
-          { id: 'description', name: 'description', type: 'string', required: false },
-          { id: 'price', name: 'price', type: 'number', required: true },
-          { id: 'stock', name: 'stock', type: 'number', required: true }
+          { id: 'id', name: 'id', type: 'string', required: true, description: 'Unique product identifier' },
+          { id: 'name', name: 'name', type: 'string', required: true, description: 'Product name' },
+          { id: 'description', name: 'description', type: 'string', required: false, description: 'Product description' },
+          { id: 'price', name: 'price', type: 'number', required: true, description: 'Product price' },
+          { id: 'stock', name: 'stock', type: 'number', required: true, description: 'Current inventory count' }
         ],
         endpoints: [
           { method: 'GET', path: '/products', description: 'List products' },
@@ -436,112 +449,4 @@ export const demoStore: ApiConfig[] = [
       }
     ]
   },
-  {
-    id: 'demo-1000',
-    name: 'Extended Demo Data',
-    version: '1.1.0',
-    description: 'Additional sample data with more complex relationships',
-    security: {
-      authentication: {
-        type: 'jwt',
-        jwt: {
-          secret: 'demo-secret',
-          expiresIn: '1h'
-        }
-      }
-    },
-    dataSources: [{
-      name: 'mongo_db',
-      type: 'mongodb',
-      config: {
-        host: 'localhost',
-        port: 27017,
-        username: 'demo_user',
-        password: 'demo_pass',
-        database: 'extended_demo',
-        tls: false
-      }
-    }],
-    entities: [
-      {
-        name: 'BlogPost',
-        attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'title', name: 'title', type: 'string', required: true },
-          { id: 'content', name: 'content', type: 'string', required: true },
-          { id: 'authorId', name: 'authorId', type: 'string', required: true },
-          { id: 'publishedAt', name: 'publishedAt', type: 'datetime', required: false },
-          { 
-            id: 'tags',
-            name: 'tags', 
-            type: 'array', 
-            items: { 
-              id: 'tag',
-              name: 'tag', 
-              type: 'string' 
-            }, 
-            required: false 
-          }
-        ],
-        endpoints: [
-          { method: 'GET', path: '/posts', description: 'List all blog posts' },
-          { method: 'POST', path: '/posts', description: 'Create new blog post' },
-          { method: 'GET', path: '/posts/:id', description: 'Get blog post details' },
-          { method: 'PUT', path: '/posts/:id', description: 'Update blog post' },
-          { method: 'DELETE', path: '/posts/:id', description: 'Delete blog post' }
-        ],
-        relationships: [
-          {
-            name: 'author',
-            type: 'many-to-one',
-            source: 'BlogPost',
-            target: 'User',
-            description: 'Blog post written by a user',
-            through: 'authorId'
-          },
-          {
-            name: 'comments',
-            type: 'one-to-many',
-            source: 'BlogPost',
-            target: 'Comment',
-            description: 'Blog post can have many comments',
-            through: 'postId'
-          }
-        ]
-      },
-      {
-        name: 'Comment',
-        attributes: [
-          { id: 'id', name: 'id', type: 'string', required: true },
-          { id: 'postId', name: 'postId', type: 'string', required: true },
-          { id: 'authorId', name: 'authorId', type: 'string', required: true },
-          { id: 'content', name: 'content', type: 'string', required: true },
-          { id: 'createdAt', name: 'createdAt', type: 'datetime', required: true }
-        ],
-        endpoints: [
-          { method: 'POST', path: '/posts/:postId/comments', description: 'Create comment' },
-          { method: 'GET', path: '/posts/:postId/comments', description: 'List comments' },
-          { method: 'DELETE', path: '/comments/:id', description: 'Delete comment' }
-        ],
-        relationships: [
-          {
-            name: 'post',
-            type: 'many-to-one',
-            source: 'Comment',
-            target: 'BlogPost',
-            description: 'Comment belongs to a blog post',
-            through: 'postId'
-          },
-          {
-            name: 'author',
-            type: 'many-to-one',
-            source: 'Comment',
-            target: 'User',
-            description: 'Comment written by a user',
-            through: 'authorId'
-          }
-        ]
-      }
-    ]
-  }
-]
+];

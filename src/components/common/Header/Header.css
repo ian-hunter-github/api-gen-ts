@@ -1,0 +1,58 @@
+.row {
+  transition: background-color 0.2s ease;
+  display: grid;
+  width: 100%;
+  align-items: center;
+}
+
+/* Cell styles moved to Table.css - only row-specific styles remain here */
+
+.row.pristine {
+  background-color: inherit;
+}
+
+.row.modified {
+  background-color: var(--state-modified) !important;
+  outline: 2px solid var(--state-modified-outline);
+}
+
+.row.new {
+  background-color: var(--state-new);
+}
+
+.row.deleted {
+  background-color: var(--state-deleted);
+  opacity: 0.6;
+  border-left: 3px solid var(--error);
+}
+
+.row.deleted .row-cell {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.row:hover {
+  background-color: var(--accent-hover);
+}
+
+.row.deleted:hover {
+  background-color: var(--state-deleted);
+}
+
+.row.modified:hover {
+  background-color: var(--state-modified);
+}
+
+.row.new:hover {
+  background-color: var(--state-new);
+}
+
+.row.header {
+  font-weight: bold;
+}
+
+.row.header .table-cell {
+  font-weight: bold;
+}

@@ -11,6 +11,7 @@ describe('apiConfigStore - Entity Relationship Operations', () => {
   it('should create API with basic relationships', () => {
     const apiId = getStore().addApi({
       name: 'Test API',
+      description: 'Test API Description',
       version: '1.0.0',
       security: {
         authentication: {
@@ -94,6 +95,7 @@ describe('apiConfigStore - Entity Relationship Operations', () => {
   it('should handle many-to-many relationships', () => {
     const apiId = getStore().addApi({
       name: 'Test API',
+      description: 'Test API Description',
       version: '1.0.0',
       security: {
         authentication: {
@@ -173,6 +175,7 @@ describe('apiConfigStore - Entity Relationship Operations', () => {
     expect(() => {
       getStore().addApi({
         name: 'Test API',
+        description: 'Test API Description',
         version: '1.0.0',
         security: {
           authentication: {

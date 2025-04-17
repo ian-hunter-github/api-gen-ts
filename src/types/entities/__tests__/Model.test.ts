@@ -1,4 +1,4 @@
-import { Model } from '../../../utils/Model';
+import { Model, ModelStatus } from '../../../utils/Model';
 import { EntityAttribute } from '../attributes';
 
 describe('Model<EntityAttribute>', () => {
@@ -12,7 +12,7 @@ describe('Model<EntityAttribute>', () => {
 
   it('creates with pristine status by default', () => {
     const model = new Model<EntityAttribute>(testAttribute);
-    expect(model.status).toBe('pristine');
+    expect(model.status).toBe(ModelStatus.Pristine);
     expect(model.original).toEqual(testAttribute);
   });
 
@@ -20,21 +20,21 @@ describe('Model<EntityAttribute>', () => {
     const model = new Model<EntityAttribute>(testAttribute);
     model.update({ required: false });
     expect(model.current?.required).toBe(false);
-    expect(model.status).toBe('modified');
+    expect(model.status).toBe(ModelStatus.Modified);
     expect(model.canUndo).toBe(true);
   });
 
   it('handles delete()', () => {
     const model = new Model<EntityAttribute>(testAttribute);
     model.delete();
-    expect(model.status).toBe('deleted');
+    expect(model.status).toBe(ModelStatus.Deleted);
   });
 
   it('handles restore()', () => {
     const model = new Model<EntityAttribute>(testAttribute);
     model.delete();
     model.restore();
-    expect(model.status).toBe('pristine');
+    expect(model.status).toBe(ModelStatus.Pristine);
   });
 
   it('supports undo/redo', () => {
@@ -114,8 +114,8 @@ describe('Model<EntityAttribute>', () => {
   });
 
   it('handles new attributes', () => {
-    const model = new Model<EntityAttribute>(testAttribute, 'new');
-    expect(model.status).toBe('new');
+    const model = new Model<EntityAttribute>(testAttribute, ModelStatus.New);
+    expect(model.status).toBe(ModelStatus.New);
     expect(model.original).toBeUndefined();
   });
 });

@@ -12,6 +12,7 @@ describe('apiConfigStore - Comprehensive Chat API Example', () => {
     // Create API with comprehensive configuration
     const apiId = getStore().addApi({
       name: 'Chat API',
+      description: 'API for chat application',
       version: '1.0.0',
       security: {
         authentication: {

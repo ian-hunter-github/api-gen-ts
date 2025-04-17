@@ -14,7 +14,13 @@ describe('ApiConfigEditor', () => {
       authentication: {
         type: 'none'
       }
-    }
+    },
+    endpoints: {
+      baseUrl: 'https://api.example.com',
+      paths: {}
+    },
+    createdAt: '2025-01-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
   };
 
   const mockAllConfigs = [mockConfig];
