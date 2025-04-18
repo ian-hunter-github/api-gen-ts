@@ -27,6 +27,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "react": "^19.0.0",
+    "react-datepicker": "^8.3.0",
     "react-dom": "^19.0.0",
     "react-feather": "^2.0.10",
     "react-hook-form": "^7.55.0",
