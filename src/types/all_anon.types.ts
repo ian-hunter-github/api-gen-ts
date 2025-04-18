@@ -396,11 +396,7 @@ export type EndpointExample = {
 //////////////////////////////////////////
 //  ./entities/entity.ts
 
-export type { EntityAttribute };
 
-/**
- * Base entity type that all entities extend
- */
 export type ApiEntity = {
   id?: string;
   name: string;
@@ -439,5 +435,3 @@ export type EntityAttribute = {
     maxLength?: number;
   };
 };
-
-export type AttributeStatus = ModelStatus;
