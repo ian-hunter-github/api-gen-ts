@@ -1,0 +1,48 @@
+import React from 'react';
+import { FormBuilder } from '../common/FormBuilder/FormBuilder';
+import './Form.module.css';
+
+interface {{typeName}}FormProps {
+  initialValues?: any;
+  onSubmit: (data: any) => void;
+}
+
+export const {{typeName}}Form = ({ initialValues = {}, onSubmit }: {{typeName}}FormProps) => {
+  const fields = [
+    {{#each fields}}
+    {
+      name: '{{name}}',
+      label: '{{description}}',
+      type: '{{type}}'{{#if (eq type 'boolean')}} as const{{/if}},
+      defaultValue: {{#if value}}{{value}}{{else}}{{#if (eq type 'string')}}''{{else if (eq type 'number')}}0{{else if (eq type 'boolean')}}false{{else}}null{{/if}}{{/if}},
+      required: {{required}},
+      {{#if validation}}
+      validation: {
+        {{#if validation.required}}required: true,{{/if}}
+        {{#if validation.min}}min: {{validation.min}},{{/if}}
+        {{#if validation.max}}max: {{validation.max}},{{/if}}
+        {{#if validation.pattern}}pattern: {{validation.pattern}},{{/if}}
+      },
+      {{/if}}
+      {{#if enumValues}}
+      options: [
+        {{#each enumValues}}
+        { value: '{{this}}', label: '{{this}}' },
+        {{/each}}
+      ],
+      {{/if}}
+      placeholder: '{{placeholder name}}'
+    },
+    {{/each}}
+  ];
+
+  return (
+    <div className="{{lowercase typeName}}-form">
+      <FormBuilder
+        fields={fields}
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+      />
+    </div>
+  );
+};
