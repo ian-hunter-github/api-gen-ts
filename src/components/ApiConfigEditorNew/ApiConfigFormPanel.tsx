@@ -4,33 +4,32 @@ import type { ApiConfig } from '../../types/all.types';
 
 interface ApiConfigFormPanelProps {
   config: ApiConfig;
-  changes: Set<string>;
-  errors: Set<string>;
-  onFieldChange: (name: string, value: string) => void;
-  //onEntityAction: (action: 'add'|'edit'|'delete', entity?: ApiEntity) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (data: ApiConfig) => void;
+  editMode: boolean;
+  onEditModeToggle: () => void;
 }
 
 export const ApiConfigFormPanel: React.FC<ApiConfigFormPanelProps> = ({
   config,
-  changes,
-  errors,
-  onFieldChange,
-  //onEntityAction,
-  onSubmit
+  onSubmit,
+  editMode,
+  onEditModeToggle
 }) => {
   return (
     <div className="form-panel">
-      <form onSubmit={onSubmit}>
+      <button 
+        type="button" 
+        onClick={onEditModeToggle}
+        className={`edit-mode-toggle ${editMode ? 'active' : ''}`}
+      >
+        {editMode ? 'Exit Edit Mode' : 'Enter Edit Mode'}
+      </button>
+      <div className="form-container">
         <ApiConfigForm
-          config={config}
-          changes={changes}
-          errors={errors}
-          onFieldChange={onFieldChange}
+          initialValues={config}
           onSubmit={onSubmit}
-//          onEntityAction={onEntityAction}
         />
-      </form>
+      </div>
     </div>
   );
 };

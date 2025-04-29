@@ -1,9 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { fromJS } from 'immutable';
-import { ApiConfig, ApiConfigCollection } from '../types/api.types';
-import { EntityRelationship } from '../types/entities/relationships';
-import { ApiEntity } from '../types/entities/entity';
+import { ApiEntity, EntityRelationship, ApiConfig, ApiConfigCollection } from '../types/all.types';
 
 function isApiConfig(config: unknown): config is ApiConfig {
   return (

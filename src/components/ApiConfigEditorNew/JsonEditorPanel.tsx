@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactJson, { InteractionProps } from 'react-json-view';
-import type { ApiConfig } from '../../types.ORIG/api.types';
+import type { ApiConfig } from '../../types/all.types';
 
 interface JsonEditorPanelProps {
   config: ApiConfig;
   editMode: boolean;
-  onToggleEditMode: () => void;
+  onToggleEditMode?: () => void;
   onConfigChange: (updatedConfig: ApiConfig) => void;
 }
 

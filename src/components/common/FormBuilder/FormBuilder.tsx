@@ -1,7 +1,7 @@
 import { useForm, FieldValues, Path, DefaultValues } from 'react-hook-form';
 import './FormBuilder.css';
 
-export type InputType = 'text' | 'number' | 'boolean' | 'select' | 'textarea' | 'date' | 'time' | 'datetime';
+export type InputType = 'text' | 'number' | 'boolean' | 'select' | 'textarea' | 'date' | 'time' | 'datetime' | 'checkbox' | 'entity-array' | 'deployment-object' | 'security-object';
 
 export interface FieldConfig<T extends FieldValues> {
   name: Path<T>;
@@ -117,7 +117,7 @@ export const FormBuilder = <T extends FieldValues,>({
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         {fields.map(field => (
           !field.hidden && (
-            <div key={field.name as string} className="form-group">
+            <div key={field.name as string} className={`form-group ${field.className || ''}`}>
               {field.type !== 'boolean' && (
                 <label htmlFor={`${field.name}-input`}>
                   {field.label}

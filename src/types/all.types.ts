@@ -228,6 +228,33 @@ export interface PolicyCondition {
 
 // ==================== API Config Types ====================
 
+export type ApiConfigCollection = Record<string, ApiConfig>;
+
+/**
+ * Returns a default initialized ApiConfig object
+ */
+export function getDefaultApiConfig(): ApiConfig {
+  return {
+    id: '',
+    name: '',
+    description: '',
+    version: '1.0.0',
+    basePath: '/api',
+    environment: 'development',
+    entities: [],
+    deployment: {
+      provider: 'docker',
+      settings: {}
+    },
+    security: {
+      authentication: {
+        type: 'none'
+      }
+    },
+    createdAt: new Date().toISOString()
+  };
+}
+
 /**
  * API Configuration
  * @complex
@@ -242,7 +269,7 @@ export interface ApiConfig {
    * @pattern ^[a-zA-Z0-9_-]+$
    */
   name: string;
-  description?: string;
+  description: string;
   version: string;
   basePath: string;
   /**
@@ -250,18 +277,37 @@ export interface ApiConfig {
    * @default "development"
    */
   environment: 'development' | 'staging' | 'production';
+  documentation?: {
+    enabled: boolean;
+    format: 'openapi' | 'asyncapi' | 'markdown';
+  };
   /**
    * @table
    */
   entities: ApiEntity[];
   deployment: DeploymentConfig;
   security: ApiSecurity;
+  endpoints?: {
+    baseUrl: string;
+    paths: Record<string, {
+      path: string;
+      operations: Record<string, EntityEndpoint>;
+    }>;
+  };
   createdAt: string;
   updatedAt?: string;
   isDemo?: boolean;
 }
 
 // ==================== Deployment Types ====================
+
+/**
+ * Deployment providers
+ */
+export type DeploymentProvider = 
+  | 'aws' | 'azure' | 'gcp' | 'docker'
+  | 'netlify' | 'vercel' | 'firebase-hosting'
+  | 'heroku' | 'digitalocean' | 'cloudflare';
 
 /**
  * Deployment Configuration
@@ -271,17 +317,13 @@ export interface DeploymentConfig {
   /**
    * @required
    */
-  name: string;
-  /**
-   * @required
-   * @enum ["development","staging","production"]
-   */
-  environment: string;
-  /**
-   * @required
-   * @enum ["aws","azure","gcp","on-premise","docker"]
-   */
-  target: string;
+  provider: DeploymentProvider;
+  settings: 
+    | { region: string; lambdaMemory?: number; apiGateway?: boolean }
+    | { siteName: string; functionsDir?: string }
+    | Record<string, unknown>;
+  name?: string;
+  environment?: string;
   deploymentId?: string;
   description?: string;
   region?: string;
@@ -366,19 +408,33 @@ export interface EntityAttribute {
   /**
    * @required
    */
+  id: string;
+  /**
+   * @required
+   */
   name: string;
   /**
    * @required
-   * @enum ["string","number","boolean","date","datetime","object","array"]
+   * @enum ["string","number","boolean","date","datetime","timestamp","uuid","object","array","reference","enum"]
    */
   type: string;
   /**
    * @default false
    */
   required?: boolean;
+  unique?: boolean;
   description?: string;
-  default?: string | number | boolean | Date | object | string[] | number[] | boolean[] | Date[] | object[];
-  validation?: AttributeValidation;
+  default?: string | number | boolean | Date | object | unknown[];
+  enumValues?: string[];
+  values?: string[];
+  items?: Omit<EntityAttribute, 'items'>;
+  validation?: {
+    min?: number;
+    max?: number;
+    pattern?: string;
+    minLength?: number;
+    maxLength?: number;
+  };
 }
 
 /**
@@ -399,11 +455,20 @@ export interface EntityRelationship {
    * @required
    */
   target: string;
+  /**
+   * @required
+   */
+  source: string;
   description?: string;
   /**
    * @default false
    */
   required?: boolean;
+  inverse?: string;
+  /**
+   * Join table name for many-to-many relationships
+   */
+  through?: string;
 }
 
 /**
@@ -421,14 +486,60 @@ export interface EntityEndpoint {
    */
   method: string;
   description?: string;
+  operationId?: string;
   /**
    * @table
    */
   parameters?: EndpointParameter[];
-  /**
-   * @table
-   */
-  responses?: EndpointResponse[];
+  requestBody?: {
+    description?: string;
+    required?: boolean;
+    content: {
+      [mimeType: string]: {
+        schema: {
+          type?: string;
+          format?: string;
+          properties?: Record<string, unknown>;
+          items?: unknown;
+          required?: string[];
+          enum?: string[];
+          $ref?: string;
+          additionalProperties?: boolean | unknown;
+          oneOf?: unknown[];
+          anyOf?: unknown[];
+          allOf?: unknown[];
+          not?: unknown;
+          nullable?: boolean;
+        };
+      };
+    };
+  };
+  responses?: {
+    [statusCode: string]: {
+      description: string;
+      content?: {
+        [mimeType: string]: {
+          schema: {
+            type?: string;
+            format?: string;
+            properties?: Record<string, unknown>;
+            items?: unknown;
+            required?: string[];
+            enum?: string[];
+            $ref?: string;
+            additionalProperties?: boolean | unknown;
+            oneOf?: unknown[];
+            anyOf?: unknown[];
+            allOf?: unknown[];
+            not?: unknown;
+            nullable?: boolean;
+          };
+        };
+      };
+    };
+  };
+  security?: Array<{ [securityScheme: string]: string[] }>;
+  tags?: string[];
 }
 
 /**
@@ -442,19 +553,32 @@ export interface EndpointParameter {
   name: string;
   /**
    * @required
-   * @enum ["query","path","header","body"]
+   * @enum ["query","header","path","cookie","body"]
    */
   in: string;
-  /**
-   * @required
-   * @enum ["string","number","boolean","array","object"]
-   */
-  type: string;
+  description?: string;
   /**
    * @default false
    */
   required?: boolean;
-  description?: string;
+  /**
+   * @complex
+   */
+  schema: {
+    type?: string;
+    format?: string;
+    properties?: Record<string, unknown>;
+    items?: unknown;
+    required?: string[];
+    enum?: string[];
+    $ref?: string;
+    additionalProperties?: boolean | unknown;
+    oneOf?: unknown[];
+    anyOf?: unknown[];
+    allOf?: unknown[];
+    not?: unknown;
+    nullable?: boolean;
+  };
 }
 
 /**

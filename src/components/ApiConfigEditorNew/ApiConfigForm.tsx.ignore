@@ -2,8 +2,8 @@ import React from 'react';
 import { ActionButtons } from '../common/ActionButtons/ActionButtons';
 import { Model } from '../../utils/Model';
 import { MemoizedEntityList } from '../EntityList/EntityList';
-import type { ApiConfig } from '../../types.ORIG/api.types';
-import type { ApiEntity } from '../../types.ORIG/entities/entity';
+import type { ApiConfig } from '../../types/api.types';
+import type { ApiEntity } from '../../types/entities/entity';
 
 interface ApiConfigFormProps {
   config: ApiConfig;

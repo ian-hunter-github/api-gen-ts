@@ -4,8 +4,8 @@ import { ApiConfigFormPanel } from './ApiConfigFormPanel.tsx';
 import { JsonEditorPanel } from './JsonEditorPanel';
 import { EntityDialog } from '../EntityDialog/EntityDialog';
 import { debounce } from '../../utils/debounce';
-import type { ApiEntity } from '../../types.ORIG/entities/entity.ts';
-import type { ApiConfig } from '../../types.ORIG/api.types.ts';
+import type { ApiEntity } from '../../types/entities/entity.ts';
+import type { ApiConfig } from '../../types/api.types.ts';
 import './ApiConfigEditor.css';
 
 interface ApiConfigEditorContainerProps {

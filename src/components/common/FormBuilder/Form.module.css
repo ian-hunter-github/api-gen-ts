@@ -1,9 +1,32 @@
+/* Grid layout for form fields */
+.form-group {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.field-col-span-3 {
+  grid-column: span 3;
+}
+
+.field-col-span-6 {
+  grid-column: span 6;
+}
+
+.field-col-span-9 {
+  grid-column: span 9;
+}
+
+.field-col-span-12 {
+  grid-column: span 12;
+}
+
 /* Base styles for form fields */
 .form-field {
-    position: relative;
-    margin-bottom: 1.5rem;
-    font-family: sans-serif;
-  }
+  position: relative;
+  font-family: sans-serif;
+}
   
   .form-field label {
     position: absolute;

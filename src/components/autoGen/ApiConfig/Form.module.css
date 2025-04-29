@@ -1,0 +1,53 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.formRow {
+  display: flex;
+  gap: 1rem;
+}
+
+.formField {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.formField label {
+  position: absolute;
+  top: -8px;
+  left: 10px;
+  background: white;
+  padding: 0 5px;
+  font-size: 0.8rem;
+  color: #666;
+  z-index: 1;
+}
+
+.formField input,
+.formField textarea,
+.formField select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #a0d1ff;
+  border-radius: 6px;
+  background: white;
+}
+
+.formField input:focus,
+.formField textarea:focus,
+.formField select:focus {
+  outline: none;
+  border-color: #4da6ff;
+  box-shadow: 0 0 0 2px rgba(77, 166, 255, 0.2);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}

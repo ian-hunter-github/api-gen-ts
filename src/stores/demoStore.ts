@@ -1,4 +1,4 @@
-import type { ApiConfig } from '../types/api.types';
+import type { ApiConfig } from '../types/all.types';
 
 /**
  * Development-only demo data that will be automatically loaded in development mode.
@@ -11,6 +11,12 @@ export const demoStore: ApiConfig[] = [
     name: 'E-Commerce API',
     version: '2.3.0',
     description: 'Full e-commerce platform API',
+    basePath: '/api/ecom',
+    environment: 'development',
+    deployment: {
+      provider: 'docker',
+      settings: {}
+    },
     createdAt: '2024-01-15T09:30:00Z',
     updatedAt: '2024-04-10T14:25:00Z',
     security: {
@@ -136,6 +142,12 @@ export const demoStore: ApiConfig[] = [
     name: 'User API',
     version: '1.0.0',
     description: 'API for managing users',
+    basePath: '/api/users',
+    environment: 'development',
+    deployment: {
+      provider: 'docker',
+      settings: {}
+    },
     createdAt: '2023-11-20T08:15:00Z',
     updatedAt: '2024-03-05T11:40:00Z',
     security: {
@@ -197,6 +209,12 @@ export const demoStore: ApiConfig[] = [
     name: 'Order API',
     version: '1.2.0',
     description: 'API for managing orders',
+    basePath: '/api/orders',
+    environment: 'development',
+    deployment: {
+      provider: 'docker',
+      settings: {}
+    },
     createdAt: '2024-02-01T10:00:00Z',
     updatedAt: '2024-04-12T16:20:00Z',
     security: {
@@ -211,18 +229,28 @@ export const demoStore: ApiConfig[] = [
           {
             name: 'order-access',
             description: 'Policy for order operations',
-            rules: [
-              {
-                resource: 'orders',
-                action: ['read'],
-                condition: 'user.role === "user"'
-              },
-              {
-                resource: 'orders',
-                action: ['create', 'read', 'update', 'delete'],
-                condition: 'user.role === "admin"'
+            effect: 'allow',
+            actions: ['read', 'create', 'update', 'delete'],
+            resources: ['orders'],
+            conditions: {
+              'user.role': {
+                operator: 'equals',
+                value: 'admin'
               }
-            ]
+            }
+          },
+          {
+            name: 'user-order-access',
+            description: 'Policy for user order operations',
+            effect: 'allow',
+            actions: ['read'],
+            resources: ['orders'],
+            conditions: {
+              'user.role': {
+                operator: 'equals',
+                value: 'user'
+              }
+            }
           }
         ]
       },
@@ -250,6 +278,12 @@ export const demoStore: ApiConfig[] = [
     name: 'Inventory API',
     version: '2.1.0',
     description: 'API for inventory management',
+    basePath: '/api/inventory',
+    environment: 'development',
+    deployment: {
+      provider: 'docker',
+      settings: {}
+    },
     createdAt: '2023-12-10T13:45:00Z',
     updatedAt: '2024-04-08T09:10:00Z',
     security: {
@@ -313,21 +347,17 @@ export const demoStore: ApiConfig[] = [
     name: 'Demo Data (can be removed)',
     version: '1.0.0',
     description: 'Sample data for development purposes',
+    basePath: '/api/demo',
+    environment: 'development',
+    deployment: {
+      provider: 'docker',
+      settings: {}
+    },
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-04-15T12:00:00Z',
     security: {
       authentication: {
         type: 'none'
-      }
-    },
-    datasource: {
-      type: 'postgres',
-      connection: {
-        host: 'localhost',
-        port: 5432,
-        database: 'demo_db',
-        username: 'demo_user',
-        password: 'demo_pass'
       }
     },
     entities: [
