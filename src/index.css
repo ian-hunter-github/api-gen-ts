@@ -24,6 +24,13 @@
   --error-dark: #b71c1c;
   --state-modified: #fff8e1;
   --state-deleted: #ffebee;
+
+  /* Light theme colors - level-based backgrounds */
+  --form-bg-level-0: hsl(0, 0%, 95%);    /* Lightest - almost white */
+  --form-bg-level-1: hsl(0, 0%, 85%);    /* Slightly darker */
+  --form-bg-level-2: hsl(0, 0%, 75%);    /* Medium light */
+  --form-bg-level-3: hsl(0, 0%, 65%);    /* Medium */
+  --form-bg-level-4: hsl(0, 0%, 55%);    /* Darkest */
 }
 
 [data-theme="dark"] {
@@ -43,6 +50,14 @@
   --error-dark: #ff3d2e;
   --state-modified: #423a2a;
   --state-deleted: #422;
+  
+   /* Dark theme colors - level-based backgrounds */
+  --form-bg-level-0-dark: hsl(0, 0%, 20%);     /* Darkest */
+  --form-bg-level-1-dark: hsl(0, 0%, 25%);     /* Slightly lighter */
+  --form-bg-level-2-dark: hsl(0, 0%, 30%);     /* Medium dark */
+  --form-bg-level-3-dark: hsl(0, 0%, 35%);     /* Medium */
+  --form-bg-level-4-dark: hsl(0, 0%, 40%);     /* Lightest */
+
 }
 
 body {

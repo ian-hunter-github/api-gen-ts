@@ -1,11 +1,10 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { ApiConfigFormPanel } from './ApiConfigFormPanel.tsx';
-import { JsonEditorPanel } from './JsonEditorPanel';
+import { JsonEditorPanel } from './JsonEditorPanel.tsx';
 import { EntityDialog } from '../EntityDialog/EntityDialog';
-import { debounce } from '../../utils/debounce';
-import type { ApiEntity } from '../../types/entities/entity.ts';
-import type { ApiConfig } from '../../types/api.types.ts';
+import { debounce } from '../../utils/debounce.ts';
+import type { ApiConfig, ApiEntity } from '../../types/all.types.ts';
 import './ApiConfigEditor.css';
 
 interface ApiConfigEditorContainerProps {

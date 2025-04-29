@@ -3,6 +3,43 @@
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
+  background-color: var(--form-bg-level-0);
+}
+
+.form [data-level="1"] {
+  background-color: var(--form-bg-level-1);
+}
+
+.form [data-level="2"] {
+  background-color: var(--form-bg-level-2);
+}
+
+.form [data-level="3"] {
+  background-color: var(--form-bg-level-3);
+}
+
+.form [data-level="4"] {
+  background-color: var(--form-bg-level-4);
+}
+
+[data-theme="dark"] .form {
+  background-color: var(--form-bg-level-0-dark);
+}
+
+[data-theme="dark"] .form [data-level="1"] {
+  background-color: var(--form-bg-level-1-dark);
+}
+
+[data-theme="dark"] .form [data-level="2"] {
+  background-color: var(--form-bg-level-2-dark);
+}
+
+[data-theme="dark"] .form [data-level="3"] {
+  background-color: var(--form-bg-level-3-dark);
+}
+
+[data-theme="dark"] .form [data-level="4"] {
+  background-color: var(--form-bg-level-4-dark);
 }
 
 .formRow {

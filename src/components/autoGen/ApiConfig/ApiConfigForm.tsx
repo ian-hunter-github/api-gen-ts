@@ -33,7 +33,7 @@ export const ApiConfigForm = ({ initialValues = getDefaultApiConfig(), onSubmit 
   });
 
   return (
-    <div className="apiconfig-form">
+    <div className="apiconfig-form" style={{ background: 'var(--form-bg-level-0)' }}>
       <FormBuilder
         fields={fields}
         initialValues={initialValues}
