@@ -1,0 +1,48 @@
+/* Base styles for all form fields */
+@import './variables.css';
+
+._form-group {
+  margin-bottom: var(--form-spacing-lg);
+}
+
+._form-input {
+  display: block;
+  width: 100%;
+  padding: var(--form-spacing-sm) var(--form-spacing-md);
+  border: 1px solid var(--form-border);
+  border-radius: var(--form-radius-md);
+  background-color: var(--form-bg);
+  color: var(--form-text);
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: var(--form-transition);
+}
+
+._form-input:focus {
+  outline: none;
+  border-color: var(--form-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+._form-input::placeholder {
+  color: var(--form-text-light);
+  opacity: 1;
+}
+
+label {
+  display: block;
+  margin-bottom: var(--form-spacing-xs);
+  font-weight: 500;
+  color: var(--form-text);
+}
+
+/* Error states */
+._form-input._error {
+  border-color: var(--form-error);
+}
+
+._error-message {
+  margin-top: var(--form-spacing-xs);
+  color: var(--form-error);
+  font-size: 0.875rem;
+}

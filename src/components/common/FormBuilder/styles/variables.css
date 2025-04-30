@@ -1,0 +1,32 @@
+/* Design tokens for form components */
+:root {
+  /* Colors */
+  --form-primary: #2563eb;
+  --form-primary-hover: #1d4ed8;
+  --form-error: #dc2626;
+  --form-text: #1f2937;
+  --form-text-light: #6b7280;
+  --form-border: #d1d5db;
+  --form-bg: #ffffff;
+  --form-bg-hover: #f9fafb;
+
+  /* Spacing */
+  --form-spacing-xs: 0.25rem;
+  --form-spacing-sm: 0.5rem;
+  --form-spacing-md: 1rem;
+  --form-spacing-lg: 1.5rem;
+  --form-spacing-xl: 2rem;
+
+  /* Border radius */
+  --form-radius-sm: 0.25rem;
+  --form-radius-md: 0.375rem;
+  --form-radius-lg: 0.5rem;
+
+  /* Shadows */
+  --form-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --form-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --form-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Transitions */
+  --form-transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}

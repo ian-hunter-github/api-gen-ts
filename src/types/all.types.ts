@@ -3,6 +3,38 @@
  * @module API Types
  */
 
+// ==================== Extracted Anonymous Types ====================
+
+/**
+ * Deployment provider-specific settings
+ * @complex
+ */
+export type DeploymentSettings = 
+  | { region: string; lambdaMemory?: number; apiGateway?: boolean }
+  | { siteName: string; functionsDir?: string }
+  | Record<string, unknown>;
+
+/**
+ * Schema definition for endpoint request/response content
+ * @complex
+ */
+export interface EndpointContentSchema {
+  type?: string;
+  format?: string;
+  properties?: Record<string, unknown>;
+  items?: unknown;
+  required?: string[];
+  enum?: string[];
+  $ref?: string;
+  additionalProperties?: boolean | unknown;
+  oneOf?: unknown[];
+  anyOf?: unknown[];
+  allOf?: unknown[];
+  not?: unknown;
+  nullable?: boolean;
+}
+
+
 // ==================== Cloud Provider Types ====================
 
 /**
@@ -318,10 +350,7 @@ export interface DeploymentConfig {
    * @required
    */
   provider: DeploymentProvider;
-  settings: 
-    | { region: string; lambdaMemory?: number; apiGateway?: boolean }
-    | { siteName: string; functionsDir?: string }
-    | Record<string, unknown>;
+  settings: DeploymentSettings;
   name?: string;
   environment?: string;
   deploymentId?: string;
@@ -496,21 +525,7 @@ export interface EntityEndpoint {
     required?: boolean;
     content: {
       [mimeType: string]: {
-        schema: {
-          type?: string;
-          format?: string;
-          properties?: Record<string, unknown>;
-          items?: unknown;
-          required?: string[];
-          enum?: string[];
-          $ref?: string;
-          additionalProperties?: boolean | unknown;
-          oneOf?: unknown[];
-          anyOf?: unknown[];
-          allOf?: unknown[];
-          not?: unknown;
-          nullable?: boolean;
-        };
+        schema: EndpointContentSchema;
       };
     };
   };
@@ -519,21 +534,7 @@ export interface EntityEndpoint {
       description: string;
       content?: {
         [mimeType: string]: {
-          schema: {
-            type?: string;
-            format?: string;
-            properties?: Record<string, unknown>;
-            items?: unknown;
-            required?: string[];
-            enum?: string[];
-            $ref?: string;
-            additionalProperties?: boolean | unknown;
-            oneOf?: unknown[];
-            anyOf?: unknown[];
-            allOf?: unknown[];
-            not?: unknown;
-            nullable?: boolean;
-          };
+          schema: EndpointContentSchema;
         };
       };
     };
@@ -564,21 +565,7 @@ export interface EndpointParameter {
   /**
    * @complex
    */
-  schema: {
-    type?: string;
-    format?: string;
-    properties?: Record<string, unknown>;
-    items?: unknown;
-    required?: string[];
-    enum?: string[];
-    $ref?: string;
-    additionalProperties?: boolean | unknown;
-    oneOf?: unknown[];
-    anyOf?: unknown[];
-    allOf?: unknown[];
-    not?: unknown;
-    nullable?: boolean;
-  };
+  schema: EndpointContentSchema;
 }
 
 /**

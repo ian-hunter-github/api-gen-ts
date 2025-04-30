@@ -1,0 +1,50 @@
+/* Accordion styles */
+.accordion-field {
+  margin-bottom: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.accordion-field.level-0 {
+  background: var(--form-bg-level-0);
+}
+
+.accordion-field.level-1 {
+  background: var(--form-bg-level-1);
+}
+
+.accordion-field.level-2 {
+  background: var(--form-bg-level-2);
+}
+
+.accordion-field.level-3 {
+  background: var(--form-bg-level-3);
+}
+
+.accordion-field.level-4 {
+  background: var(--form-bg-level-4);
+}
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  background: inherit;
+}
+
+.accordion-label {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+  text-align: left;
+}
+
+.accordion-content {
+  padding: 15px;
+  border-top: 1px solid var(--border-color);
+  background: inherit;
+}

@@ -19,7 +19,7 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
 }) => {
   const [config, setConfig] = useState<ApiConfig>(initialConfig);
   const [editMode, setEditMode] = useState<boolean>(false);
-  const showJsonEditor = false;
+  const showJsonEditor = true;
 
   const validateConfig = useCallback((currentConfig: ApiConfig) => {
     return !allConfigs.some(c => 

@@ -1,0 +1,63 @@
+/* Base styles for form fields */
+.form-field {
+  position: relative;
+  font-family: sans-serif;
+}
+  
+.form-field label {
+  position: absolute;
+  top: -0.6rem;
+  left: 0.75rem;
+  background: white;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1e40af;
+  z-index: 2;
+  transform: translateY(-50%);
+  background: inherit;
+}
+  
+.form-input,
+.form-select,
+.form-checkbox,
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  padding-top: 1.25rem;
+  border: 2px solid #3b82f6;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+  background: inherit;
+  transition: border-color 0.2s, background-color 0.2s;
+  box-sizing: border-box;
+  margin: 0;
+}
+  
+.form-input:focus {
+  border-color: #2563eb;
+}
+  
+.form-field.error .form-input {
+  border-color: #dc2626 !important;
+  background-color: #fee2e2 !important;
+}
+  
+.form-field.error .form-error {
+  color: #dc2626;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+  
+.form-field.dirty:not(.error) .form-input,
+.form-field.dirty:not(.error) .form-select,
+.form-field.dirty:not(.error) .form-checkbox {
+  border-color: #facc15;
+  background-color: #fef9c3;
+}
+  
+.form-error {
+  display: none;
+}

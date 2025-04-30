@@ -1,0 +1,25 @@
+/* Grid system for form layout */
+.form-grid-container {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+  width: 100%;
+}
+
+.form-grid-container > * {
+  grid-column: span 12;
+}
+
+/* Field span classes */
+.field-col-span-1 { grid-column: span 1; }
+.field-col-span-2 { grid-column: span 2; }
+.field-col-span-3 { grid-column: span 3; }
+.field-col-span-4 { grid-column: span 4; }
+.field-col-span-5 { grid-column: span 5; }
+.field-col-span-6 { grid-column: span 6; }
+.field-col-span-7 { grid-column: span 7; }
+.field-col-span-8 { grid-column: span 8; }
+.field-col-span-9 { grid-column: span 9; }
+.field-col-span-10 { grid-column: span 10; }
+.field-col-span-11 { grid-column: span 11; }
+.field-col-span-12 { grid-column: span 12; }

@@ -17,7 +17,7 @@ export const ApiConfigFormPanel: React.FC<ApiConfigFormPanelProps> = ({
 }) => {
   return (
     <div className="form-panel">
-      <button 
+      <button style={{ visibility: 'hidden' }}
         type="button" 
         onClick={onEditModeToggle}
         className={`edit-mode-toggle ${editMode ? 'active' : ''}`}

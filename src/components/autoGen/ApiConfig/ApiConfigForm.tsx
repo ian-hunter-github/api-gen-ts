@@ -1,5 +1,4 @@
 import { FormBuilder } from '../../common/FormBuilder/FormBuilder';
-import './Form.module.css';
 import { ApiConfig, getDefaultApiConfig } from '../../../types/all.types';
 import { generateUUID } from '../../../utils/uuid';
 import { ApiConfigMetadata } from '../../../types/metadata/api-config.meta';
@@ -32,8 +31,10 @@ export const ApiConfigForm = ({ initialValues = getDefaultApiConfig(), onSubmit 
     return field;
   });
 
+  console.debug('Generated fields:', fields);
+  
   return (
-    <div className="apiconfig-form" style={{ background: 'var(--form-bg-level-0)' }}>
+    <div className="apiconfig-form" style={{ backgroundColor: 'var(--form-bg-level-0)' }}>
       <FormBuilder
         fields={fields}
         initialValues={initialValues}
