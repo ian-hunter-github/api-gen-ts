@@ -79,7 +79,7 @@ export const ApiConfigMetadata: Record<string, FieldMetadata> = {
     type: { kind: 'primitive', type: 'string' },
     validation: { 
       required: true,
-      pattern: '^[a-zA-Z0-9_-]+$'
+      pattern: '^[ a-zA-Z0-9_-]+$'
     },
     likelyWidthChars: 20
   },

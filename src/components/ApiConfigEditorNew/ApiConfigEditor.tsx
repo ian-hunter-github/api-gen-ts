@@ -6,6 +6,8 @@ import type { ApiConfig, EntityEndpoint } from '../../types/all.types';
 import './ApiConfigEditor.css';
 import { ApiConfigFormPanel } from './ApiConfigFormPanel';
 
+import { useApiFormContext } from "../../contexts/ApiFormContext";
+
 interface ApiConfigEditorProps {
   config: ApiConfig;
   onSave: (updatedConfig: ApiConfig) => void;
@@ -17,9 +19,19 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
   onSave,
   allConfigs
 }) => {
+  console.debug('ApiConfigEditor mounting');
+  const {readOnly, setReadOnly} = useApiFormContext();
   const [config, setConfig] = useState<ApiConfig>(initialConfig);
-  const [editMode, setEditMode] = useState<boolean>(false);
   const showJsonEditor = true;
+
+  React.useEffect(() => {
+    console.debug('ApiConfigEditor: FormContext readOnly changed to:', readOnly);
+    setReadOnly(false, 'ApiConfigEditor mount');
+  }, []);
+
+  React.useEffect(() => {
+    console.debug('ApiConfigEditor: FormContext readOnly changed to:', readOnly);
+  }, [readOnly]);
 
   const validateConfig = useCallback((currentConfig: ApiConfig) => {
     return !allConfigs.some(c => 
@@ -37,15 +49,20 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
     }
   };
 
+  // const handleEditToggle = () => {
+  //   const newReadOnly = !readOnly;
+  //   console.log('Toggling readOnly from', readOnly, 'to', newReadOnly);
+  //   setReadOnly(newReadOnly);
+  //   console.log('After setReadOnly, context readOnly is now:', newReadOnly);
+  // };
+
   return (
     <div className="api-config-editor">
       <PanelGroup direction="horizontal">
         <Panel defaultSize={80}>
           <ApiConfigFormPanel
-          config={config}
-          onSubmit={handleSubmit}
-          editMode={editMode}
-          onEditModeToggle={() => setEditMode(!editMode)}
+            config={config}
+            onSubmit={handleSubmit}
           />
         </Panel>
         <PanelResizeHandle className="resize-handle" />
@@ -53,7 +70,7 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
           <Panel defaultSize={20} minSize={10}>
             <JsonEditorPanel
               config={memoizedConfig}
-              editMode={editMode}
+              editMode={readOnly}
               onConfigChange={(updatedConfig: {
                 id?: string;
                 name?: string;
@@ -103,8 +120,6 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
           </Panel>
         )}
       </PanelGroup>
-
-
     </div>
   );
 };

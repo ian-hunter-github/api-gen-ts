@@ -37,4 +37,6 @@ export interface FieldMetadata {
   layout?: FieldLayout;
   likelyWidthChars?: number;
   hidden?: boolean;
+  $default?: () => unknown;
+  $baseValues?: Record<string, unknown>;
 }

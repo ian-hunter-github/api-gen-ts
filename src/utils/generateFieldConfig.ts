@@ -3,8 +3,6 @@ import { ApiConfigMetadata, MetadataRegistry } from '../types/metadata/api-confi
 import { generateUUID } from './uuid';
 import { ApiConfig } from '../types/all.types';
 import { FieldType, FieldMetadata } from '../types/metadata/types';
-import { TableFieldAdapter } from '../components/common/FormBuilder/fields/TableField/TableFieldAdapter';
-import type { FC } from 'react';
 
 type FieldTypeMap = {
   [key: string]: InputType;
@@ -19,12 +17,6 @@ const fieldTypeMap: FieldTypeMap = {
   'datetime': 'datetime',
   'date': 'date'
 };
-
-type ComponentMap = {
-  [key: string]: FC<{ value: unknown; onChange: (value: unknown) => void }> | undefined;
-};
-
-const componentMap: ComponentMap = {};
 
 interface FieldMeta {
   component?: string;
@@ -41,11 +33,6 @@ interface FieldMeta {
 }
 
 const calculateColSpan = (fieldMeta: FieldMeta): string => {
-  // Special case for textarea components
-  if (fieldMeta.component === 'textarea') {
-    return 'field-col-span-12';
-  }
-
   const type = typeof fieldMeta.type === 'string' ? fieldMeta.type : 
     fieldMeta.type.kind === 'primitive' ? fieldMeta.type.type :
     fieldMeta.type.kind === 'enum' ? 'enum' :
@@ -71,10 +58,10 @@ const calculateColSpan = (fieldMeta: FieldMeta): string => {
   }
 };
 
-
 function generateFieldConfig(
   metadata: typeof ApiConfigMetadata & Record<string, FieldMetadata | unknown>,
-  visitedTypes: Set<string> = new Set()
+  visitedTypes: Set<string> = new Set(),
+  readOnly: boolean = false
 ): FieldConfig<ApiConfig>[] {
   try {
     return Object.entries(metadata as typeof ApiConfigMetadata).map(([fieldName, fieldMeta]) => {
@@ -88,9 +75,6 @@ function generateFieldConfig(
         className: calculateColSpan(fieldMeta),
         isArray: fieldMeta.isArray || (typeof fieldMeta.type === 'object' && fieldMeta.type.kind === 'array'),
         isComplex: fieldMeta.isComplex || (typeof fieldMeta.type === 'object' && fieldMeta.type.kind === 'complex'),
-        component: fieldName === 'entities' 
-          ? TableFieldAdapter
-          : fieldMeta.component ? componentMap[fieldMeta.component] : undefined
       };
 
       if (typeof fieldMeta.type === 'string') {
@@ -104,23 +88,16 @@ function generateFieldConfig(
             config.type = 'select';
             break;
           case 'array':
-            // For array types, we need to determine the type of the items
             if (fieldMeta.type.itemType.kind === 'primitive') {
               config.type = fieldTypeMap[fieldMeta.type.itemType.type] || 'text';
             } else if (fieldMeta.type.itemType.kind === 'complex') {
-              // For complex array items, we'll use the TableFieldAdapter
               config.type = 'table';
-              // Handle complex array items (generate table columns from metadata)
               if (fieldMeta.type.itemType.kind === 'complex') {
                 const typeName = fieldMeta.type.itemType.type;
-                console.log(`Processing complex array type: ${typeName}`);
-                
-                // Get metadata for the complex type using naming convention
                 const typeMetadataKey = `${typeName}Metadata`;
                 const typeMetadata = MetadataRegistry[typeMetadataKey as keyof typeof MetadataRegistry];
                 
                 if (!typeMetadata) {
-                  console.warn(`No metadata found for type: ${typeName}`);
                   return {
                     name: fieldName as keyof ApiConfig,
                     label: fieldName.charAt(0).toUpperCase() + fieldName.slice(1),
@@ -130,7 +107,6 @@ function generateFieldConfig(
                 }
                 
                 if (typeMetadata && typeof typeMetadata === 'object') {
-                  console.log(`Generating columns for ${typeName}`);
                   config.columns = Object.entries(typeMetadata).map(([key, meta]) => {
                     if (typeof meta !== 'object' || meta === null) {
                       return {
@@ -161,7 +137,8 @@ function generateFieldConfig(
                       key,
                       label: key.charAt(0).toUpperCase() + key.slice(1),
                       type: typeValue,
-                      width: typeof likelyWidthChars === 'number' ? `${likelyWidthChars * 8}px` : undefined
+                      width: typeof likelyWidthChars === 'number' ? `${likelyWidthChars * 8}px` : undefined,
+                      readOnly
                     };
                   });
                 }
@@ -171,36 +148,28 @@ function generateFieldConfig(
             break;
           case 'complex': {
             config.isComplex = true;
-            // Look up nested metadata for complex types
             const typeName = fieldMeta.type.type;
-            console.log(`Processing complex type: ${typeName}`);
-            
-            // Get metadata for the complex type using naming convention
             const typeMetadataKey = `${typeName}Metadata`;
             const typeMetadata = MetadataRegistry[typeMetadataKey as keyof typeof MetadataRegistry];
             
             if (visitedTypes.has(typeName)) {
-              console.warn(`Circular reference detected for type: ${typeName}`);
               return config;
             }
 
             if (typeMetadata) {
-              console.log(`Found nested metadata for ${typeName}`, typeMetadata);
               const newVisited = new Set(visitedTypes);
               newVisited.add(typeName);
               config.nestedFields = generateFieldConfig(
                 typeMetadata as typeof ApiConfigMetadata & Record<string, FieldMetadata | unknown>,
-                newVisited
+                newVisited,
+                readOnly
               );
-            } else {
-              console.warn(`No metadata found for complex type: ${typeName}`);
             }
             break;
           }
         }
       }
 
-      // Handle enum values
       if (typeof fieldMeta.type === 'object' && fieldMeta.type.kind === 'enum' && fieldMeta.type.values) {
         config.options = fieldMeta.type.values.map(value => ({
           value,
@@ -208,7 +177,6 @@ function generateFieldConfig(
         }));
       }
 
-      // Handle validation patterns
       if (fieldMeta.validation?.pattern) {
         config.validation = {
           pattern: {
@@ -218,7 +186,6 @@ function generateFieldConfig(
         };
       }
 
-      // Special handling for ID field
       if (fieldName === 'id') {
         config.defaultValue = generateUUID();
         config.hidden = true;
@@ -226,8 +193,7 @@ function generateFieldConfig(
 
       return config;
     });
-  } catch (error) {
-    console.error('Error generating field config:', error);
+  } catch {
     return [];
   }
 }

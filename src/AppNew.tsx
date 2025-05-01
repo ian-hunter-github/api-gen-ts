@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ApiConfigEditor } from "./components/ApiConfigEditorNew/ApiConfigEditor";
 import { ApiConfig, DeploymentProvider } from "./types/all.types";
 import { useTheme } from "./contexts/ThemeContext";
+import { ApiFormProvider } from "./contexts/ApiFormContext";
 import { ThemeToggle } from "./components/ThemeToggle/ThemeToggle";
 import "./App.css";
 
@@ -115,7 +116,8 @@ function AppNew() {
         <div className="panel-content">
           {tabs.map(tab => (
             <div key={tab.id} style={{ display: activeTab === tab.id ? "block" : "none" }}>
-              <ApiConfigEditor
+              <ApiFormProvider>
+                <ApiConfigEditor
                 config={{
                   ...tab.config,
                   id: tab.config.id || "1234",
@@ -205,7 +207,8 @@ function AppNew() {
                     }))
                   })) || []
                 }))}
-              />
+                />
+              </ApiFormProvider>
             </div>
           ))}
         </div>

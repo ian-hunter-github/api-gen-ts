@@ -262,30 +262,6 @@ export interface PolicyCondition {
 
 export type ApiConfigCollection = Record<string, ApiConfig>;
 
-/**
- * Returns a default initialized ApiConfig object
- */
-export function getDefaultApiConfig(): ApiConfig {
-  return {
-    id: '',
-    name: '',
-    description: '',
-    version: '1.0.0',
-    basePath: '/api',
-    environment: 'development',
-    entities: [],
-    deployment: {
-      provider: 'docker',
-      settings: {}
-    },
-    security: {
-      authentication: {
-        type: 'none'
-      }
-    },
-    createdAt: new Date().toISOString()
-  };
-}
 
 /**
  * API Configuration

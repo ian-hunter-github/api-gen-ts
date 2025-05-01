@@ -1,5 +1,6 @@
 import React from 'react';
 import { UseFormRegister, FieldError, FieldValues } from 'react-hook-form';
+import { useApiFormContext } from '../../../../../contexts/ApiFormContext';
 import '../fields.css';
 
 export interface SelectInputProps {
@@ -35,14 +36,26 @@ const SelectInput: React.FC<SelectInputProps> = ({
   placeholder,
   validation
 }) => {
+  const { readOnly: formReadOnly, setHasChanges, setHasErrors } = useApiFormContext();
+
+  React.useEffect(() => {
+    if (error) {
+      setHasErrors(true);
+    }
+  }, [error, setHasErrors]);
+
+  const handleChange = () => {
+    setHasChanges(true);
+  };
   return (
     <div className={`form-field ${className} ${error ? 'error' : ''}`}>
       {label && <label className="field-label" htmlFor={name}>{label}</label>}
       <select
         id={name}
         className={`field-input`}
-        disabled={disabled || readOnly}
+        disabled={disabled || readOnly || formReadOnly}
         {...register(name, {
+          onChange: handleChange,
           required: typeof required === 'string' ? required : required ? `${label || 'This field'} is required` : false,
           ...validation
         })}

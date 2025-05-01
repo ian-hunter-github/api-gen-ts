@@ -1,4 +1,6 @@
-import { useForm, FieldValues, Path, DefaultValues, FieldError, UseFormRegister } from 'react-hook-form';
+import React from 'react';
+import { useForm, FieldValues, Path, DefaultValues, FieldError, UseFormRegister, FormProvider, useWatch } from 'react-hook-form';
+import { useApiFormContext } from '../../../contexts/ApiFormContext';
 import './styles/grid.css';
 import './styles/base.css';
 import './FormBuilder.css';
@@ -30,7 +32,6 @@ export interface FieldConfig<T extends FieldValues> {
   options?: {value: string, label: string}[];
   placeholder?: string;
   disabled?: boolean;
-  readOnly?: boolean;
   hidden?: boolean;
   className?: string;
   rows?: number;
@@ -62,7 +63,7 @@ const convertFieldToRecordType = <T extends FieldValues>(field: FieldConfig<T>):
   nestedFields: field.nestedFields?.map(convertFieldToRecordType)
 });
 
-export const FormBuilder = <T extends FieldValues,>({
+export const FormBuilder = <T extends FieldValues>({
   fields,
   initialValues,
   onSubmit,
@@ -70,19 +71,33 @@ export const FormBuilder = <T extends FieldValues,>({
   isNested = false,
   level = 1
 }: FormBuilderProps<T>) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset
-  } = useForm<T>({
+  const { setHasChanges, setHasErrors, readOnly } = useApiFormContext();
+  const methods = useForm<T>({
     defaultValues: initialValues as DefaultValues<T>
   });
 
   const handleFormSubmit = (data: T) => {
     onSubmit(data);
-    reset(data);
+    methods.reset(data);
+    setHasChanges(false);
   };
+
+  const { register, handleSubmit, formState: { errors, isDirty } } = methods;
+  useWatch({ control: methods.control }); // Track form values for reactivity
+
+  // Update hasChanges when form values change - skip for table operations
+  React.useEffect(() => {
+    if (!readOnly) {
+      setHasChanges(isDirty);
+    }
+  }, [isDirty, setHasChanges, readOnly]);
+
+  // Update hasErrors when validation errors change - skip for table operations
+  React.useEffect(() => {
+    if (!readOnly) {
+      setHasErrors(Object.keys(errors).length > 0);
+    }
+  }, [errors, setHasErrors, readOnly]);
 
   // Removed unused getInputClass function since we're using dedicated components
 
@@ -99,10 +114,11 @@ export const FormBuilder = <T extends FieldValues,>({
         label={field.label}
         className={field.className}
         level={depth}
+        isOpen={field.defaultValue !== undefined}
       >
         {field.nestedFields ? (
           <FormBuilder<Record<string, unknown>>
-            fields={field.nestedFields.map(convertFieldToRecordType)}
+            fields={field.nestedFields.map(f => convertFieldToRecordType(f))}
             initialValues={(field.defaultValue as Record<string, unknown>) || {}}
             onSubmit={() => {}}
             className={field.className}
@@ -162,7 +178,7 @@ export const FormBuilder = <T extends FieldValues,>({
           required={field.required}
           error={errors[field.name] as FieldError | undefined}
           disabled={field.disabled}
-          readOnly={field.readOnly}
+          readOnly={readOnly || methods.formState.isSubmitting}
           className={field.className}
           rows={field.rows}
           validation={field.validation}
@@ -175,7 +191,6 @@ export const FormBuilder = <T extends FieldValues,>({
           required={field.required}
           error={errors[field.name] as FieldError | undefined}
           disabled={field.disabled}
-          readOnly={field.readOnly}
           className={field.className}
           options={field.options || []}
           validation={field.validation}
@@ -188,7 +203,7 @@ export const FormBuilder = <T extends FieldValues,>({
           required={field.required}
           error={errors[field.name] as FieldError | undefined}
           disabled={field.disabled}
-          readOnly={field.readOnly}
+          readOnly={readOnly}
           className={field.className}
           validation={field.validation}
         />;
@@ -200,7 +215,7 @@ export const FormBuilder = <T extends FieldValues,>({
           required={field.required}
           error={errors[field.name] as FieldError | undefined}
           disabled={field.disabled}
-          readOnly={field.readOnly}
+          readOnly={readOnly}
           className={field.className}
           validation={field.validation}
           type={field.type === 'checkbox' ? undefined : field.type}
@@ -210,10 +225,11 @@ export const FormBuilder = <T extends FieldValues,>({
 
   return (
     <div className={`form-builder-container ${className} ${isNested ? 'nested' : ''}`}>
-      <form 
-        onSubmit={handleSubmit(handleFormSubmit)} 
-        className="form-grid-container"
-      >
+      <FormProvider {...methods}>
+        <form 
+          onSubmit={handleSubmit(handleFormSubmit)} 
+          className="form-grid-container"
+        >
         {fields.map(field => (
           !field.hidden && (
             <div key={field.name as string} className={`form-group ${field.className || ''} form-group-span-${field.span || 12}`}>
@@ -226,7 +242,8 @@ export const FormBuilder = <T extends FieldValues,>({
             </div>
           )
         ))}
-      </form>
+        </form>
+      </FormProvider>
     </div>
   );
 }

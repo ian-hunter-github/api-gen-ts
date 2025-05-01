@@ -1,5 +1,6 @@
-import { ReactNode, JSX, useState } from 'react';
+import React, { ReactNode, JSX, useState } from 'react';
 import { FieldValues } from 'react-hook-form';
+import { useApiFormContext } from '../../../../../contexts/ApiFormContext';
 import './AccordionField.css';
 
 export interface AccordionFieldProps<T extends FieldValues> {
@@ -21,6 +22,8 @@ export const AccordionField = <T extends FieldValues>({
 }: AccordionFieldProps<T>): JSX.Element => {
   const [open, setOpen] = useState(isOpen);
 
+  const { setHasChanges, setHasErrors } = useApiFormContext();
+
   return (
     <div className={`accordion-field level-${level} ${className}`} data-field-name={name}>
       <div 
@@ -34,7 +37,26 @@ export const AccordionField = <T extends FieldValues>({
       </div>
       {open && (
         <div className="accordion-content">
-          {children}
+          {React.Children.map(children, child => {
+            if (React.isValidElement<{
+              readOnly?: boolean;
+              onChange?: (event: React.ChangeEvent<HTMLElement>) => void;
+              onError?: (hasError: boolean) => void;
+            }>(child)) {
+              return React.cloneElement(child, {
+                ...child.props,
+                onChange: (event: React.ChangeEvent<HTMLElement>) => {
+                  setHasChanges(true);
+                  child.props.onChange?.(event);
+                },
+                onError: (hasError: boolean) => {
+                  setHasErrors(hasError);
+                  child.props.onError?.(hasError);
+                }
+              });
+            }
+            return child;
+          })}
         </div>
       )}
     </div>
