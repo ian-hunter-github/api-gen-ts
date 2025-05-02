@@ -223,26 +223,33 @@ export const FormBuilder = <T extends FieldValues>({
     }
   };
 
+  const formContent = (
+    <>
+      {fields.map(field => (
+        !field.hidden && (
+          <div key={field.name as string} className={`form-group ${field.className || ''} form-group-span-${field.span || 12}`}>
+            {renderInput(field, level)}
+            {errors[field.name] && (
+              <span className="error-message">
+                {errors[field.name]?.message as string}
+              </span>
+            )}
+          </div>
+        )
+      ))}
+    </>
+  );
+
   return (
     <div className={`form-builder-container ${className} ${isNested ? 'nested' : ''}`}>
       <FormProvider {...methods}>
-        <form 
-          onSubmit={handleSubmit(handleFormSubmit)} 
-          className="form-grid-container"
-        >
-        {fields.map(field => (
-          !field.hidden && (
-            <div key={field.name as string} className={`form-group ${field.className || ''} form-group-span-${field.span || 12}`}>
-              {renderInput(field, level)}
-              {errors[field.name] && (
-                <span className="error-message">
-                  {errors[field.name]?.message as string}
-                </span>
-              )}
-            </div>
-          )
-        ))}
-        </form>
+        {isNested ? (
+          formContent
+        ) : (
+          <form onSubmit={handleSubmit(handleFormSubmit)} className="form-grid-container">
+            {formContent}
+          </form>
+        )}
       </FormProvider>
     </div>
   );
