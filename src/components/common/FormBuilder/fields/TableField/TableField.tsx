@@ -1,11 +1,113 @@
-import { ReactNode, JSX, useState, useEffect, useMemo } from 'react';
-import { FieldValues } from 'react-hook-form';
+import { JSX, useState, useEffect, useMemo } from 'react';
+import { FieldValues, useFormContext, FieldError } from 'react-hook-form';
 import { useApiFormContext } from '../../../../../contexts/ApiFormContext';
 import './TableField.css';
 
 import { FieldMetadata } from '../../../../../types/metadata/types';
 import { generateUUID } from '../../../../../utils/uuid';
 import { initializeApiEntity } from '../../../../../types/defaults';
+import { FormBuilder, InputType } from '../../FormBuilder';
+import TextInput from '../TextInput/TextInput';
+import SelectInput from '../SelectInput/SelectInput';
+import CheckboxInput from '../CheckboxInput/CheckboxInput';
+import ToggleInput from '../ToggleInput/ToggleInput';
+
+const getFieldComponent = (type: string) => {
+  switch(type) {
+    case 'text':
+    case 'string':
+      return TextInput;
+    case 'number':
+      return TextInput;
+    case 'select':
+      return SelectInput;
+    case 'checkbox':
+      return CheckboxInput;
+    case 'toggle':
+      return ToggleInput;
+    case 'array':
+    case 'complex':
+    case 'object':
+      return null; // Will be handled with button
+    default:
+      return TextInput;
+  }
+};
+
+interface TableCellProps {
+  name: string;
+  type: string;
+  value: unknown;
+  onChange: (value: unknown) => void;
+  readOnly: boolean;
+  metadata?: FieldMetadata;
+}
+
+const TableCell = ({
+  name,
+  type,
+  readOnly,
+  metadata
+}: TableCellProps) => {
+  console.log(`Rendering TableCell for ${name} with type ${type}`);
+  const { register, formState: { errors } } = useFormContext();
+  const FieldComponent = getFieldComponent(type);
+  
+  console.log(`FieldComponent for ${type}:`, FieldComponent);
+  
+  if (FieldComponent === null) {
+    console.log(`No FieldComponent for ${type}, returning null`);
+    return null; // This case should be handled by the parent component
+  }
+
+  const fieldError = errors[name] as FieldError | undefined;
+  console.log(`Field error for ${name}:`, fieldError);
+  
+  const fieldProps = {
+    name,
+    register,
+    error: fieldError,
+    disabled: readOnly,
+    options: metadata?.type?.kind === 'enum' 
+      ? metadata.type.values.map(value => ({
+          value,
+          label: value,
+          disabled: false
+        }))
+      : [],
+    defaultValue: metadata?.defaultValue,
+    ...(metadata?.validation && {
+      validation: {
+        ...(metadata.validation.required && { required: 'This field is required' }),
+        ...(metadata.validation.pattern && { 
+          pattern: {
+            value: new RegExp(metadata.validation.pattern),
+            message: 'Invalid pattern'
+          }
+        }),
+        ...(metadata.validation.minLength && { 
+          minLength: {
+            value: metadata.validation.minLength,
+            message: `Minimum length is ${metadata.validation.minLength}`
+          }
+        }),
+        ...(metadata.validation.maxLength && { 
+          maxLength: {
+            value: metadata.validation.maxLength,
+            message: `Maximum length is ${metadata.validation.maxLength}`
+          }
+        })
+      }
+    })
+  };
+
+  console.log(`Field props for ${name}:`, fieldProps);
+  return (
+    <FieldComponent
+      {...fieldProps}
+    />
+  );
+};
 
 export interface TableFieldProps<T extends FieldValues> {
   name: keyof T;
@@ -38,14 +140,19 @@ export const TableField = <T extends FieldValues>({
   useEffect(() => {
   }, [readOnly, name]);
 
-  const [rows, setRows] = useState<T[keyof T][]>(data);
+  const [rows, setRows] = useState<T[keyof T][]>(data || []);
   const [prevTableErrors, setPrevTableErrors] = useState(false);
-  const [isAddingRow, setIsAddingRow] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogContent, setDialogContent] = useState<{
+    title: string;
+    value: unknown;
+    type: string;
+    onChange: (value: unknown) => void;
+  } | null>(null);
   const [newRowIds, setNewRowIds] = useState<Set<string>>(new Set());
+  const { setValue } = useFormContext();
 
   useEffect(() => {
-    if (isAddingRow) return;
-    
     const hasErrors = rows.some(row => {
       if (metadata) {
         return Object.entries(metadata).some(([key, field]) => {
@@ -63,7 +170,7 @@ export const TableField = <T extends FieldValues>({
       setHasErrors(hasErrors);
       setPrevTableErrors(hasErrors);
     }
-  }, [rows, metadata, setHasErrors, isAddingRow, newRowIds]);
+  }, [rows, metadata, setHasErrors, newRowIds, prevTableErrors]);
 
   const derivedColumns = useMemo(() => {
     const cols = metadata && metaType 
@@ -102,21 +209,37 @@ export const TableField = <T extends FieldValues>({
     }
   }, [rows, derivedColumns]);
 
-  if (!derivedColumns.length) {
-    throw new Error('TableField requires either columns or metadata prop');
+  if (!derivedColumns?.length) {
+    return <div className="table-field-error">No columns defined for table</div>;
   }
 
   const handleAddRow = () => {
     if (readOnly) return;
     
+    console.log('Adding new row with metaType:', metaType);
     let newRow: T[keyof T];
     if (metaType === 'ApiEntity') {
-      newRow = initializeApiEntity() as T[keyof T];
-      derivedColumns.forEach(column => {
-        if (column.type === 'string' && !newRow[column.key] && metadata?.[column.key]?.defaultValue) {
-          (newRow as Record<string, string>)[column.key] = metadata[column.key].defaultValue as string;
-        }
-      });
+      const baseEntity = initializeApiEntity();
+      console.log('Base ApiEntity structure:', baseEntity);
+      newRow = { 
+        ...baseEntity as T[keyof T],
+        id: generateUUID(),
+        // Ensure all required fields have values
+        ...(derivedColumns.reduce((acc, column) => {
+          const baseEntityRecord = baseEntity as unknown as Record<string, unknown>;
+          if (metadata?.[column.key]?.validation?.required && 
+              !baseEntityRecord[column.key]) {
+            (acc as Record<string, unknown>)[column.key] = 
+              metadata[column.key]?.defaultValue ?? 
+              (column.type === 'number' ? 0 : 
+               column.type === 'boolean' ? false : 
+               column.type === 'array' ? [] : 
+               column.type === 'complex' ? {} : '');
+          }
+          return acc;
+        }, {} as Record<string, unknown>))
+      };
+      console.log('New row after processing columns:', newRow);
     } else {
       newRow = derivedColumns.reduce((acc, column) => {
         if (metadata?.[column.key]?.defaultValue !== undefined) {
@@ -134,27 +257,16 @@ export const TableField = <T extends FieldValues>({
         }
         return acc;
       }, {} as T[keyof T]);
+      newRow = { ...newRow, id: generateUUID() };
     }
 
-    const rowWithId = { ...newRow, id: generateUUID() };
+    const updatedRows = [...rows, newRow];
+    setRows(updatedRows);
+    setNewRowIds(prev => new Set(prev).add(newRow.id));
     
-    setIsAddingRow(true);
-    try {
-      const updatedRows = [...rows, rowWithId];
-      setRows(updatedRows);
-      setNewRowIds(prev => new Set(prev).add(rowWithId.id));
-      setHasChanges(true);
-    } catch (error) {
-      console.error('Error adding row:', error);
-      throw error;
-    } finally {
-      setIsAddingRow(false);
-      setNewRowIds(prev => {
-        const updated = new Set(prev);
-        updated.delete(rowWithId.id);
-        return updated;
-      });
-    }
+    // Update form state
+    setValue(name as string, updatedRows, { shouldDirty: true });
+    setHasChanges(true);
   };
 
   return (
@@ -207,25 +319,7 @@ export const TableField = <T extends FieldValues>({
                       padding: '8px'
                     }}
                   >
-                    {column.type === 'boolean' ? (
-                      <input 
-                        type="checkbox"
-                        checked={!!(row as Record<string, boolean>)[column.key]}
-                        onChange={(e) => {
-                          if (!readOnly) {
-                            const updatedRows = [...rows];
-                            (updatedRows[rowIndex] as Record<string, boolean>)[column.key] = e.target.checked;
-                            setRows(updatedRows);
-                            setHasChanges(true);
-                          }
-                        }}
-                        disabled={readOnly}
-                        style={{
-                          cursor: readOnly ? 'not-allowed' : 'pointer',
-                          opacity: readOnly ? 0.6 : 1
-                        }}
-                      />
-                    ) : column.type === 'complex' ? (
+                    {getFieldComponent(column.type) === null ? (
                       <button
                         disabled={readOnly}
                         style={{
@@ -236,47 +330,41 @@ export const TableField = <T extends FieldValues>({
                           cursor: readOnly ? 'not-allowed' : 'pointer',
                           opacity: readOnly ? 0.6 : 1
                         }}
-                      >
-                        {readOnly ? 'View' : 'Edit'} {column.label}
-                      </button>
-                    ) : column.type === 'array' ? (
-                      <button
-                        disabled={readOnly}
-                        style={{
-                          padding: '4px 8px',
-                          backgroundColor: '#f0f0f0',
-                          border: '1px solid #ccc',
-                          borderRadius: '4px',
-                          cursor: readOnly ? 'not-allowed' : 'pointer',
-                          opacity: readOnly ? 0.6 : 1
+                        onClick={() => {
+                          if (readOnly) return;
+                          const nestedValue = (row as Record<string, unknown>)[column.key];
+                          setDialogContent({
+                            title: column.label,
+                            value: nestedValue,
+                            type: column.type,
+                            onChange: (value: unknown) => {
+                              const updatedRows = [...rows];
+                              (updatedRows[rowIndex] as Record<string, unknown>)[column.key] = value;
+                              setRows(updatedRows);
+                              setHasChanges(true);
+                            }
+                          });
+                          setDialogOpen(true);
                         }}
                       >
-                        View {column.label} ({((row as Record<string, unknown[]>)[column.key] as unknown[] || []).length})
+                        {column.label}...
                       </button>
-                    ) : column.type === 'string' ? (
-                      <input
-                        type="text"
-                        value={(row as Record<string, string>)[column.key] ?? ''}
-                        onChange={(e) => {
-                          if (!readOnly) {
-                            const updatedRows = [...rows];
-                            (updatedRows[rowIndex] as Record<string, string>)[column.key] = e.target.value;
-                            setRows(updatedRows);
-                            setHasChanges(true);
-                          }
-                        }}
-                        disabled={readOnly}
-                        style={{
-                          width: '100%',
-                          padding: '4px',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                          cursor: readOnly ? 'not-allowed' : 'text',
-                          opacity: readOnly ? 0.6 : 1
-                        }}
-                      />
                     ) : (
-                      (row as Record<string, ReactNode>)[column.key] ?? ''
+                      <TableCell
+                      name={`${String(name)}.${rowIndex}.${column.key}`}
+                      type={column.type}
+                      value={(row as Record<string, unknown>)[column.key]}
+                      onChange={(value: unknown) => {
+                        if (!readOnly) {
+                          const updatedRows = [...rows];
+                          (updatedRows[rowIndex] as Record<string, unknown>)[column.key] = value;
+                          setRows(updatedRows);
+                          setHasChanges(true);
+                        }
+                      }}
+                      readOnly={readOnly}
+                      metadata={metadata?.[column.key]}
+                    />
                     )}
                   </td>
                 ))}
@@ -303,6 +391,80 @@ export const TableField = <T extends FieldValues>({
       >
         + Add Row
       </button>
+
+      {dialogOpen && dialogContent && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '80%',
+            maxWidth: '800px',
+            maxHeight: '80vh',
+            overflow: 'auto'
+          }}>
+            <h3>{dialogContent.title}</h3>
+            <FormBuilder
+              fields={[{
+                name: 'nestedValue',
+                label: dialogContent.title,
+                type: dialogContent.type as InputType,
+                defaultValue: dialogContent.value,
+                ...(metadata?.[dialogContent.title.toLowerCase()]?.validation && {
+                  validation: {
+                    ...(metadata[dialogContent.title.toLowerCase()].validation?.required && { 
+                      required: metadata[dialogContent.title.toLowerCase()].validation?.required 
+                    }),
+                    ...(metadata[dialogContent.title.toLowerCase()].validation?.pattern && { 
+                      pattern: { 
+                        value: new RegExp(metadata[dialogContent.title.toLowerCase()].validation?.pattern || ''),
+                        message: 'Invalid pattern'
+                      }
+                    }),
+                    ...(metadata[dialogContent.title.toLowerCase()].validation?.minLength && { 
+                      minLength: metadata[dialogContent.title.toLowerCase()].validation?.minLength 
+                    }),
+                    ...(metadata[dialogContent.title.toLowerCase()].validation?.maxLength && { 
+                      maxLength: metadata[dialogContent.title.toLowerCase()].validation?.maxLength 
+                    })
+                  }
+                })
+              }]}
+              initialValues={{ nestedValue: dialogContent.value }}
+              onSubmit={(values: { nestedValue: unknown }) => {
+                dialogContent.onChange(values.nestedValue);
+                setDialogOpen(false);
+              }}
+              isNested={true}
+            />
+            <button 
+              onClick={() => setDialogOpen(false)}
+              style={{
+                marginTop: '16px',
+                padding: '8px 16px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
