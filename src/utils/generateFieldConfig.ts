@@ -95,14 +95,51 @@ function generateFieldConfig(
             config.type = 'select';
             break;
           case 'array':
+            // Handle type-specific behavior
             if (fieldMeta.type.itemType.kind === 'primitive') {
               config.type = fieldTypeMap[fieldMeta.type.itemType.type] || 'text';
             } else if (fieldMeta.type.itemType.kind === 'complex') {
-              config.type = 'table';
-              if (fieldMeta.type.itemType.kind === 'complex') {
+              console.debug('Found complex type for field:', fieldName);
+              console.debug('Field meta:', fieldMeta);
+              
+              // Default to table for complex types unless component is specified
+              config.type = fieldMeta.component ? 
+                fieldMeta.component as InputType : 
+                'table';
+
+              // Handle complex type metadata
+                console.debug('Processing complex type metadata for:', fieldMeta.type.itemType.type);
                 const typeName = fieldMeta.type.itemType.type;
-                const typeMetadataKey = `${typeName}Metadata`;
-                const typeMetadata = MetadataRegistry[typeMetadataKey as keyof typeof MetadataRegistry];
+                let typeMetadata;
+                
+                console.debug('Available metadata keys:', Object.keys(MetadataRegistry));
+                
+                // First try to get metadata using meta property if it exists
+                if (fieldMeta.type.itemType.meta) {
+                  const metaKey = fieldMeta.type.itemType.meta as keyof typeof MetadataRegistry;
+                  console.debug(`Looking up metadata by meta key: ${metaKey}`);
+                  typeMetadata = MetadataRegistry[metaKey];
+                  console.debug(`Found metadata:`, typeMetadata);
+                }
+                
+                // If still not found, try to get by type name
+                if (!typeMetadata) {
+                  const typeMetadataKey = `${typeName}Metadata` as keyof typeof MetadataRegistry;
+                  console.debug(`Looking up metadata by type key: ${typeMetadataKey}`);
+                  typeMetadata = MetadataRegistry[typeMetadataKey];
+                  console.debug(`Found metadata:`, typeMetadata);
+                }
+                
+                // Special case for EntityAttribute if still not found
+                if (!typeMetadata && typeName === 'EntityAttribute') {
+                  typeMetadata = MetadataRegistry.EntityAttributeMetadata;
+                  console.debug(`Found EntityAttribute metadata:`, typeMetadata);
+                }
+
+                if (!typeMetadata) {
+                  console.error(`Failed to find metadata for type: ${typeName}`);
+                  throw new Error(`No metadata found for type: ${typeName}`);
+                }
                 
                 if (!typeMetadata) {
                   return {
@@ -146,14 +183,17 @@ function generateFieldConfig(
                     
                     return {
                       key,
-                      label: key.charAt(0).toUpperCase() + key.slice(1),
+                      label: metaObj.displayName || key.charAt(0).toUpperCase() + key.slice(1),
                       type: metaObj.isArray ? 'array' : typeValue,
                       width: typeof likelyWidthChars === 'number' ? `${likelyWidthChars * 8}px` : undefined,
-                      readOnly
+                      readOnly,
+                      validation: metaObj.validation,
+                      defaultValue: metaObj.defaultValue,
+                      options: typeInfo && typeof typeInfo === 'object' && 'kind' in typeInfo && typeInfo.kind === 'enum' ? 
+                        typeInfo.values?.map((v: string) => ({ value: v, label: v })) : undefined
                     };
                   });
                 }
-              }
             }
             config.isArray = true;
             break;

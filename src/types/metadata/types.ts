@@ -6,7 +6,7 @@ export type FieldType =
   | { kind: 'primitive', type: 'string' | 'number' | 'boolean' | 'date' | 'datetime' }
   | { kind: 'array', itemType: FieldType, meta?: string }
   | { kind: 'enum', values: string[] }
-  | { kind: 'complex', type: 'DeploymentConfig' | 'ApiEntity' | 'ApiConfig' | 'ApiSecurity' | 'AwsConfig' | 'AzureConfig' | 'GcpConfig' | 'DockerConfig' | 'ScalingConfig' | 'MonitoringConfig' | 'AuthenticationConfig' | 'AuthorizationConfig' | 'CorsConfig' | 'JwtConfig' | 'OAuth2Config' | 'ApiKeyConfig' | 'PolicyCondition' | 'SecurityRole' | 'SecurityPolicy' | 'MonitoringAlert' | 'EntityAttribute' | 'EntityRelationship' | 'EntityEndpoint' | 'OAuth2Scopes', meta?: string }
+  | { kind: 'complex', type: 'DeploymentConfig' | 'ApiEntity' | 'ApiConfig' | 'ApiSecurity' | 'AwsConfig' | 'AzureConfig' | 'GcpConfig' | 'DockerConfig' | 'ScalingConfig' | 'MonitoringConfig' | 'AuthenticationConfig' | 'AuthorizationConfig' | 'CorsConfig' | 'JwtConfig' | 'OAuth2Config' | 'ApiKeyConfig' | 'PolicyCondition' | 'SecurityRole' | 'SecurityPolicy' | 'MonitoringAlert' | 'EntityAttribute' | 'EntityRelationship' | 'EntityEndpoint' | 'OAuth2Scopes', meta?: string, fields?: Record<string, FieldMetadata> }
   ;
 
 export interface FieldValidation {

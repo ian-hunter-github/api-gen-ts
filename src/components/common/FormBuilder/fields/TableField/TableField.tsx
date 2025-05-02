@@ -415,53 +415,82 @@ export const TableField = <T extends FieldValues>({
             overflow: 'auto'
           }}>
             <h3>{dialogContent.title}</h3>
-            <FormBuilder
-              fields={[{
-                name: 'nestedValue',
-                label: dialogContent.title,
-                type: dialogContent.type as InputType,
-                defaultValue: dialogContent.value,
-                ...(metadata?.[dialogContent.title.toLowerCase()]?.validation && {
-                  validation: {
-                    ...(metadata[dialogContent.title.toLowerCase()].validation?.required && { 
-                      required: metadata[dialogContent.title.toLowerCase()].validation?.required 
-                    }),
-                    ...(metadata[dialogContent.title.toLowerCase()].validation?.pattern && { 
-                      pattern: { 
-                        value: new RegExp(metadata[dialogContent.title.toLowerCase()].validation?.pattern || ''),
-                        message: 'Invalid pattern'
+            {dialogContent.type === 'EntityAttribute' ? (
+              <div>
+                <TableField
+                  name="nestedValue"
+                  label={dialogContent.title}
+                  data={Array.isArray(dialogContent.value) ? dialogContent.value : []}
+                  metaType="EntityAttribute"
+                  metadata={metadata?.[dialogContent.title.toLowerCase()]?.type?.fields}
+                  level={level + 1}
+                />
+                <button 
+                  onClick={() => setDialogOpen(false)}
+                  style={{
+                    marginTop: '16px',
+                    padding: '8px 16px',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <div>
+                <FormBuilder
+                  fields={[{
+                    name: 'nestedValue',
+                    label: dialogContent.title,
+                    type: dialogContent.type as InputType,
+                    defaultValue: dialogContent.value,
+                    ...(metadata?.[dialogContent.title.toLowerCase()]?.validation && {
+                      validation: {
+                        ...(metadata[dialogContent.title.toLowerCase()].validation?.required && { 
+                          required: metadata[dialogContent.title.toLowerCase()].validation?.required 
+                        }),
+                        ...(metadata[dialogContent.title.toLowerCase()].validation?.pattern && { 
+                          pattern: { 
+                            value: new RegExp(metadata[dialogContent.title.toLowerCase()].validation?.pattern || ''),
+                            message: 'Invalid pattern'
+                          }
+                        }),
+                        ...(metadata[dialogContent.title.toLowerCase()].validation?.minLength && { 
+                          minLength: metadata[dialogContent.title.toLowerCase()].validation?.minLength 
+                        }),
+                        ...(metadata[dialogContent.title.toLowerCase()].validation?.maxLength && { 
+                          maxLength: metadata[dialogContent.title.toLowerCase()].validation?.maxLength 
+                        })
                       }
-                    }),
-                    ...(metadata[dialogContent.title.toLowerCase()].validation?.minLength && { 
-                      minLength: metadata[dialogContent.title.toLowerCase()].validation?.minLength 
-                    }),
-                    ...(metadata[dialogContent.title.toLowerCase()].validation?.maxLength && { 
-                      maxLength: metadata[dialogContent.title.toLowerCase()].validation?.maxLength 
                     })
-                  }
-                })
-              }]}
-              initialValues={{ nestedValue: dialogContent.value }}
-              onSubmit={(values: { nestedValue: unknown }) => {
-                dialogContent.onChange(values.nestedValue);
-                setDialogOpen(false);
-              }}
-              isNested={true}
-            />
-            <button 
-              onClick={() => setDialogOpen(false)}
-              style={{
-                marginTop: '16px',
-                padding: '8px 16px',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Close
-            </button>
+                  }]}
+                  initialValues={{ nestedValue: dialogContent.value }}
+                  onSubmit={(values: { nestedValue: unknown }) => {
+                    dialogContent.onChange(values.nestedValue);
+                    setDialogOpen(false);
+                  }}
+                  isNested={true}
+                />
+                <button 
+                  onClick={() => setDialogOpen(false)}
+                  style={{
+                    marginTop: '16px',
+                    padding: '8px 16px',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

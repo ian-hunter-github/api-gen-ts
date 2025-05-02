@@ -68,3 +68,21 @@ export function initializeType<T>(
     ...overrides
   };
 }
+
+export function getDefaultEntityAttribute() {
+  return {
+    name: '',
+    description: '',
+    type: 'string',
+    required: false,
+    defaultValue: ''
+  };
+}
+
+export function initializeEntityAttribute(overrides = {}) {
+  return {
+    ...getDefaultEntityAttribute(),
+    id: generateUUID(),
+    ...overrides
+  };
+}

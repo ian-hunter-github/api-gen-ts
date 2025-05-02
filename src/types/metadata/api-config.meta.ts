@@ -112,7 +112,8 @@ export const ApiConfigMetadata: Record<string, FieldMetadata> = {
         meta: 'ApiEntityMetadata'
       } 
     },
-    component: 'accordion'
+    isArray: true,
+    component: 'table'
   },
   deployment: {
     type: { kind: 'complex', type: 'DeploymentConfig' },
@@ -489,6 +490,32 @@ export const PolicyConditionMetadata: Record<string, FieldMetadata> = {
   }
 };
 
+export const EntityAttributeMetadata: Record<string, FieldMetadata> = {
+  name: {
+    type: { kind: 'primitive', type: 'string' },
+    validation: { required: true },
+    likelyWidthChars: 20
+  },
+  description: {
+    type: { kind: 'primitive', type: 'string' },
+    likelyWidthChars: 50
+  },
+  type: {
+    type: { kind: 'enum', values: ['string', 'number', 'boolean', 'date', 'datetime'] },
+    validation: { required: true },
+    likelyWidthChars: 10
+  },
+  required: {
+    type: { kind: 'primitive', type: 'boolean' },
+    defaultValue: false,
+    likelyWidthChars: 8
+  },
+  defaultValue: {
+    type: { kind: 'primitive', type: 'string' },
+    likelyWidthChars: 15
+  }
+};
+
 // Centralized metadata registry
 export const MetadataRegistry = {
   ApiConfigMetadata,
@@ -514,5 +541,6 @@ export const MetadataRegistry = {
   SecurityRoleMetadata,
   SecurityPolicyMetadata,
   PolicyConditionMetadata,
+  EntityAttributeMetadata,
   DeploymentConfigMetadata
 };
