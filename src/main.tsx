@@ -7,7 +7,6 @@ import { ThemeProvider } from './contexts/ThemeContext'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
-      <h1>New App!</h1>
       <AppNew />
     </ThemeProvider>
   </StrictMode>,

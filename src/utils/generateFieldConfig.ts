@@ -9,13 +9,20 @@ type FieldTypeMap = {
 };
 
 const fieldTypeMap: FieldTypeMap = {
-  'string': 'text',
-  'number': 'number',
-  'boolean': 'checkbox',
-  'enum': 'select',
-  'textarea': 'text',
-  'datetime': 'datetime',
-  'date': 'date'
+  // Primitive types
+  'string': 'text',        // Maps to TextInput component
+  'number': 'number',      // Maps to NumberInput component
+  'boolean': 'checkbox',   // Maps to CheckboxInput component
+  'enum': 'select',        // Maps to SelectInput component
+  
+  // Special input types
+  'textarea': 'textarea',  // Maps to TextArea component
+  'datetime': 'datetime',  // Maps to DateTimeInput component
+  'date': 'date',          // Maps to DateInput component
+  
+  // Complex types
+  'array': 'table',        // Maps to TableField component for array data
+  'object': 'table'        // Maps to TableField component for object data
 };
 
 interface FieldMeta {
@@ -126,17 +133,21 @@ function generateFieldConfig(
                       typeValue = typeInfo;
                     } else if (typeof typeInfo === 'object' && typeInfo !== null) {
                       const typeObj = typeInfo as Record<string, unknown>;
-                      if (typeObj.kind === 'primitive' && typeof typeObj.type === 'string') {
+                      if (typeObj.kind === 'array') {
+                        typeValue = 'array';
+                      } else if (typeObj.kind === 'primitive' && typeof typeObj.type === 'string') {
                         typeValue = typeObj.type;
                       } else if (typeObj.kind === 'enum') {
                         typeValue = 'string';
+                      } else if (typeObj.kind === 'complex') {
+                        typeValue = 'complex';
                       }
                     }
                     
                     return {
                       key,
                       label: key.charAt(0).toUpperCase() + key.slice(1),
-                      type: typeValue,
+                      type: metaObj.isArray ? 'array' : typeValue,
                       width: typeof likelyWidthChars === 'number' ? `${likelyWidthChars * 8}px` : undefined,
                       readOnly
                     };

@@ -13,17 +13,11 @@ export const ApiConfigFormPanel: React.FC<ApiConfigFormPanelProps> = ({
   config,
   onSubmit,
 }) => {
-  console.debug('ApiConfigFormPanel mounting');
   const {readOnly} = useApiFormContext();
 
   React.useEffect(() => {
-    console.debug('ApiConfigFormPanel: FormContext readOnly:', readOnly);
   }, [readOnly]);
 
-  console.debug("ApiConfigFormPanel received props:", {
-    config,
-    onSubmit,
-  });
 
   const methods = useForm({
     defaultValues: config,

@@ -19,18 +19,15 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
   onSave,
   allConfigs
 }) => {
-  console.debug('ApiConfigEditor mounting');
   const {readOnly, setReadOnly} = useApiFormContext();
   const [config, setConfig] = useState<ApiConfig>(initialConfig);
   const showJsonEditor = true;
 
   React.useEffect(() => {
-    console.debug('ApiConfigEditor: FormContext readOnly changed to:', readOnly);
     setReadOnly(false, 'ApiConfigEditor mount');
   }, []);
 
   React.useEffect(() => {
-    console.debug('ApiConfigEditor: FormContext readOnly changed to:', readOnly);
   }, [readOnly]);
 
   const validateConfig = useCallback((currentConfig: ApiConfig) => {
@@ -51,9 +48,7 @@ export const ApiConfigEditor: React.FC<ApiConfigEditorProps> = ({
 
   // const handleEditToggle = () => {
   //   const newReadOnly = !readOnly;
-  //   console.log('Toggling readOnly from', readOnly, 'to', newReadOnly);
   //   setReadOnly(newReadOnly);
-  //   console.log('After setReadOnly, context readOnly is now:', newReadOnly);
   // };
 
   return (
