@@ -1,5 +1,5 @@
 import { JSX, useState, useEffect, useMemo } from 'react';
-import { FieldValues, useFormContext, FieldError } from 'react-hook-form';
+import { FieldValues, useFormContext } from 'react-hook-form';
 import { useApiFormContext } from '../../../../../contexts/ApiFormContext';
 import './TableField.css';
 
@@ -11,6 +11,8 @@ import TextInput from '../TextInput/TextInput';
 import SelectInput from '../SelectInput/SelectInput';
 import CheckboxInput from '../CheckboxInput/CheckboxInput';
 import ToggleInput from '../ToggleInput/ToggleInput';
+
+import { TableCell } from './TableCell';
 
 const getFieldComponent = (type: string) => {
   switch(type) {
@@ -34,80 +36,6 @@ const getFieldComponent = (type: string) => {
   }
 };
 
-interface TableCellProps {
-  name: string;
-  type: string;
-  value: unknown;
-  onChange: (value: unknown) => void;
-  readOnly: boolean;
-  metadata?: FieldMetadata;
-}
-
-const TableCell = ({
-  name,
-  type,
-  readOnly,
-  metadata
-}: TableCellProps) => {
-  console.log(`Rendering TableCell for ${name} with type ${type}`);
-  const { register, formState: { errors } } = useFormContext();
-  const FieldComponent = getFieldComponent(type);
-  
-  console.log(`FieldComponent for ${type}:`, FieldComponent);
-  
-  if (FieldComponent === null) {
-    console.log(`No FieldComponent for ${type}, returning null`);
-    return null; // This case should be handled by the parent component
-  }
-
-  const fieldError = errors[name] as FieldError | undefined;
-  console.log(`Field error for ${name}:`, fieldError);
-  
-  const fieldProps = {
-    name,
-    register,
-    error: fieldError,
-    disabled: readOnly,
-    options: metadata?.type?.kind === 'enum' 
-      ? metadata.type.values.map(value => ({
-          value,
-          label: value,
-          disabled: false
-        }))
-      : [],
-    defaultValue: metadata?.defaultValue,
-    ...(metadata?.validation && {
-      validation: {
-        ...(metadata.validation.required && { required: 'This field is required' }),
-        ...(metadata.validation.pattern && { 
-          pattern: {
-            value: new RegExp(metadata.validation.pattern),
-            message: 'Invalid pattern'
-          }
-        }),
-        ...(metadata.validation.minLength && { 
-          minLength: {
-            value: metadata.validation.minLength,
-            message: `Minimum length is ${metadata.validation.minLength}`
-          }
-        }),
-        ...(metadata.validation.maxLength && { 
-          maxLength: {
-            value: metadata.validation.maxLength,
-            message: `Maximum length is ${metadata.validation.maxLength}`
-          }
-        })
-      }
-    })
-  };
-
-  console.log(`Field props for ${name}:`, fieldProps);
-  return (
-    <FieldComponent
-      {...fieldProps}
-    />
-  );
-};
 
 export interface TableFieldProps<T extends FieldValues> {
   name: keyof T;
