@@ -5,7 +5,7 @@ import './TableField.css';
 
 import { FieldMetadata } from '../../../../../types/metadata/types';
 import { generateUUID } from '../../../../../utils/uuid';
-import { initializeApiEntity } from '../../../../../types/defaults';
+import type * as Defaults from '../../../../../types/defaults';
 import { FormBuilder, InputType } from '../../FormBuilder';
 import TextInput from '../TextInput/TextInput';
 import SelectInput from '../SelectInput/SelectInput';
@@ -213,14 +213,19 @@ export const TableField = <T extends FieldValues>({
     return <div className="table-field-error">No columns defined for table</div>;
   }
 
-  const handleAddRow = () => {
+  const handleAddRow = async () => {
     if (readOnly) return;
     
     console.log('Adding new row with metaType:', metaType);
     let newRow: T[keyof T];
-    if (metaType === 'ApiEntity') {
-      const baseEntity = initializeApiEntity();
-      console.log('Base ApiEntity structure:', baseEntity);
+    if (metaType) {
+      const initializeFn = `initialize${metaType}` as keyof typeof Defaults;
+      const defaults = await import('../../../../../types/defaults');
+      if (!defaults[initializeFn]) {
+        throw new Error(`Initializer function ${initializeFn} not found in defaults.ts`);
+      }
+      const baseEntity = defaults[initializeFn](() => ({}), metadata ? metadata as Partial<object> : {});
+      console.log(`Base ${metaType} structure:`, baseEntity);
       newRow = { 
         ...baseEntity as T[keyof T],
         id: generateUUID(),
@@ -415,32 +420,6 @@ export const TableField = <T extends FieldValues>({
             overflow: 'auto'
           }}>
             <h3>{dialogContent.title}</h3>
-            {dialogContent.type === 'EntityAttribute' ? (
-              <div>
-                <TableField
-                  name="nestedValue"
-                  label={dialogContent.title}
-                  data={Array.isArray(dialogContent.value) ? dialogContent.value : []}
-                  metaType="EntityAttribute"
-                  metadata={metadata?.[dialogContent.title.toLowerCase()]?.type?.fields}
-                  level={level + 1}
-                />
-                <button 
-                  onClick={() => setDialogOpen(false)}
-                  style={{
-                    marginTop: '16px',
-                    padding: '8px 16px',
-                    backgroundColor: '#4CAF50',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Close
-                </button>
-              </div>
-            ) : (
               <div>
                 <FormBuilder
                   fields={[{
@@ -490,7 +469,7 @@ export const TableField = <T extends FieldValues>({
                   Close
                 </button>
               </div>
-            )}
+            )
           </div>
         </div>
       )}
